@@ -1,0 +1,11 @@
+{
+    "name": "FcmCommun",
+    "alias": "fcmcommun",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\FcmCommun\\Providers\\FcmCommunServiceProvider"
+    ],
+    "files": []
+}
