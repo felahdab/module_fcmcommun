@@ -15,5 +15,5 @@ use Modules\FcmCommun\Http\Controllers\FcmCommunController;
 */
 
 Route::group([], function () {
-    Route::resource('fcmcommun', FcmCommunController::class)->names('fcmcommun');
+    //Route::resource('fcmcommun', FcmCommunController::class)->names('fcmcommun');
 });

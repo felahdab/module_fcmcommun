@@ -15,5 +15,5 @@ use Modules\FcmCommun\Http\Controllers\FcmCommunController;
 */
 
 Route::middleware(['auth:sanctum'])->prefix('v1')->group(function () {
-    Route::apiResource('fcmcommun', FcmCommunController::class)->names('fcmcommun');
+    //Route::apiResource('fcmcommun', FcmCommunController::class)->names('fcmcommun');
 });
