@@ -8,9 +8,12 @@ use Illuminate\Database\Eloquent\Model;
 use Modules\FcmCommun\DataObjects\UserGeneratedEvent;
 use Modules\FcmCommun\DataObjects\RemoteGeneratedEvent;
 
+use Modules\FcmCommun\Traits\HasTablePrefix;
+
 class StoredEvent extends Model
 {
     use HasFactory;
+    use HasTablePrefix;
 
     protected $fillable = [
         'event_uuid',

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('stored_events', function (Blueprint $table) {
+        Schema::create('fcmcommun_stored_events', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid');
             $table->string('event_type');
@@ -31,6 +31,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('stored_events');
+        Schema::dropIfExists('fcmcommun_stored_events');
     }
 };
