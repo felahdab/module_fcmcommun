@@ -7,15 +7,11 @@ namespace Modules\FcmCommun\DataObjects;
 use Spatie\LaravelData\Data;
 use Illuminate\Support\Collection;
 
-use Modules\FcmCommun\DataObjects\SousObjectifDto;
-
 class ObjectifDto extends Data
 {
+    public string $id;
+    public string $libelle_long;
+    public string $libelle_court;
     
-    public string $objectif_libcourt;
-    public string $objectif_liblong;
-    
-    /** @var Collection<int, SousObjectifDto> */
-    public Collection $sous_objectifs;
     
 }

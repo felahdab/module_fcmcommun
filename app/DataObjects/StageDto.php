@@ -8,8 +8,7 @@ use Spatie\LaravelData\Data;
 
 class StageDto extends Data
 {
-    public function __construct(
-        public string $stage_libcourt,
-        public string $stage_liblong
-    ) {}
+    public string $id;
+    public string $libelle_court;  
+    public string $libelle_long;
 }

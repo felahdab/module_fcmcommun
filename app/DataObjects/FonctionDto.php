@@ -7,19 +7,15 @@ namespace Modules\FcmCommun\DataObjects;
 use Spatie\LaravelData\Data;
 use Illuminate\Support\Collection;
 
-use Modules\FcmCommun\DataObjects\StageDto;
-use Modules\FcmCommun\DataObjects\CompagnonageDto;
+use Modules\FcmCommun\DataObjects\CompetenceDto;
 
 class FonctionDto extends Data
 {
-    
-    public string $fonction_libcourt;
-    public string $fonction_liblong;
+    public string $id;
+    public string $libelle_long;
+    public string $libelle_court;
 
-    /** @var Collection<int, StageDto> */
-    public Collection $stages;
-
-    /** @var Collection<int, CompagnonageDto> */
-    public Collection $compagnonages;
+    /** @var Collection<int, CompetenceDto> */
+    public Collection $competences;
     
 }
