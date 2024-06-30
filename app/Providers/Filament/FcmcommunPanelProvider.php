@@ -30,8 +30,8 @@ class FcmcommunPanelProvider extends PanelProvider
             ->colors([
                 'primary' => Color::Teal,
             ])
-            ->discoverResources(in: module_path($this->module, 'Filament/Fcmcommun/Resources'), for: "$moduleNamespace\\Filament\\Fcmcommun\\Resources")
-            ->discoverPages(in: module_path($this->module, 'Filament/Fcmcommun/Pages'), for: "$moduleNamespace\\Filament\\Fcmcommun\\Pages")
+            ->discoverResources(in: module_path($this->module, 'app/Filament/Fcmcommun/Resources'), for: "$moduleNamespace\\Filament\\Fcmcommun\\Resources")
+            ->discoverPages(in: module_path($this->module, 'app/Filament/Fcmcommun/Pages'), for: "$moduleNamespace\\Filament\\Fcmcommun\\Pages")
             ->pages([
                 Pages\Dashboard::class,
             ])
