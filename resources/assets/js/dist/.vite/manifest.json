@@ -1,0 +1,8 @@
+{
+  "resources/assets/js/src/LivretDeTransformation/index.js": {
+    "file": "livret-de-transformation.js",
+    "name": "index",
+    "src": "resources/assets/js/src/LivretDeTransformation/index.js",
+    "isEntry": true
+  }
+}

@@ -21,6 +21,8 @@ class FcmCommunServiceProvider extends ServiceProvider
         $this->registerTranslations();
         $this->registerConfig();
         $this->registerViews();
+        $this->registerAssets();
+        
         $this->loadMigrationsFrom(module_path($this->moduleName, 'database/migrations'));
     }
 
@@ -74,6 +76,14 @@ class FcmCommunServiceProvider extends ServiceProvider
     {
         $this->publishes([module_path($this->moduleName, 'config/config.php') => config_path($this->moduleNameLower.'.php')], 'config');
         $this->mergeConfigFrom(module_path($this->moduleName, 'config/config.php'), $this->moduleNameLower);
+    }
+
+    /**
+     * Register js assets.
+     */
+    protected function registerAssets(): void
+    {
+        $this->publishes([module_path($this->moduleName, 'resources/assets/js/dist/livret-de-transformation.js') => base_path('public/assets/modules/' . $this->moduleNameLower.'/livret-de-transformation.js')], 'fcmcommun-module-assets');
     }
 
     /**

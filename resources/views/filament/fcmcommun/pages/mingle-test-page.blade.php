@@ -1,4 +1,4 @@
 <x-filament-panels::page>
     <div> Test </div>
-    @livewire('fcmcommun::test-mingle')
+    @livewire('fcmcommun::livret-de-transformation')
 </x-filament-panels::page>
