@@ -12,8 +12,8 @@ console.log( __dirname + '/resources/assets/js/LivretDeTransformation/index.js')
 
 export default defineConfig({
     build: {
-        //outDir: '../../public/assets/modules/fcmcommun',
-        outDir: 'resources/assets/js/dist/',
+        outDir: '../../public/assets/modules/fcmcommun',   // Configuration adaptée pour le dev: pas besoin de publier les assets
+        //outDir: 'resources/assets/js/dist/',   // Configuration de production: les assets sont buildes dans le module et doivent être publiés
         emptyOutDir: true,
         manifest: true,
         rollupOptions: {

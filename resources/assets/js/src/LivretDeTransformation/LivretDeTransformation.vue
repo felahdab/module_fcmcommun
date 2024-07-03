@@ -32,7 +32,24 @@
       />
     </p>
   
-    <Treeview :config="config" :nodes="nodes"> </Treeview>
+    <Treeview 
+        :config="config" 
+        :nodes="nodes"
+        @nodeOpened="console.log(`node-opened`)"
+        @nodeClosed="console.log('node-closed')"
+        @nodeFocus="console.log('node-focus')"
+        @nodeToggle="console.log('node-toggle')"
+        @nodeBlur="console.log('node-blur')"
+        @nodeEdit="console.log('node-edit')"
+        @nodeChecked="console.log('node-checked')"
+        @nodeUnchecked="console.log('node-unchecked')"
+        @nodeDragstart="console.log('node-dragstart')"
+        @nodeDragenter="console.log('node-dragenter')"
+        @nodeDragleave="console.log('node-dragleave')"
+        @nodeDragend="console.log('node-dragend')"
+        @nodeOver="console.log('node-over')"
+        @nodeDrop="console.log('node-drop')"> 
+    </Treeview>
   </template>
   
 
@@ -50,13 +67,13 @@
 
   const config = ref({
         roots: ["id1", "id2"],
-        keyboardNavigation: false,
+        keyboardNavigation: true,
         dragAndDrop: false,
-        checkboxes: false,
+        checkboxes: true,
         editable: false,
         disabled: false,
         padding: 25,
-        checkMode : 1 // 0: répercute l'activation des checkboxes vers les enfants. 1: ne répercute pas.
+        checkMode : 0 // 0: répercute l'activation des checkboxes vers les enfants. 1: ne répercute pas.
       });
 
   const nodes = ref( {
