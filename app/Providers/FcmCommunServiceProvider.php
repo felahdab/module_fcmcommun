@@ -84,6 +84,7 @@ class FcmCommunServiceProvider extends ServiceProvider
     protected function registerAssets(): void
     {
         $this->publishes([module_path($this->moduleName, 'resources/assets/js/dist/livret-de-transformation.js') => base_path('public/assets/modules/' . $this->moduleNameLower.'/livret-de-transformation.js')], 'fcmcommun-module-assets');
+        $this->publishes([module_path($this->moduleName, 'resources/assets/js/dist/livret-de-transformation.css') => base_path('public/assets/modules/' . $this->moduleNameLower.'/livret-de-transformation.css')], 'fcmcommun-module-assets');
     }
 
     /**

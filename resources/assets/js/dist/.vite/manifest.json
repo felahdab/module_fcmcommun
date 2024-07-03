@@ -3,6 +3,9 @@
     "file": "livret-de-transformation.js",
     "name": "index",
     "src": "resources/assets/js/src/LivretDeTransformation/index.js",
-    "isEntry": true
+    "isEntry": true,
+    "css": [
+      "livret-de-transformation.css"
+    ]
   }
 }

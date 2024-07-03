@@ -18,7 +18,7 @@ export default defineConfig({
         manifest: true,
         rollupOptions: {
             output: {
-                assetFileNames: 'livret-de-transformation.js',
+                assetFileNames: 'livret-de-transformation.[ext]',
                 //chunkFileNames: 'client/rsc/[chunks]/[name].[hash].js',
                 entryFileNames: 'livret-de-transformation.js'
             }

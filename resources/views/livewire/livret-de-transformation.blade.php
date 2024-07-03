@@ -1,5 +1,6 @@
 @push(config('mingle.stack'))
     <script src="{!! asset('modules/fcmcommun/livret-de-transformation.js') !!}"></script>
+    <link rel="stylesheet" href="{!! asset('modules/fcmcommun/livret-de-transformation.css') !!}">
 @endpush
 
 <div
