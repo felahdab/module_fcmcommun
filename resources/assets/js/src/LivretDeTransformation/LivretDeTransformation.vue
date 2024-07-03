@@ -32,7 +32,7 @@
       />
     </p>
   
-    <Treeview :config="config" :nodes="nodes['nodes']"> </Treeview>
+    <Treeview :config="config" :nodes="nodes"> </Treeview>
   </template>
   
 
@@ -59,7 +59,7 @@
         checkMode : 1 // 0: répercute l'activation des checkboxes vers les enfants. 1: ne répercute pas.
       });
 
-  const nodes = ref({ "nodes": {
+  const nodes = ref( {
         id1: {
           text: "text1",
           children: ["id11", "id12"],
@@ -86,23 +86,16 @@
           text: "id113",
         },
       }
-    });
+    );
   
   const message = mingleData.message;
-  
-  console.log(message) // 'Message in a bottle 🍾'
-  console.log(config.value["roots"]);
-  console.log(nodes.value);
   
  function get_livret(){
     wire.get_livret()
     .then(data => {
         data = JSON.parse(data);
-        nodes.value['nodes'] = data["nodes"];
-        //console.log("nodes set");
-        //console.log(config.value["roots"]);
-
-        config.value["roots"]=data["roots"];
+        nodes.value = data["nodes"];
+        config.value["roots"] = data["roots"];
     }) 
 }
   
