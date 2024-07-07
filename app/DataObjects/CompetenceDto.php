@@ -14,6 +14,8 @@ class CompetenceDto extends Data
     public string $id;
     public string $libelle_long;
     public string $libelle_court;
+    public string $url;
+    public ?string $same;
 
     /** @var Collection<int, SavoirFaireDto> */
     public Collection $savoirfaires;

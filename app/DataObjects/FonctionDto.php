@@ -14,6 +14,7 @@ class FonctionDto extends Data
     public string $id;
     public string $libelle_long;
     public string $libelle_court;
+    public string $url;
 
     /** @var Collection<int, CompetenceDto> */
     public Collection $competences;
