@@ -1,5 +1,7 @@
 <template>
     <div class="btn" @click="get_livret">Refresh</div>
+    <div class="btn" @click="update_livret">Update</div>
+    
     <p>
       <label for="showCheckBoxes">Checkboxes</label>
       <input id="showCheckBoxes" type="checkbox" v-model="config.checkboxes" />
@@ -66,7 +68,7 @@
   const {wire, mingleData} = props;
 
   const config = ref({
-        roots: ["id1", "id2"],
+        roots: [],
         keyboardNavigation: true,
         dragAndDrop: false,
         checkboxes: true,
@@ -76,37 +78,8 @@
         checkMode : 0 // 0: répercute l'activation des checkboxes vers les enfants. 1: ne répercute pas.
       });
 
-  const nodes = ref( {
-        id1: {
-          text: "text1",
-          children: ["id11", "id12"],
-        },
-        id2: {
-          text: "text2",
-          children: [],
-        },
-        id11: {
-          text: "text11",
-          children: ["id111", "id112", "id113"],
-        },
-        id12: {
-          text: "text12",
-          children: [],
-        },
-        id111: {
-          text: "id111",
-        },
-        id112: {
-          text: "id112",
-        },
-        id113: {
-          text: "id113",
-        },
-      }
-    );
-  
-  const message = mingleData.message;
-  
+  const nodes = ref( [] );
+    
  function get_livret(){
     wire.get_livret()
     .then(data => {
@@ -114,6 +87,14 @@
         nodes.value = data["nodes"];
         config.value["roots"] = data["roots"];
     }) 
+}
+
+function update_livret(){
+  console.log(nodes.value)
+  wire.update_livret(
+    nodes.value
+  )
+  //get_livret()
 }
   
 </script>
