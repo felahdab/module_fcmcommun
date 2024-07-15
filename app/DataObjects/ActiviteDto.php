@@ -15,4 +15,5 @@ class ActiviteDto extends Data
     public string $duree_validite;
     public string $prerequis;
     public string $type;
+    public array $state = [ "checked" => false, "opened" => false];
 }

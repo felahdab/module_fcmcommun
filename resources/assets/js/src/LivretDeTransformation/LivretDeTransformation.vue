@@ -39,12 +39,12 @@
         :nodes="nodes"
         @nodeOpened="console.log(`node-opened`)"
         @nodeClosed="console.log('node-closed')"
-        @nodeFocus="console.log('node-focus')"
+        @nodeFocus="nodeFocus"
         @nodeToggle="console.log('node-toggle')"
         @nodeBlur="console.log('node-blur')"
         @nodeEdit="console.log('node-edit')"
-        @nodeChecked="console.log('node-checked')"
-        @nodeUnchecked="console.log('node-unchecked')"
+        @nodeChecked="nodeChecked"
+        @nodeUnchecked="nodeUnChecked"
         @nodeDragstart="console.log('node-dragstart')"
         @nodeDragenter="console.log('node-dragenter')"
         @nodeDragleave="console.log('node-dragleave')"
@@ -75,7 +75,7 @@
         editable: false,
         disabled: false,
         padding: 25,
-        checkMode : 0 // 0: répercute l'activation des checkboxes vers les enfants. 1: ne répercute pas.
+        checkMode : 1 // 0: répercute l'activation des checkboxes vers les enfants. 1: ne répercute pas.
       });
 
   const nodes = ref( [] );
@@ -87,14 +87,32 @@
         nodes.value = data["nodes"];
         config.value["roots"] = data["roots"];
     }) 
-}
+  }
 
-function update_livret(){
-  console.log(nodes.value)
-  wire.update_livret(
-    nodes.value
-  )
-  //get_livret()
-}
+  function update_livret(){
+    console.log(nodes.value)
+    wire.update_livret(
+      nodes.value
+    )
+    //get_livret()
+  }
+
+  function nodeChecked(node){
+    if (node.state.checked){
+      node.state={
+                "checked": true,
+                "opened" : true
+      }
+    }
+    console.log('node-checked'); console.log(node.state.checked )
+  }
+
+  function nodeUnChecked(node){
+    console.log('node-unchecked'); console.log(node.state.checked )
+  }
+
+  function nodeFocus(node){
+    console.log('node-focus'); console.log(node )
+  }
   
 </script>

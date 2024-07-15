@@ -6,17 +6,21 @@ use Ijpatricio\Mingle\Concerns\InteractsWithMingles;
 use Ijpatricio\Mingle\Contracts\HasMingles;
 use Livewire\Component;
 
+use App\Models\User;
+
 use Modules\FcmCentral\Models\ParcoursSerialise;
+use Modules\FcmCentral\Models\UserParcours;
 use Modules\FcmCentral\Services\ParcoursService;
 use Modules\FcmCommun\DataObjects\ParcoursDto;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class LivretDeTransformation extends Component implements HasMingles
 {
     use InteractsWithMingles;
 
-    public string $uuid="9c77c749-4654-488c-a530-1e827fca9676";
+    public string $uuid="2bb1800f-c247-434b-abef-4eab4cff0836"; // pour les tests uniquement.
 
     public function component(): string
     {
@@ -29,81 +33,67 @@ class LivretDeTransformation extends Component implements HasMingles
     public function mingleData()
     {
         return [    
-            'message' => 'Message in a bottle 🍾',
         ];
-    }
-
-    public function doubleIt($amount)
-    {
-        return $amount * 2;
     }
 
     public function get_livret()
     {
-        // $livret = [
-        //     "roots" => ["id1", "id2", "id3", "id4"],
-        //     "nodes" => [
-        //         "id1" => [
-        //             "text"=> "text1",
-        //             "children" => ["id11"],
-        //             "state" => []
-        //         ],
-        //         "id11" => [
-        //             "text"=> "text11",
-        //             "children" => [],
-        //             "state" => []
-        //         ],
-        //         "id2" => [
-        //             "text"=> "text2 from server",
-        //             "children" => [],
-        //             "state" => []
-        //         ],
-        //         "id3" => [
-        //             "text"=> "text3 from server",
-        //             "children" => [],
-        //             "state" => []
-        //         ],
-        //         "id4" => [
-        //             "text"=> "text4 from server",
-        //             "children" => ["id41"],
-        //             "state" => []
-        //         ],
-        //         "id41" => [
-        //             "text"=> "text41 from server",
-        //             "children" => [],
-        //             "state" => []
-        //         ],
-        //     ]
-        // ];
-      
-        // return json_encode($livret);
-
-        $parcours = ParcoursSerialise::where("uuid", $this->uuid)->orderBy("version")->get()->last();
-
+        // On charge un parcours serialise, mais ensuite, cela devra etre le parcours serialise d'un utilisateur.
+        $parcours = UserParcours::where("user_id", $this->uuid)->get()->last();
+        //dump($parcours);
         $dto = ParcoursDto::from($parcours->parcours);
-
+        //dump($dto);
         $nodes = Arr::keyBy(ParcoursService::transform_for_treeview([$dto->toArray()]), "id" );
+        //dump($nodes);
+
         $roots = ParcoursService::get_roots_for_treeview([$dto->toArray()]);
 
         $livret = [
                 "roots" => $roots,
                 "nodes" => $nodes
         ];
-        //ddd( ($livret, JSON_PRETTY_PRINT));
-        //ddd($livret);
-        //return $livret;
+
+        //dump($livret);
+
         return json_encode($livret);
     }
 
-    public function update_livret($livret){
-        //ddd($livret);
-        $parcours = ParcoursSerialise::where("uuid", $this->uuid)->orderBy("version")->get()->last();
+    public function update_livret($livret)
+    {
+        $parcours = UserParcours::where("user_id", $this->uuid)->get()->last();
         $dto = ParcoursDto::from($parcours->parcours);
-
         $nodes = Arr::keyBy(ParcoursService::transform_for_treeview([$dto->toArray()]), "id" );
 
-        //ddd(Arr::dot($nodes));
-        //ddd(Arr::dot($livret));
+        $livret_after=Arr::dot($livret);
+        //ddd($livret_after);
+        $livret_after=Arr::where($livret_after, function ($value, $key) {
+            if (Str::contains($key, "checked")) return true;
+            return false;
+        });
+        //dump($livret_after);
+        //dump('-----------------------');
+
+        $livret_before = Arr::dot($nodes);
+        $livret_before=Arr::where($livret_before, function ($value, $key) {
+            if (Str::contains($key, "checked")) return true;
+            return false;
+        });
+        //dump($livret_before);
+        //dump('-----------------------');
+        //ddd($secondColl);
+
+        $changes=[];
+        foreach ($livret_before as $key => $value){
+            if ($livret_before[$key] != $livret_after[$key]){
+                $changes[$key] = $livret_after[$key] ? "set" : "unset";
+            }
+        }
+        //dump($changes);
+        $changes=Arr::undot($changes);
+        //ddd($changes);
+        
+        ParcoursService::applyChanges($parcours, $changes);
+
         return;
     }
 
