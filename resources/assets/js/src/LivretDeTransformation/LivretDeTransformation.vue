@@ -51,6 +51,10 @@
         @nodeDragend="console.log('node-dragend')"
         @nodeOver="console.log('node-over')"
         @nodeDrop="console.log('node-drop')"> 
+
+        <template #before-input="props">
+          <span> {{ props.node.state.checked }} </span>
+        </template>
     </Treeview>
   </template>
   
