@@ -12,7 +12,7 @@ class UserGeneratedEvent extends Data
 
     public function __construct(
         public string $event_type,
-        public int $user_id,
+        public string $user_id,
         public string $object_class,
         public ?string $object_uuid,
         public array $detail
