@@ -12,6 +12,12 @@
             )
     "
 >
+    <div>
+        {{ $this->triggerUpdateAction }}
+    
+        <x-filament-actions::modals />
+    </div>
+
     <div id="{{ $this->mingleId }}-container" wire:ignore x-ignore>
         <div
                 id="{{ $this->mingleId }}"

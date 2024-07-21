@@ -2,23 +2,33 @@
 
 namespace Modules\FcmCommun\Http\Livewire;
 
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+
+use Filament\Actions\Concerns\InteractsWithActions;
+use Filament\Forms\Concerns\InteractsWithForms;
+use Filament\Actions\Contracts\HasActions;
+use Filament\Forms\Contracts\HasForms;
+use Filament\Actions\Action;
+
+use Filament\Forms\Components\TextInput;
+
 use Ijpatricio\Mingle\Concerns\InteractsWithMingles;
 use Ijpatricio\Mingle\Contracts\HasMingles;
 use Livewire\Component;
 
 use App\Models\User;
-
+use Illuminate\Contracts\Pipeline\Hub;
 use Modules\FcmCentral\Models\ParcoursSerialise;
 use Modules\FcmCentral\Models\UserParcours;
 use Modules\FcmCentral\Services\ParcoursService;
 use Modules\FcmCommun\DataObjects\ParcoursDto;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-
-class LivretDeTransformation extends Component implements HasMingles
+class LivretDeTransformation extends Component implements HasMingles, HasActions, HasForms
 {
     use InteractsWithMingles;
+    use InteractsWithActions;
+    use InteractsWithForms;
 
     public string $uuid=""; // pour les tests uniquement.
 
@@ -38,6 +48,31 @@ class LivretDeTransformation extends Component implements HasMingles
     {
         return [    
         ];
+    }
+
+    public function updateAction(): Action
+    {
+        return Action::make('updateAction')
+            ->label("Mettre à jour le livret")
+            ->requiresConfirmation()
+            ->form([
+                TextInput::make('commentaire')
+            ])
+            ->action(function (array $arguments, array $data) {
+                $livret = $arguments["livret"];
+                $commentaire = $data["commentaire"];
+                $this->update_livret($livret, $commentaire);
+                return;
+            });
+    }
+
+    public function triggerUpdateAction(): Action
+    {
+        return Action::make('triggerUpdateAction')
+            ->label("Mettre à jour le livret")
+            ->action(function(){
+                $this->dispatch('fcm-livretfcm--update');
+            });
     }
 
     public function get_livret()
@@ -62,7 +97,7 @@ class LivretDeTransformation extends Component implements HasMingles
         return json_encode($livret);
     }
 
-    public function update_livret($livret)
+    public function update_livret($livret, $commentaire)
     {
         $parcours = UserParcours::where("user_id", $this->uuid)->get()->last();
         $dto = ParcoursDto::from($parcours->parcours);

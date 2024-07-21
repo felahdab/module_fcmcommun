@@ -1,7 +1,4 @@
-<template>
-    <div class="btn" @click="get_livret">Refresh</div>
-    <div class="btn" @click="update_livret">Update</div>
-    
+<template>    
     <p>
       <label for="showCheckBoxes">Checkboxes</label>
       <input id="showCheckBoxes" type="checkbox" v-model="config.checkboxes" />
@@ -65,6 +62,7 @@
   import { ref , onMounted} from 'vue';
 
   onMounted(() => {
+    window.addEventListener('fcm-livretfcm--update', () => triggerUpdate())
     get_livret();
 })
   
@@ -97,12 +95,20 @@
     }) 
   }
 
+  function triggerUpdate(){
+    wire.mountAction('updateAction', { livret : nodes.value })
+  }
+
   function update_livret(){
     console.log(nodes.value)
     wire.update_livret(
       nodes.value
     )
     //get_livret()
+  }
+
+  function update_livret_thru_component_action(){
+    wire.mountAction('updateAction', { livret : nodes.value })
   }
 
   function nodeChecked(node){
