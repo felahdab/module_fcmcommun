@@ -61,8 +61,12 @@
 
 <script setup>
   import Treeview from "vue3-treeview";
-  import "vue3-treeview/dist/style.css";
-  import { ref } from 'vue';
+  import "./LivretDeTransformation.css";
+  import { ref , onMounted} from 'vue';
+
+  onMounted(() => {
+    get_livret();
+})
   
   const props = defineProps({
       wire: {},

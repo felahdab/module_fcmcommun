@@ -20,7 +20,11 @@ class LivretDeTransformation extends Component implements HasMingles
 {
     use InteractsWithMingles;
 
-    public string $uuid="2bb1800f-c247-434b-abef-4eab4cff0836"; // pour les tests uniquement.
+    public string $uuid=""; // pour les tests uniquement.
+
+    public function mount(string $uuid = "2bb1800f-c247-434b-abef-4eab4cff0836") {
+        $this->uuid = $uuid;
+    }
 
     public function component(): string
     {
