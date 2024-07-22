@@ -19,8 +19,7 @@ class LocalUserGeneratedEventListener
     }
 
     /**
-     * Handle the event. // En vrai, devrait etre declare avec UserGeneratedEvent|RemoteGeneratedEvent $event, pour activer l'association
-     * automatique entre les event et leur listener.
+     * Handle the event.
      */
     public function handle(UserGeneratedEvent|RemoteGeneratedEvent $event): void
     {
