@@ -63,7 +63,9 @@
 
   onMounted(() => {
     window.addEventListener('fcm-livretfcm--update', () => triggerUpdate())
+    window.addEventListener('fcm-livretfcm--refresh', () => get_livret())
     get_livret();
+
 })
   
   const props = defineProps({
@@ -118,15 +120,18 @@
                 "opened" : true
       }
     }
-    console.log('node-checked'); console.log(node.state.checked )
+    console.log('node-checked'); 
+    //console.log(node.state.checked )
   }
 
   function nodeUnChecked(node){
-    console.log('node-unchecked'); console.log(node.state.checked )
+    console.log('node-unchecked'); 
+    //console.log(node.state.checked )
   }
 
   function nodeFocus(node){
-    console.log('node-focus'); console.log(node )
+    console.log('node-focus');
+    //console.log(node )
   }
   
 </script>
