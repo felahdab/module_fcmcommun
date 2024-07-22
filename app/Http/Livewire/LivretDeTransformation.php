@@ -11,7 +11,7 @@ use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Contracts\HasForms;
 use Filament\Actions\Action;
 
-use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Textarea;
 
 use Ijpatricio\Mingle\Concerns\InteractsWithMingles;
 use Ijpatricio\Mingle\Contracts\HasMingles;
@@ -54,14 +54,16 @@ class LivretDeTransformation extends Component implements HasMingles, HasActions
     {
         return Action::make('updateAction')
             ->label("Mettre à jour le livret")
+            ->visible($this->authorizeUser())
             ->requiresConfirmation()
             ->form([
-                TextInput::make('commentaire')
+                Textarea::make('commentaire')
             ])
             ->action(function (array $arguments, array $data) {
                 $livret = $arguments["livret"];
                 $commentaire = $data["commentaire"];
                 $this->update_livret($livret, $commentaire);
+                $this->dispatch('fcm-livretfcm--refresh');
                 return;
             });
     }
@@ -70,9 +72,14 @@ class LivretDeTransformation extends Component implements HasMingles, HasActions
     {
         return Action::make('triggerUpdateAction')
             ->label("Mettre à jour le livret")
+            ->visible($this->authorizeUser())
             ->action(function(){
                 $this->dispatch('fcm-livretfcm--update');
             });
+    }
+
+    public function authorizeUser(){
+        return false;
     }
 
     public function get_livret()
