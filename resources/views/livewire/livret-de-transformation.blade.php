@@ -13,7 +13,9 @@
     "
 >
     <div>
-        {{ $this->triggerUpdateAction }}
+        @if ($this->triggerUpdateAction->isVisible())
+            {{ $this->triggerUpdateAction }}
+        @endif
     
         <x-filament-actions::modals />
     </div>

@@ -79,7 +79,7 @@ class LivretDeTransformation extends Component implements HasMingles, HasActions
     }
 
     public function authorizeUser(){
-        return false;
+        return true;
     }
 
     public function get_livret()
