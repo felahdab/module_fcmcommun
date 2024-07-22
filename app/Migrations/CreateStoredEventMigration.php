@@ -1,19 +1,23 @@
 <?php
 
+namespace Modules\FcmCommun\Migrations;
+
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
+class CreateStoredEventMigration extends Migration
 {
+    public $prefix = '';
     /**
      * Run the migrations.
      */
     public function up(): void
     {
-        Schema::create('fcmcommun_stored_events', function (Blueprint $table) {
+        Schema::create($this->prefix . 'stored_events', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid');
+            $table->timestamp('event_datetime')->useCurrent();
             $table->string('event_type');
             $table->integer('user_id'); // Doit devenir un uuid ultérieurement
             $table->string('object_class');
@@ -31,6 +35,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('fcmcommun_stored_events');
+        Schema::dropIfExists($this->prefix . 'stored_events');
     }
 };
