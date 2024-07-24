@@ -5,10 +5,9 @@ namespace Modules\FcmCommun\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
-use Modules\FcmCentral\Traits\HasTablePrefix;
+use Modules\FcmCommun\Traits\HasTablePrefix;
 
 use App\Models\User;
-use Modules\FcmCentral\Models\ParcoursSerialise;
 
 class UserParcours extends Model
 {
@@ -30,11 +29,4 @@ class UserParcours extends Model
     {
         return $this->belongsTo(User::class, 'user_id');
     }
-
-    public function parcoursserialise() 
-    {
-        return $this->belongsTo(ParcoursSerialise::class, 'parcours_id');
-    }
-
-    
 }
