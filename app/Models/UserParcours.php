@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 use Modules\FcmCommun\Traits\HasTablePrefix;
 
-use App\Models\User;
+use Modules\FcmCommun\Models\User;
 
 class UserParcours extends Model
 {
