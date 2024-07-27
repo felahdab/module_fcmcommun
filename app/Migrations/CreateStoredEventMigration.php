@@ -15,18 +15,17 @@ class CreateStoredEventMigration extends Migration
     public function up(): void
     {
         Schema::create($this->prefix . 'stored_events', function (Blueprint $table) {
-            $table->id();
-            $table->uuid('uuid');
+            $table->uuid('event_uuid')->primary();
             $table->timestamp('event_datetime')->useCurrent();
             $table->string('event_type');
-            $table->integer('user_id'); // Doit devenir un uuid ultérieurement
+            $table->uuid('user_id'); // Doit devenir un uuid ultérieurement
             $table->string('object_class');
             $table->uuid('object_uuid')->nullable(true);
             $table->json('detail')->nullable(true);
 
             $table->timestamps();
 
-            $table->unique('uuid');
+            $table->unique('event_uuid');
         });
     }
 

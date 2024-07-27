@@ -4,6 +4,8 @@ namespace Modules\FcmCommun\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
+
 
 use Modules\FcmCommun\DataObjects\UserGeneratedEvent;
 use Modules\FcmCommun\DataObjects\RemoteGeneratedEvent;
@@ -14,6 +16,9 @@ class StoredEvent extends Model
 {
     use HasFactory;
     use HasTablePrefix;
+    use HasUuids;
+
+    protected $primaryKey = 'event_uuid';
 
     protected $fillable = [
         'event_uuid',
@@ -31,7 +36,8 @@ class StoredEvent extends Model
         ];
     }
 
-    public static function createFromUserGeneratedEvent(UserGeneratedEvent|RemoteGeneratedEvent $event){
+    public static function createFromUserGeneratedEvent(UserGeneratedEvent|RemoteGeneratedEvent $event)
+    {
         $data = $event->toArray();
         $detail = $data["detail"];
         unset($data["detail"]);
