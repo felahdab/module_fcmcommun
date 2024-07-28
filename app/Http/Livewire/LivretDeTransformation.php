@@ -138,7 +138,7 @@ class LivretDeTransformation extends Component implements HasMingles, HasActions
         $changes=Arr::undot($changes);
         //ddd($changes);
         
-        ParcoursService::applyChanges($parcours, $changes);
+        ParcoursService::applyChanges($parcours, $changes, $commentaire);
 
         return;
     }
