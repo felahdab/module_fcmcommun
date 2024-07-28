@@ -85,14 +85,19 @@ class LivretDeTransformation extends Component implements HasMingles, HasActions
     public function get_livret()
     {
         // On charge un parcours serialise, mais ensuite, cela devra etre le parcours serialise d'un utilisateur.
-        $parcours = UserParcours::where("user_id", $this->uuid)->get()->last();
+        $parcours = UserParcours::where("user_id", $this->uuid)->get();
         //dump($parcours);
-        $dto = ParcoursDto::from($parcours->parcours);
-        //dump($dto);
-        $nodes = Arr::keyBy(ParcoursService::transform_for_treeview([$dto->toArray()]), "id" );
-        //dump($nodes);
+        $dtos = $parcours->map(function($p) {
+            return ParcoursDto::from($p->parcours);
+        });
 
-        $roots = ParcoursService::get_roots_for_treeview([$dto->toArray()]);
+        //ddd($dtos);
+
+        $nodes = Arr::keyBy(ParcoursService::transform_for_treeview($dtos->toArray()), "id" );
+        //ddd($nodes);
+
+        $roots = ParcoursService::get_roots_for_treeview($dtos->toArray());
+        //ddd($roots);
 
         $livret = [
                 "roots" => $roots,
@@ -106,9 +111,13 @@ class LivretDeTransformation extends Component implements HasMingles, HasActions
 
     public function update_livret($livret, $commentaire)
     {
-        $parcours = UserParcours::where("user_id", $this->uuid)->get()->last();
-        $dto = ParcoursDto::from($parcours->parcours);
-        $nodes = Arr::keyBy(ParcoursService::transform_for_treeview([$dto->toArray()]), "id" );
+        $parcours = UserParcours::where("user_id", $this->uuid)->get();
+
+        $dtos = $parcours->map(function($p) {
+            return ParcoursDto::from($p->parcours);
+        });
+
+        $nodes = Arr::keyBy(ParcoursService::transform_for_treeview($dtos->toArray()), "id" );
 
         $livret_after=Arr::dot($livret);
         //ddd($livret_after);
@@ -116,7 +125,7 @@ class LivretDeTransformation extends Component implements HasMingles, HasActions
             if (Str::contains($key, "checked")) return true;
             return false;
         });
-        //dump($livret_after);
+        //ddd($livret_after);
         //dump('-----------------------');
 
         $livret_before = Arr::dot($nodes);
@@ -124,7 +133,7 @@ class LivretDeTransformation extends Component implements HasMingles, HasActions
             if (Str::contains($key, "checked")) return true;
             return false;
         });
-        //dump($livret_before);
+        //ddd($livret_before);
         //dump('-----------------------');
         //ddd($secondColl);
 
@@ -134,7 +143,7 @@ class LivretDeTransformation extends Component implements HasMingles, HasActions
                 $changes[$key] = $livret_after[$key] ? "set" : "unset";
             }
         }
-        //dump($changes);
+        //ddd($changes);
         $changes=Arr::undot($changes);
         //ddd($changes);
         
