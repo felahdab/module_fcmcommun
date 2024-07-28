@@ -19,16 +19,22 @@ use Livewire\Component;
 
 use App\Models\User;
 use Illuminate\Contracts\Pipeline\Hub;
+
+use Modules\FcmCommun\DataObjects\ParcoursDto;
+
+use Modules\FcmCentral\Services\ParcoursService;
 use Modules\FcmCentral\Models\ParcoursSerialise;
 use Modules\FcmCentral\Models\UserParcours;
-use Modules\FcmCentral\Services\ParcoursService;
-use Modules\FcmCommun\DataObjects\ParcoursDto;
 
 class LivretDeTransformation extends Component implements HasMingles, HasActions, HasForms
 {
     use InteractsWithMingles;
     use InteractsWithActions;
     use InteractsWithForms;
+
+    public static $ParcoursService = ParcoursService::class;
+    public static $ParcoursSerialise = ParcoursSerialise::class;
+    public static $UserParcours = UserParcours::class;
 
     public string $uuid=""; // pour les tests uniquement.
 
@@ -85,7 +91,7 @@ class LivretDeTransformation extends Component implements HasMingles, HasActions
     public function get_livret()
     {
         // On charge un parcours serialise, mais ensuite, cela devra etre le parcours serialise d'un utilisateur.
-        $parcours = UserParcours::where("user_id", $this->uuid)->get();
+        $parcours = static::$UserParcours::where("user_id", $this->uuid)->get();
         //dump($parcours);
         $dtos = $parcours->map(function($p) {
             return ParcoursDto::from($p->parcours);
@@ -93,10 +99,10 @@ class LivretDeTransformation extends Component implements HasMingles, HasActions
 
         //ddd($dtos);
 
-        $nodes = Arr::keyBy(ParcoursService::transform_for_treeview($dtos->toArray()), "id" );
+        $nodes = Arr::keyBy(static::$ParcoursService::transform_for_treeview($dtos->toArray()), "id" );
         //ddd($nodes);
 
-        $roots = ParcoursService::get_roots_for_treeview($dtos->toArray());
+        $roots = static::$ParcoursService::get_roots_for_treeview($dtos->toArray());
         //ddd($roots);
 
         $livret = [
@@ -111,13 +117,13 @@ class LivretDeTransformation extends Component implements HasMingles, HasActions
 
     public function update_livret($livret, $commentaire)
     {
-        $parcours = UserParcours::where("user_id", $this->uuid)->get();
+        $parcours = static::$UserParcours::where("user_id", $this->uuid)->get();
 
         $dtos = $parcours->map(function($p) {
             return ParcoursDto::from($p->parcours);
         });
 
-        $nodes = Arr::keyBy(ParcoursService::transform_for_treeview($dtos->toArray()), "id" );
+        $nodes = Arr::keyBy(static::$ParcoursService::transform_for_treeview($dtos->toArray()), "id" );
 
         $livret_after=Arr::dot($livret);
         //ddd($livret_after);
@@ -147,7 +153,7 @@ class LivretDeTransformation extends Component implements HasMingles, HasActions
         $changes=Arr::undot($changes);
         //ddd($changes);
         
-        ParcoursService::applyChanges($parcours, $changes, $commentaire);
+        static::$ParcoursService::applyChanges($parcours, $changes, $commentaire);
 
         return;
     }
