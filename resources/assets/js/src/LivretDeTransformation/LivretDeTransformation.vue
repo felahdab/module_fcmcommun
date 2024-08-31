@@ -1,5 +1,5 @@
 <template>    
-    <p>
+    <!-- <p>
       <label for="showCheckBoxes">Checkboxes</label>
       <input id="showCheckBoxes" type="checkbox" v-model="config.checkboxes" />
   
@@ -29,7 +29,7 @@
         :value="modeBool"
         @input="changeMode"
       />
-    </p>
+    </p> -->
   
     <Treeview 
         :config="config" 
@@ -49,9 +49,9 @@
         @nodeOver="console.log('node-over')"
         @nodeDrop="console.log('node-drop')"> 
 
-        <template #before-input="props">
+        <!-- <template #before-input="props">
           <span> {{ props.node.state.checked }} </span>
-        </template>
+        </template> -->
     </Treeview>
   </template>
   
@@ -66,7 +66,7 @@
     window.addEventListener('fcm-livretfcm--refresh', () => get_livret())
     get_livret();
 
-})
+  })
   
   const props = defineProps({
       wire: {},
@@ -116,8 +116,8 @@
   function nodeChecked(node){
     if (node.state.checked){
       node.state={
-                "checked": true,
-                "opened" : true
+        "checked": true,
+        "opened" : true
       }
     }
     console.log('node-checked'); 

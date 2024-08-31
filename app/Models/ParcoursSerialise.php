@@ -15,7 +15,8 @@ class ParcoursSerialise extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [ "uuid",
+    protected $fillable = [ "id", 
+                            "uuid",
                             "libelle_long",
                             "libelle_court", 
                             "version", 
