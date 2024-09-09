@@ -2,7 +2,7 @@
 
 namespace Modules\FcmCommun\Models;
 
-use Modules\RH\Entities\Personne as BaseModel;
+use Modules\RH\Models\Personne as BaseModel;
 
 class User extends BaseModel
 {
