@@ -1,0 +1,41 @@
+## 0.0.1 (September 09, 2024)
+- Created VERSION, Created CHANGELOG.md, Bumped to 0.0.1
+- wip
+- Modification du livret de transformation et du service ParcoursService pour permettre l'emploi de classes dynamiques dans les modules FcmCentral et FcmUnite.
+- Adaptations pour gérer plusieurs parcours simultanément
+- Transmission du commentaire au service
+- wip events
+- Creation d'un modele User dans FcmCommun.
+- Make the attribution of the id of UserParcours automatic.
+- wip userparcours
+- Conversion du modele UserParcours en modele commun.
+- Creation de 2 migrations comunes supplémentaires et du modele ParcoursSerialise
+- Retrait de commentaire superflu.
+- Fait en sorte que le bouton de mise a jour du livret disparaisse quand l'utilisateur n'a pas le droit.
+- Ajout de la verification de l'autorisation de mise à jour du livret et du refresh.
+- Transformation de la migration des stored event en une classe destinee a etre utilisee par les autres modules.
+- Ajout de l'evenement refresh au livret de FCM pour provoquer une mise à jour.
+- Introduction des actions Filament dans le composant Livewire. Utilisation des event pour declancher des actions du composant Vue.
+- Creation d'une ressource User, avec une page Livret de Transformation, pour demontrer la possibilite d'intégrer le composant LiveWire contenant le composant Vue dans une page Filament.
+- Ajustement du composant LiveWire du livret de transformation.
+- Ajout du state destine au tree view vuejs pour afficher et valider le parcours.
+- Il faut faire référence aux utilisateurs par leur uuid.
+- wip mise en forme du livret
+- wip sur validation et devalidation d'elements du parcours
+- wip
+- Adaptation des DTO au nouveau modele de donnees FCM
+- wip
+- Simplification du code.
+- Première version fonctionnelle de vue3-treeview qui charge ses données depuis Livewire.
+- npm install vue3-treeview
+- Integration d'un composant  Vue pour la présentation du livret de transformation dans un composant Livewire.
+- wip
+- Ajustement des DTO pour serialisation et deserialisation des parcours.
+- Ajout du slug du module comme prefixe de table en base
+- Ajout du slug du module dans les url des routes api
+- Reprise des travaux exploratoires
+- Mise a jour de composer.json et de la configuration du module
+- Creation d'un panel Filament dans le module
+- Ajout du prefixe skeletor aux routes du module.
+- Initial commit after creation
+
