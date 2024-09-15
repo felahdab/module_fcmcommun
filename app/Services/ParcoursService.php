@@ -167,13 +167,13 @@ class ParcoursService
         }
     }
 
-    public static function attribuer_parcours_a_un_user($user, $parcours)
+    public static function attribuer_parcours_a_un_user($marin, $parcours)
     {
         $event = new static::$UserGeneratedEvent(
             event_type: "parcours_attribue",
             user_id: auth()->user()->uuid,
-            object_class: get_class($user),
-            object_uuid: $user->uuid,
+            object_class: get_class($marin),
+            object_uuid: $marin->id,
             detail: [
                 "parcoursserialise" => $parcours->id,
                 // "parcours" => $parcours->uuid,
@@ -184,13 +184,13 @@ class ParcoursService
         event($event);
     }
 
-    public static function retirer_parcours_a_un_user($user, $parcours)
+    public static function retirer_parcours_a_un_user($marin, $parcours)
     {
         $event = new static::$UserGeneratedEvent(
             event_type: "parcours_retire",
             user_id: auth()->user()->uuid,
-            object_class: get_class($user),
-            object_uuid: $user->uuid,
+            object_class: get_class($marin),
+            object_uuid: $marin->id,
             detail: [
                 "parcoursserialise" => $parcours->id,
                 // "parcours" => $parcours->uuid,
