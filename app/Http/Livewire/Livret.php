@@ -13,10 +13,6 @@ use Filament\Forms\Contracts\HasForms;
 
 use Filament\Forms\Components\Textarea;
 
-use Modules\FcmCentral\Services\ParcoursService;
-use Modules\FcmCentral\Models\ParcoursSerialise;
-use Modules\FcmCentral\Models\UserParcours;
-
 use Modules\FcmCommun\Services\LivretService;
 
 class Livret extends Component implements HasActions, HasForms
