@@ -106,9 +106,6 @@ class ParcoursService
                     foreach ($competence->savoirfaires as $savoirfaire){
                         foreach($savoirfaire->activites as $activite){
                             if (Arr::exists($changes, $activite->id)){
-                                $activite->state = $changes[$activite->id]["state"]["checked"] == "set" ? ["checked"=> true] : ["checked" => false ] ;
-                                // Raise an event for the modification of the state of the parcours.
-
                                 $event = new static::$UserGeneratedEvent(
                                     event_type: $changes[$activite->id]["state"]["checked"] == "set" ? "valide_activite" : "invalide_activite",
                                     user_id: auth()->user()->uuid,
@@ -127,9 +124,6 @@ class ParcoursService
                         }
 
                         if (Arr::exists($changes, $savoirfaire->id)){
-                            $savoirfaire->state = $changes[$savoirfaire->id]["state"]["checked"] == "set" ? ["checked"=> true] : ["checked" => false ] ;
-                            // Raise an event for the modification of the state of the parcours.
-
                             $event = new static::$UserGeneratedEvent(
                                 event_type: $changes[$savoirfaire->id]["state"]["checked"] == "set" ? "valide_savoirfaire" : "invalide_savoirfaire",
                                 user_id: auth()->user()->uuid,
