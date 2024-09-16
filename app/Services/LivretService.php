@@ -10,7 +10,6 @@ use Illuminate\Support\Str;
 use Modules\FcmCommun\DataObjects\ParcoursDto;
 
 use Modules\FcmCentral\Models\ParcoursSerialise;
-use Modules\FcmCentral\Models\User;
 use Modules\FcmCentral\Models\UserParcours;
 use Modules\FcmCentral\Services\ParcoursService;
 
@@ -18,13 +17,10 @@ use Modules\FcmCentral\Events\UserGeneratedEvent;
 
 class LivretService
 {
-
     public static $UserGeneratedEvent = UserGeneratedEvent::class;
-    public static $ParcoursSerialise = ParcoursSerialise::class;
-    public static $ParcoursService = ParcoursService::class;
-    public static $UserParcours = UserParcours::class;
-
-    public static $User = User::class;
+    public static $ParcoursSerialise  = ParcoursSerialise::class;
+    public static $ParcoursService    = ParcoursService::class;
+    public static $UserParcours       = UserParcours::class;
 
     public static function get_livret($uuid)
     {
@@ -50,7 +46,7 @@ class LivretService
 
         //dump($livret);
         return $livret;
-        return json_encode($livret);
+        //return json_encode($livret);
     }
 
     public static function update_livret($uuid, $livret, $commentaire)
