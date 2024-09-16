@@ -20,62 +20,45 @@ class LivretService
     public static $UserGeneratedEvent = UserGeneratedEvent::class;
     public static $ParcoursSerialise  = ParcoursSerialise::class;
     public static $ParcoursService    = ParcoursService::class;
-    public static $MarinParcours       = MarinParcours::class;
+    public static $MarinParcours      = MarinParcours::class;
 
     public static function get_livret($uuid)
     {
-        // On charge un parcours serialise, mais ensuite, cela devra etre le parcours serialise d'un utilisateur.
-        $parcours = static::$MarinParcours::where("marin_id", $uuid)->get();
-        //dump($parcours);
-        $dtos = $parcours->map(function($p) {
-            return ParcoursDto::from($p->parcours);
-        });
+        $dtos = static::$ParcoursService::get_parcours_for_marin_as_dtos($uuid);
+        $dtos_as_array=$dtos->toArray();
 
-        //ddd($dtos);
-
-        $nodes = Arr::keyBy(static::$ParcoursService::transform_for_treeview($dtos->toArray()), "id" );
-        //ddd($nodes);
+        $nodes = Arr::keyBy(static::$ParcoursService::transform_for_treeview($dtos_as_array), "id" );
 
         $roots = static::$ParcoursService::get_roots_for_treeview($dtos->toArray());
-        //ddd($roots);
 
         $livret = [
                 "roots" => $roots,
                 "nodes" => $nodes
         ];
 
-        //dump($livret);
         return $livret;
-        //return json_encode($livret);
     }
 
     public static function update_livret($uuid, $livret, $commentaire)
     {
         $parcours = static::$MarinParcours::where("marin_id", $uuid)->get();
 
-        $dtos = $parcours->map(function($p) {
-            return ParcoursDto::from($p->parcours);
-        });
+        $dtos = static::$ParcoursService::get_parcours_for_marin_as_dtos($uuid);
+        $dtos_as_array=$dtos->toArray();
 
-        $nodes = Arr::keyBy(static::$ParcoursService::transform_for_treeview($dtos->toArray()), "id" );
+        $nodes = Arr::keyBy(static::$ParcoursService::transform_for_treeview($dtos_as_array), "id" );
 
         $livret_after=Arr::dot($livret);
-        //ddd($livret_after);
         $livret_after=Arr::where($livret_after, function ($value, $key) {
             if (Str::contains($key, "checked")) return true;
             return false;
         });
-        //ddd($livret_after);
-        //dump('-----------------------');
 
         $livret_before = Arr::dot($nodes);
         $livret_before=Arr::where($livret_before, function ($value, $key) {
             if (Str::contains($key, "checked")) return true;
             return false;
         });
-        //ddd($livret_before);
-        //dump('-----------------------');
-        //ddd($secondColl);
 
         $changes=[];
         foreach ($livret_before as $key => $value){
@@ -83,9 +66,8 @@ class LivretService
                 $changes[$key] = $livret_after[$key] ? "set" : "unset";
             }
         }
-        //ddd($changes);
+
         $changes=Arr::undot($changes);
-        //ddd($changes);
         
         static::$ParcoursService::applyChanges($parcours, $changes, $commentaire);
 

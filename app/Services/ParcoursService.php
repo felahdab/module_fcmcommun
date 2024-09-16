@@ -2,102 +2,82 @@
 
 namespace Modules\FcmCommun\Services;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 
 use Modules\FcmCommun\DataObjects\ParcoursDto;
 
 use Modules\FcmCentral\Models\ParcoursSerialise;
-use Modules\FcmCentral\Models\User;
+use Modules\FcmCentral\Models\MarinParcours;
 use Modules\FcmCentral\Events\UserGeneratedEvent;
+
 
 class ParcoursService
 {
 
     public static $UserGeneratedEvent = UserGeneratedEvent::class;
     public static $ParcoursSerialise = ParcoursSerialise::class;
-    public static $User = User::class;
+    public static $MarinParcours       = MarinParcours::class;
 
-    public static function transform_for_treeview($arrs)
+    private static function adjust_node_state($node)
+    {
+        // Si le noeud n'a pas de state on donne un state par defaut
+        if (! array_key_exists("state", $node)){
+            $node["state"] = [
+                "checked" => false,
+                "opened" => false
+            ];
+        }
+
+        // Si le noeud a un state mais pas de checked dans celui-ci, on
+        // definit la valeur par defaut de checked.
+        if (! array_key_exists("checked", $node["state"])){
+            $node["state"]["checked"] =  false;
+        }
+
+        return $node;
+    }
+
+    private static function generate_node_from_array_by_key(&$arr, $key)
     {
         $ret = [];
+        //ddd($arr);
+        $content = Arr::pull($arr, $key);
+        //ddd($content);
+        $arr["children"] = Arr::pluck($content, "id");
 
-        foreach($arrs as $arr){
+        $arr = static::adjust_node_state($arr);
+
+        $content = static::transform_for_treeview($content);
+
+        $ret[] = $arr;
+        $ret = array_merge($ret, $content);
+
+        return $ret;
+    }
+
+    public static function transform_for_treeview(&$dtos_as_array)
+    {
+        //ddd($dtos_as_array);
+        $ret = [];
+
+        foreach($dtos_as_array as $arr){
             $arr["text"] = $arr["libelle_long"];
 
             if (Arr::exists($arr, "fonctions")){
-                
-                $fonctions = Arr::pull($arr, "fonctions");
-                $arr["children"]= Arr::pluck($fonctions, "id");
-                if (! array_key_exists("state", $arr)){
-                    $arr["state"] = [
-                        "checked" => false,
-                        "opened" => false
-                    ];
-                }
-
-                $fonctions = static::transform_for_treeview($fonctions);
-
-                $ret[] = $arr;
-                $ret = array_merge($ret, $fonctions);
-
+                $ret = array_merge($ret, static::generate_node_from_array_by_key($arr, 'fonctions'));
             }
             elseif (Arr::exists($arr, "competences")){
-                $competences = Arr::pull($arr, "competences");
-                $arr["children"]= Arr::pluck($competences, "id");
-                if (! array_key_exists("state", $arr)){
-                    $arr["state"] = [
-                        "checked" => false,
-                        "opened" => false
-                    ];
-                }
-
-                $competences = static::transform_for_treeview($competences);
-
-                $ret[] = $arr;
-                $ret = array_merge($ret, $competences);
-
+                $ret = static::generate_node_from_array_by_key($arr, 'competences');
             }
             elseif (Arr::exists($arr, "savoirfaires")){
-                $savoirfaires = Arr::pull($arr, "savoirfaires");
-                $arr["children"]= Arr::pluck($savoirfaires, "id");
-                if (! array_key_exists("state", $arr)){
-                    $arr["state"] = [
-                        "checked" => false,
-                        "opened" => false
-                    ];
-                }
-
-                $savoirfaires = static::transform_for_treeview($savoirfaires);
-
-                $ret[] = $arr;
-                $ret = array_merge($ret, $savoirfaires);
-
+                $ret = static::generate_node_from_array_by_key($arr, 'savoirfaires');
             }
             elseif (Arr::exists($arr, "activites")){
-                $activites = Arr::pull($arr, "activites");
-                $arr["children"]= Arr::pluck($activites, "id");
-                if (! array_key_exists("state", $arr)){
-                    $arr["state"] = [
-                        "checked" => false,
-                        "opened" => false
-                    ];
-                }
-
-                $activites = static::transform_for_treeview($activites);
-
-                $ret[] = $arr;
-                $ret = array_merge($ret, $activites);
-
+                $ret = static::generate_node_from_array_by_key($arr, 'activites');
             }
             else {
-                if (! array_key_exists("state", $arr)){
-                    $arr["state"] = [
-                        "checked" => false,
-                        "opened" => false
-                    ];
-                }
+                $arr = static::adjust_node_state($arr);
                 $ret[] = $arr;
             }
         }        
@@ -110,7 +90,19 @@ class ParcoursService
         return Arr::pluck($arrs, "id");
     }
 
+    public static function get_parcours_for_marin_as_dtos($uuid)
+    {
+        $parcours_du_marin = static::$MarinParcours::where("marin_id", $uuid)->get();
+
+        $dtos = $parcours_du_marin->map(function($p) {
+            return ParcoursDto::from($p->parcours);
+        });
+
+        return $dtos;
+    }
+
     public static function applyChanges(Collection $alluserparcours, $changes, $commentaire){
+        
         foreach($alluserparcours as $userparcours){
             $dto = ParcoursDto::from($userparcours->parcours);
             
@@ -123,9 +115,9 @@ class ParcoursService
                                 // Raise an event for the modification of the state of the parcours.
 
                                 $event = new static::$UserGeneratedEvent(
-                                    event_type: $changes[$activite->id]["state"]["checked"] == "set" ? "activite_validee" : "activite_devalidee",
+                                    event_type: $changes[$activite->id]["state"]["checked"] == "set" ? "valide_activite" : "invalide_activite",
                                     user_id: auth()->user()->uuid,
-                                    object_class: static::$User, 
+                                    object_class: static::$Marin, 
                                     object_uuid: $userparcours->user_id,
                                     detail: [
                                         "userparcours_id" => $userparcours->id,
@@ -144,9 +136,9 @@ class ParcoursService
                             // Raise an event for the modification of the state of the parcours.
 
                             $event = new static::$UserGeneratedEvent(
-                                event_type: $changes[$savoirfaire->id]["state"]["checked"] == "set" ? "savoirfaire_valide" : "savoirfaire_devalide",
+                                event_type: $changes[$savoirfaire->id]["state"]["checked"] == "set" ? "valide_savoirfaire" : "invalide_savoirfaire",
                                 user_id: auth()->user()->uuid,
-                                object_class: static::$User, 
+                                object_class: static::$Marin, 
                                 object_uuid: $userparcours->user_id,
                                 detail: [
                                     "userparcours_id" => $userparcours->id,
@@ -170,7 +162,7 @@ class ParcoursService
     public static function attribuer_parcours_a_un_user($marin, $parcours)
     {
         $event = new static::$UserGeneratedEvent(
-            event_type: "parcours_attribue",
+            event_type: "attribue_parcours",
             user_id: auth()->user()->uuid,
             object_class: get_class($marin),
             object_uuid: $marin->id,
@@ -187,7 +179,7 @@ class ParcoursService
     public static function retirer_parcours_a_un_user($marin, $parcours)
     {
         $event = new static::$UserGeneratedEvent(
-            event_type: "parcours_retire",
+            event_type: "retire_parcours",
             user_id: auth()->user()->uuid,
             object_class: get_class($marin),
             object_uuid: $marin->id,
