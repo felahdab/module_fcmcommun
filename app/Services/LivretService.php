@@ -48,14 +48,14 @@ class LivretService
 
         $nodes = Arr::keyBy(static::$ParcoursService::transform_for_treeview($dtos_as_array), "id" );
 
-        $livret_after=Arr::dot($livret);
-        $livret_after=Arr::where($livret_after, function ($value, $key) {
+        $livret_before = Arr::dot($nodes);
+        $livret_before=Arr::where($livret_before, function ($value, $key) {
             if (Str::contains($key, "checked")) return true;
             return false;
         });
-
-        $livret_before = Arr::dot($nodes);
-        $livret_before=Arr::where($livret_before, function ($value, $key) {
+        
+        $livret_after=Arr::dot($livret);
+        $livret_after=Arr::where($livret_after, function ($value, $key) {
             if (Str::contains($key, "checked")) return true;
             return false;
         });

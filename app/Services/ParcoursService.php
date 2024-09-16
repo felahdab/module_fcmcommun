@@ -41,24 +41,19 @@ class ParcoursService
     private static function generate_node_from_array_by_key(&$arr, $key)
     {
         $ret = [];
-        //ddd($arr);
         $content = Arr::pull($arr, $key);
-        //ddd($content);
         $arr["children"] = Arr::pluck($content, "id");
-
         $arr = static::adjust_node_state($arr);
 
         $content = static::transform_for_treeview($content);
 
-        $ret[] = $arr;
-        $ret = array_merge($ret, $content);
+        $ret = array_merge([$arr], $content);
 
         return $ret;
     }
 
     public static function transform_for_treeview(&$dtos_as_array)
     {
-        //ddd($dtos_as_array);
         $ret = [];
 
         foreach($dtos_as_array as $arr){
@@ -101,10 +96,10 @@ class ParcoursService
         return $dtos;
     }
 
-    public static function applyChanges(Collection $alluserparcours, $changes, $commentaire){
-        
-        foreach($alluserparcours as $userparcours){
-            $dto = ParcoursDto::from($userparcours->parcours);
+    public static function applyChanges(Collection $tous_marinparcours_du_marin, $changes, $commentaire)
+    {
+        foreach($tous_marinparcours_du_marin as $marinparcours){
+            $dto = ParcoursDto::from($marinparcours->parcours);
             
             foreach($dto->fonctions as $fonction){
                 foreach($fonction->competences as $competence){
@@ -117,11 +112,11 @@ class ParcoursService
                                 $event = new static::$UserGeneratedEvent(
                                     event_type: $changes[$activite->id]["state"]["checked"] == "set" ? "valide_activite" : "invalide_activite",
                                     user_id: auth()->user()->uuid,
-                                    object_class: static::$Marin, 
-                                    object_uuid: $userparcours->user_id,
+                                    object_class: "Marin", 
+                                    object_uuid: $marinparcours->marin_id,
                                     detail: [
-                                        "userparcours_id" => $userparcours->id,
-                                        "parcours_id" => $userparcours->parcours_id,
+                                        "marinparcours_id" => $marinparcours->id,
+                                        "parcours_id" => $marinparcours->parcours_id,
                                         "activite_id" => $activite->id,
                                         "commentaire" => $commentaire
                                     ]
@@ -138,11 +133,11 @@ class ParcoursService
                             $event = new static::$UserGeneratedEvent(
                                 event_type: $changes[$savoirfaire->id]["state"]["checked"] == "set" ? "valide_savoirfaire" : "invalide_savoirfaire",
                                 user_id: auth()->user()->uuid,
-                                object_class: static::$Marin, 
-                                object_uuid: $userparcours->user_id,
+                                object_class: "Marin", 
+                                object_uuid: $marinparcours->marin_id,
                                 detail: [
-                                    "userparcours_id" => $userparcours->id,
-                                    "parcours_id" => $userparcours->parcours_id,
+                                    "marinparcours_id" => $marinparcours->id,
+                                    "parcours_id" => $marinparcours->parcours_id,
                                     "savoirfaire_id" => $savoirfaire->id,
                                     "commentaire" => $commentaire
                                 ]
@@ -154,8 +149,8 @@ class ParcoursService
                     }
                 }
             }
-            $userparcours->parcours=$dto;
-            $userparcours->save();
+            $marinparcours->parcours=$dto;
+            $marinparcours->save();
         }
     }
 
