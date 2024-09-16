@@ -10,7 +10,7 @@ use Illuminate\Support\Str;
 use Modules\FcmCommun\DataObjects\ParcoursDto;
 
 use Modules\FcmCentral\Models\ParcoursSerialise;
-use Modules\FcmCentral\Models\UserParcours;
+use Modules\FcmCentral\Models\MarinParcours;
 use Modules\FcmCentral\Services\ParcoursService;
 
 use Modules\FcmCentral\Events\UserGeneratedEvent;
@@ -20,12 +20,12 @@ class LivretService
     public static $UserGeneratedEvent = UserGeneratedEvent::class;
     public static $ParcoursSerialise  = ParcoursSerialise::class;
     public static $ParcoursService    = ParcoursService::class;
-    public static $UserParcours       = UserParcours::class;
+    public static $MarinParcours       = MarinParcours::class;
 
     public static function get_livret($uuid)
     {
         // On charge un parcours serialise, mais ensuite, cela devra etre le parcours serialise d'un utilisateur.
-        $parcours = static::$UserParcours::where("user_id", $uuid)->get();
+        $parcours = static::$MarinParcours::where("marin_id", $uuid)->get();
         //dump($parcours);
         $dtos = $parcours->map(function($p) {
             return ParcoursDto::from($p->parcours);
@@ -51,7 +51,7 @@ class LivretService
 
     public static function update_livret($uuid, $livret, $commentaire)
     {
-        $parcours = static::$UserParcours::where("user_id", $uuid)->get();
+        $parcours = static::$MarinParcours::where("marin_id", $uuid)->get();
 
         $dtos = $parcours->map(function($p) {
             return ParcoursDto::from($p->parcours);
