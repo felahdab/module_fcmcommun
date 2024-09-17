@@ -15,7 +15,7 @@ use Filament\Forms\Components\Textarea;
 
 use Modules\FcmCommun\Services\LivretService;
 
-class Livret extends Component implements HasActions, HasForms
+abstract class Livret extends Component implements HasActions, HasForms
 {
     use InteractsWithActions;
     use InteractsWithForms;
@@ -23,11 +23,10 @@ class Livret extends Component implements HasActions, HasForms
     public $uuid;
     public $livret;
 
-    public function mount($uuid)
-    {
-        $this->uuid = $uuid;
-        $this->livret = LivretService::get_livret($this->uuid);
-    }
+    protected $livret_service;
+
+    abstract public function boot();
+    abstract public function mount($uuid);
 
     public function render()
     {
@@ -46,7 +45,7 @@ class Livret extends Component implements HasActions, HasForms
             ->action(function (array $arguments, array $data) {
                 $livret = $this->livret['nodes'];
                 $commentaire = $data["commentaire"];
-                LivretService::update_livret($this->uuid, $livret, $commentaire);
+                $this->livret_service->update_livret($this->uuid, $livret, $commentaire);
                 $this->dispatch('$refresh');
                 return;
             });
