@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 use Modules\FcmCommun\Traits\HasTablePrefix;
 
-use Modules\FcmCommun\Models\User;
+use Modules\FcmCommun\Models\Marin;
 
-class UserParcours extends Model
+class MarinParcours extends Model
 {
     use HasTablePrefix;
     use HasUuids;
@@ -17,7 +17,7 @@ class UserParcours extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [ "user_id",
+    protected $fillable = [ "marin_id",
                             "parcours_id",
                             "parcours"];
 
@@ -25,8 +25,8 @@ class UserParcours extends Model
         'parcours' => 'array',
     ];
 
-    public function user() 
+    public function marin() 
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(Marin::class, 'marin_id');
     }
 }

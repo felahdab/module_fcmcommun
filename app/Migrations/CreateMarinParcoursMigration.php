@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schema;
 
 use Illuminate\Support\Facades\DB;
 
-class CreateUserParcoursMigration extends Migration
+class CreateMarinParcoursMigration extends Migration
 {
     public $prefix = '';
     /**
@@ -16,17 +16,19 @@ class CreateUserParcoursMigration extends Migration
      */
     public function up(): void
     {
-        Schema::create($this->prefix . 'user_parcours', function (Blueprint $table) {
+        Schema::create($this->prefix . 'marin_parcours', function (Blueprint $table) {
             $table->uuid('id')->primary()->default(DB::raw('UUID()'));
-            $table->foreignUuid('user_id')->references('uuid')->on('users');
+            $table->foreignUuid('marin_id');
             // La relation ci-dessous emporte avec elle l'uuid du parcours et la version de celui-ci.
             $table->foreignUuid('parcours_id')->references('id')->on('fcmcentral_parcours_serialises');
 
             $table->json('parcours');
-            
+            $table->json('data')->nullable()->default(null);
+
+
             $table->timestamps();
 
-            $table->unique(['user_id', 'parcours_id']);
+            $table->unique(['marin_id', 'parcours_id']);
         });
     }
 
