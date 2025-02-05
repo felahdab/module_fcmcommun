@@ -35,7 +35,7 @@ class FcmcommunPanelProvider extends PanelProvider
     {
         $moduleNamespace = $this->getModuleNamespace();
         return $panel
-            ->id('fcmcommun::fcmcommun')
+            ->id('FCM Commun')
             ->path($this->prefix . '/fcmcommun')
             ->colors([
                 'primary' => Color::Teal,
@@ -49,8 +49,8 @@ class FcmcommunPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: module_path($this->module, 'Filament/Fcmcommun/Widgets'), for: "$moduleNamespace\\Filament\\Fcmcommun\\Widgets")
             ->widgets([
-                Widgets\AccountWidget::class,
-                Widgets\FilamentInfoWidget::class,
+                //Widgets\AccountWidget::class,
+                //Widgets\FilamentInfoWidget::class,
             ])
             ->middleware([
                 EncryptCookies::class,
