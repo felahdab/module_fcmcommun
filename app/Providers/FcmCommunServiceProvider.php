@@ -4,6 +4,7 @@ namespace Modules\FcmCommun\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Modules\FcmCommun\Console\RefreshDbSeeder;
 
 class FcmCommunServiceProvider extends ServiceProvider
 {
@@ -39,7 +40,9 @@ class FcmCommunServiceProvider extends ServiceProvider
      */
     protected function registerCommands(): void
     {
-        // $this->commands([]);
+        $this->commands([
+            RefreshDbSeeder::class,
+        ]);
     }
 
     /**

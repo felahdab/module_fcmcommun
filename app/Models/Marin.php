@@ -1,10 +1,33 @@
 <?php
 
 namespace Modules\FcmCommun\Models;
+use Illuminate\Database\Eloquent\Model;
 
-use Modules\RH\Models\Marin as BaseModel;
 
-class Marin extends BaseModel
+
+class Marin extends Model
 {
+  
+
+    /**
+     * The attributes that are mass assignable.
+     */
+    protected $fillable = [
+        'rh_marin_id',
+        'data',
+        'cohorte_id',
+        'mentor_id'
+    ];
+
+    protected $casts = [
+        'data' => 'array',
+    ];
+
+ 
+
+   
+   
+
     
+
 }

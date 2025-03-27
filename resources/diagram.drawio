@@ -1,0 +1,372 @@
+<mxfile host="65bd71144e">
+    <diagram id="rEEMI1x3Wx4cQR7zpNxX" name="Page-1">
+        <mxGraphModel dx="540" dy="673" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" background="#ffffff" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="10" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;" parent="1" source="3" target="7" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;" parent="1" source="3" target="8" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <object label="#UserGeneratedEvent" event_type="" object_class="" object_uuid="" user_id="" detail="" id="3">
+                    <mxCell style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                        <mxGeometry x="380" y="260" width="150" height="50" as="geometry"/>
+                    </mxCell>
+                </object>
+                <mxCell id="6" value="#LocalUserGeneratedEventListener" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="520" y="355" width="250" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="#StoreUserGeneratedEventListener" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+                    <mxGeometry x="520" y="435" width="250" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="Endpoint postevent" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;dashed=1;curved=1;fontSize=22;" parent="1" source="73" target="12" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="74" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=1;fontSize=35;endArrow=classic;endFill=1;" parent="1" source="8" target="73" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="#TransmitUserGeneratedEventListener" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+                    <mxGeometry x="520" y="515" width="250" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;" parent="1" source="3" target="6" edge="1">
+                    <mxGeometry width="80" relative="1" as="geometry">
+                        <mxPoint x="560" y="340" as="sourcePoint"/>
+                        <mxPoint x="640" y="340" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="15" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="12" target="14" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="#EventController" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#e3c800;fontColor=#000000;strokeColor=#B09500;" parent="1" vertex="1">
+                    <mxGeometry x="610" y="770" width="250" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;curved=1;" parent="1" source="14" target="16" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;curved=1;" parent="1" source="14" target="17" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <object label="#UserGeneratedEvent" event_type="" object_class="" object_uuid="" user_id="" detail="" id="14">
+                    <mxCell style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                        <mxGeometry x="660" y="880" width="150" height="50" as="geometry"/>
+                    </mxCell>
+                </object>
+                <mxCell id="16" value="#LocalUserGeneratedEventListener" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="1000" width="250" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="#StoreUserGeneratedEventListener" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+                    <mxGeometry x="400" y="1050" width="250" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="21" value="Token" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="20" target="73" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="configuration: token + url" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="390" y="560" width="160" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="23" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="22" target="12" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="22" value="#Remotesystem" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+                    <mxGeometry x="380" y="770" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="29" value="event_type=create" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="24" target="3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="24" value="#CreateRecord" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="170" y="100" width="150" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="27" value="event_type=update" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="25" target="3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="25" value="#EditRecord" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="435" y="100" width="150" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="28" value="event_type=delete" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="26" target="3" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="26" value="#DeleteAction" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="700" y="100" width="150" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="31" value="Modifie la base de donnees locale. &lt;br&gt;Réalise l'action décrite dans l'Event" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="790" y="340" width="260" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="32" value="Stocke le UserGeneratedEvent en base de donnes locale.&lt;br&gt;IM: être capable de retrouver l'historique et de reconstuire en rejouant les évènements;" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="797" y="420" width="260" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="33" value="Sérialise le UserGeneratedEvent.&lt;br&gt;Le transmet à un endpoint distan &lt;br&gt;(url et token en configuration)." style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="920" y="542.5" width="260" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="34" value="Authentifie les requetes distantes.&lt;br&gt;Désérialise les UserGeneratedEvent.&lt;br&gt;Les dispatche dans l'application." style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="880" y="770" width="260" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="35" value="Font exactement la même chose que dans l'autre instance" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="750" y="1030" width="260" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="39" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=1;curved=1;strokeWidth=8;dashed=1;endArrow=none;endFill=0;" parent="1" edge="1">
+                    <mxGeometry width="80" relative="1" as="geometry">
+                        <mxPoint x="25" y="670" as="sourcePoint"/>
+                        <mxPoint x="4820" y="640" as="targetPoint"/>
+                        <Array as="points"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="40" value="Instance unité" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=35;" parent="1" vertex="1">
+                    <mxGeometry x="70" y="310" width="170" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="41" value="Instance synthèse" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=35;" parent="1" vertex="1">
+                    <mxGeometry x="70" y="810" width="170" height="120" as="geometry"/>
+                </mxCell>
+                <mxCell id="50" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" parent="1" source="51" target="54" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="51" value="#EventController" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#e3c800;fontColor=#000000;strokeColor=#B09500;" parent="1" vertex="1">
+                    <mxGeometry x="1720" y="770" width="250" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="52" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;curved=1;" parent="1" source="54" target="55" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="53" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=1;entryY=0.5;entryDx=0;entryDy=0;curved=1;" parent="1" source="54" target="56" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <object label="#UserGeneratedEvent" event_type="" object_class="" object_uuid="" user_id="" detail="" id="54">
+                    <mxCell style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                        <mxGeometry x="1770" y="870" width="150" height="50" as="geometry"/>
+                    </mxCell>
+                </object>
+                <mxCell id="55" value="#LocalUserGeneratedEventListener" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="1510" y="1000" width="250" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="56" value="#StoreUserGeneratedEventListener" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+                    <mxGeometry x="1510" y="1050" width="250" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="59" value="token" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="60" target="51" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="60" value="#Remotesystem" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+                    <mxGeometry x="1490" y="770" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="94" value="event_type=create &lt;br style=&quot;font-size: 13px;&quot;&gt;&amp;amp;&amp;amp; &lt;br style=&quot;font-size: 13px;&quot;&gt;object_class=&quot;App\Models\User&quot;" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=1;fontSize=13;endArrow=classic;endFill=1;" parent="1" source="62" target="82" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="62" value="Création nouvel utilisateur" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="1430" y="110" width="150" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="72" value="Création, modification ou suppression initiée depuis l'instance unité" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=35;" parent="1" vertex="1">
+                    <mxGeometry x="215" y="25" width="620" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="73" value="#RemoteApiClientService" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+                    <mxGeometry x="670" y="585" width="250" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="80" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;" parent="1" source="82" target="84" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="81" style="edgeStyle=orthogonalEdgeStyle;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;" parent="1" source="82" target="86" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <object label="#UserGeneratedEvent" event_type="" object_class="" object_uuid="" user_id="" detail="" id="82">
+                    <mxCell style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                        <mxGeometry x="1430" y="257.5" width="150" height="50" as="geometry"/>
+                    </mxCell>
+                </object>
+                <mxCell id="83" value="#LocalUserGeneratedEventListener" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="1570" y="360" width="250" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="84" value="#StoreUserGeneratedEventListener" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+                    <mxGeometry x="1570" y="410" width="250" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="85" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=1;fontSize=35;endArrow=classic;endFill=1;" parent="1" source="86" target="93" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="86" value="#TransmitUserGeneratedEventListener" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#f8cecc;strokeColor=#b85450;" parent="1" vertex="1">
+                    <mxGeometry x="1570" y="460" width="250" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="87" value="" style="edgeStyle=orthogonalEdgeStyle;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;curved=1;" parent="1" source="82" target="83" edge="1">
+                    <mxGeometry width="80" relative="1" as="geometry">
+                        <mxPoint x="1610" y="337.5" as="sourcePoint"/>
+                        <mxPoint x="1690" y="337.5" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="88" value="Token" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="89" target="93" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="89" value="configuration: token + url" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="1440" y="557.5" width="160" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="97" value="Endpoint newuser" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=1;fontSize=22;endArrow=classic;endFill=1;startArrow=classic;startFill=1;" parent="1" source="93" target="51" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="155" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=1;fontSize=24;startArrow=none;startFill=0;endArrow=classic;endFill=1;" parent="1" source="93" target="145" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="93" value="#RemoteApiClientService" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+                    <mxGeometry x="1720" y="582.5" width="250" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="95" value="Cas particulier User" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=35;" parent="1" vertex="1">
+                    <mxGeometry x="1850" y="25" width="370" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="96" value="etat=pending_uuid" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;" parent="1" vertex="1">
+                    <mxGeometry x="1590" y="260" width="220" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="98" value="Vérifie si l'utilisateur a déjà un uuid.&lt;br&gt;Si oui: renvoie l'uuid à l'instance unité.&lt;br&gt;Si non: génère un uuid et le renvoie à l'instance unité&lt;br&gt;&lt;br&gt;Tout ceci sous la forme d'un UserGeneratedEvent &quot;user_received_uuid&quot;.&lt;br&gt;&lt;br&gt;Soit celui stocké en base. &lt;br&gt;Soit celui généré à la volée." style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="1970" y="720" width="270" height="270" as="geometry"/>
+                </mxCell>
+                <mxCell id="106" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=1;fontSize=22;endArrow=classic;endFill=1;" parent="1" source="100" target="103" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="107" value="event_type=user_receives_uuid" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=1;fontSize=22;endArrow=classic;endFill=1;" parent="1" source="100" target="102" edge="1">
+                    <mxGeometry x="-0.2333" y="20" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <object label="#RemoteGeneratedEvent" event_type="" object_class="" object_uuid="" user_id="" detail="" id="100">
+                    <mxCell style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                        <mxGeometry x="2930" y="515" width="150" height="50" as="geometry"/>
+                    </mxCell>
+                </object>
+                <mxCell id="102" value="#LocalUserGeneratedEventListener" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="3115" y="332.5" width="250" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="103" value="#StoreUserGeneratedEventListener" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+                    <mxGeometry x="3115" y="391" width="250" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="113" value="uuid=uuid&lt;br&gt;etat_pending_history" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=22;" parent="1" vertex="1">
+                    <mxGeometry x="3395" y="322.5" width="220" height="50" as="geometry"/>
+                </mxCell>
+                <mxCell id="114" value="L'utilisateur n'existe pas" style="text;strokeColor=#6c8ebf;align=center;fillColor=#dae8fc;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;gradientColor=#7ea6e0;" parent="1" vertex="1">
+                    <mxGeometry x="1480" y="40" width="300" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="115" value="L'utilisateur existe mais&lt;br&gt;etat = &quot;pending_uuid&quot;" style="text;strokeColor=#6c8ebf;align=center;fillColor=#dae8fc;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;gradientColor=#7ea6e0;" parent="1" vertex="1">
+                    <mxGeometry x="1870" y="340" width="300" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="116" value="L'utilisateur existe,&lt;br&gt;uuid = uuid&lt;br&gt;etat_&quot;pending_history&quot;" style="text;strokeColor=#6c8ebf;align=center;fillColor=#dae8fc;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;gradientColor=#7ea6e0;" parent="1" vertex="1">
+                    <mxGeometry x="3285" y="110" width="300" height="100" as="geometry"/>
+                </mxCell>
+                <mxCell id="133" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;strokeWidth=1;fontSize=24;startArrow=none;startFill=0;endArrow=classic;endFill=1;" parent="1" source="117" target="131" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="117" value="#RetreiveUserHistoryJob" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="3895" y="455" width="250" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="120" value="#EventController" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#e3c800;fontColor=#000000;strokeColor=#B09500;" parent="1" vertex="1">
+                    <mxGeometry x="3895" y="772.5" width="250" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="126" value="token" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="127" target="120" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="127" value="#Remotesystem" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+                    <mxGeometry x="3665" y="772.5" width="130" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="128" value="Token" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="129" target="131" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="129" value="configuration: token + url" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="3615" y="545" width="160" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="130" value="Endpoint&lt;br&gt;get_user_history" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=1;fontSize=22;endArrow=classic;endFill=1;startArrow=classic;startFill=1;" parent="1" source="131" target="120" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="141" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=1;fontSize=24;startArrow=none;startFill=0;endArrow=classic;endFill=1;" parent="1" source="131" target="137" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="131" value="#RemoteApiClientService" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+                    <mxGeometry x="3895" y="545" width="250" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="132" value="Récupère les évènements relatifs à l'utilisateur (par uuid)&lt;br&gt;et renvoie tout ça au client;" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="3875" y="870" width="270" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="135" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=1;fontSize=22;endArrow=classic;endFill=1;" parent="1" source="137" target="139" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="136" value="&lt;br&gt;" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=1;fontSize=22;endArrow=classic;endFill=1;" parent="1" source="137" target="138" edge="1">
+                    <mxGeometry x="-0.2333" y="20" relative="1" as="geometry">
+                        <mxPoint as="offset"/>
+                    </mxGeometry>
+                </mxCell>
+                <object label="#RemoteGeneratedEvent" event_type="" object_class="" object_uuid="" user_id="" detail="" id="137">
+                    <mxCell style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#dae8fc;strokeColor=#6c8ebf;" parent="1" vertex="1">
+                        <mxGeometry x="4275" y="535" width="150" height="50" as="geometry"/>
+                    </mxCell>
+                </object>
+                <mxCell id="138" value="#LocalUserGeneratedEventListener" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#d5e8d4;strokeColor=#82b366;" parent="1" vertex="1">
+                    <mxGeometry x="4460" y="355" width="250" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="139" value="#StoreUserGeneratedEventListener" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#e1d5e7;strokeColor=#9673a6;" parent="1" vertex="1">
+                    <mxGeometry x="4460" y="410" width="250" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="142" value="Pour chaque UserGeneratedEvent reçu,&lt;br&gt;génère un UserGeneratedEvent idenqitue.&lt;br&gt;Le dossier est donc reconstruitt progressivement" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="4470" y="500" width="270" height="110" as="geometry"/>
+                </mxCell>
+                <mxCell id="143" value="L'utilisateur existe,&lt;br&gt;uuid = uuid&lt;br&gt;historique reconstitué&lt;br&gt;etat_&quot;ready&quot;" style="text;strokeColor=#6c8ebf;align=center;fillColor=#dae8fc;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;gradientColor=#7ea6e0;" parent="1" vertex="1">
+                    <mxGeometry x="4095" y="110" width="300" height="140" as="geometry"/>
+                </mxCell>
+                <mxCell id="144" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;strokeWidth=1;fontSize=24;startArrow=none;startFill=0;endArrow=classic;endFill=1;" parent="1" source="145" target="153" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="145" value="#RetreiveUserUuidJob" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="2520" y="460" width="250" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="146" value="#EventController" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#e3c800;fontColor=#000000;strokeColor=#B09500;" parent="1" vertex="1">
+                    <mxGeometry x="2520" y="770" width="250" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="147" value="token" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="148" target="146" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="148" value="#Remotesystem" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#fff2cc;strokeColor=#d6b656;rotation=0;" parent="1" vertex="1">
+                    <mxGeometry x="2290" y="770" width="130" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="149" value="Token" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" parent="1" source="150" target="153" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="150" value="configuration: token + url" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="2290" y="552.5" width="160" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="151" value="Endpoint&lt;br&gt;get_user_uuid" style="edgeStyle=none;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeWidth=1;fontSize=22;endArrow=classic;endFill=1;startArrow=classic;startFill=1;" parent="1" source="153" target="146" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="152" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=1;fontSize=24;startArrow=none;startFill=0;endArrow=classic;endFill=1;" parent="1" source="153" target="100" edge="1">
+                    <mxGeometry relative="1" as="geometry">
+                        <mxPoint x="2900" y="540" as="targetPoint"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="156" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=1;fontSize=24;startArrow=none;startFill=0;endArrow=classic;endFill=1;" parent="1" source="100" target="117" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="153" value="#RemoteApiClientService" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#ffe6cc;strokeColor=#d79b00;" parent="1" vertex="1">
+                    <mxGeometry x="2520" y="560" width="250" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="154" value="Récupère les évènements relatifs à l'utilisateur (par uuid)&lt;br&gt;et renvoie tout ça au client;" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="2500" y="850" width="270" height="150" as="geometry"/>
+                </mxCell>
+                <mxCell id="157" value="Point de faiblesse:&lt;br&gt;Pour le moment, pas d'autre choix que de faire référence à l'utilisateur par une donnée administrative:&lt;br&gt;email&lt;br&gt;nid" style="text;strokeColor=#b85450;align=center;fillColor=#f8cecc;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=24;gradientColor=#ea6b66;" parent="1" vertex="1">
+                    <mxGeometry x="2400" y="92.5" width="300" height="247.5" as="geometry"/>
+                </mxCell>
+                <mxCell id="158" value="Utilisé pour décrire les clients de l'API,&lt;br&gt;leur associer des token,&lt;br&gt;et définir les droits" style="ellipse;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+                    <mxGeometry x="100" y="772.5" width="260" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="159" value="Donc: ne pas permettre de travailler sur un dossier tant que &quot;etat != ready&quot;" style="text;strokeColor=#b85450;align=center;fillColor=#f8cecc;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;fontSize=35;gradientColor=#ea6b66;" parent="1" vertex="1">
+                    <mxGeometry x="2950" y="1000" width="620" height="130" as="geometry"/>
+                </mxCell>
+                <mxCell id="161" value="" style="edgeStyle=none;orthogonalLoop=1;jettySize=auto;html=1;strokeWidth=8;fontSize=24;fontColor=#000000;startArrow=none;startFill=0;endArrow=none;endFill=0;dashed=1;rounded=0;" parent="1" edge="1">
+                    <mxGeometry width="80" relative="1" as="geometry">
+                        <mxPoint x="1250" y="20" as="sourcePoint"/>
+                        <mxPoint x="1250" y="1130" as="targetPoint"/>
+                        <Array as="points"/>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="171" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeWidth=1;fontSize=24;fontColor=#000000;startArrow=none;startFill=0;endArrow=none;endFill=0;" parent="1" source="170" target="117" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="170" value="#RetreiveUserHistoryCommand" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="3895" y="317.5" width="250" height="55" as="geometry"/>
+                </mxCell>
+                <mxCell id="173" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;strokeWidth=1;fontSize=24;fontColor=#000000;startArrow=none;startFill=0;endArrow=none;endFill=0;" parent="1" source="172" target="145" edge="1">
+                    <mxGeometry relative="1" as="geometry"/>
+                </mxCell>
+                <mxCell id="172" value="#RetreiveUserUuidCommand" style="whiteSpace=wrap;html=1;labelBackgroundColor=none;fillColor=#FFFFFF;" parent="1" vertex="1">
+                    <mxGeometry x="2520" y="360" width="250" height="55" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
