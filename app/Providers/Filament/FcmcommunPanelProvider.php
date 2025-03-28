@@ -26,6 +26,12 @@ use App\Http\Middleware\InitializeTenancyByPath;
 use App\Http\Middleware\SetTenantCookieMiddleware;
 use App\Http\Middleware\SetTenantDefaultForRoutesMiddleware;
 
+use Filament\Navigation\NavigationItem;
+use Filament\Pages\Dashboard;
+use Filament\Navigation\NavigationGroup;
+use Illuminate\Support\Facades\Route;
+use  Modules\FcmCommun\Helpers\NavigationFilamentHelper;
+
 class FcmcommunPanelProvider extends PanelProvider
 {
     use UsesSkeletorPrefixAndMultitenancyTrait;
@@ -42,6 +48,7 @@ class FcmcommunPanelProvider extends PanelProvider
             ])
             ->font('Inter', provider: SpatieGoogleFontProvider::class)
             ->defaultAvatarProvider(AnnudefAvatarProvider::class)
+            ->brandName("FCM Commun")
             ->discoverResources(in: module_path($this->module, 'app/Filament/Fcmcommun/Resources'), for: "$moduleNamespace\\Filament\\Fcmcommun\\Resources")
             ->discoverPages(in: module_path($this->module, 'app/Filament/Fcmcommun/Pages'), for: "$moduleNamespace\\Filament\\Fcmcommun\\Pages")
             ->pages([
@@ -68,7 +75,17 @@ class FcmcommunPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            // Menu Side Bar Haut
+            ->topNavigation()
+            // Appel du Helper pour le Menu Modules
+            ->navigationItems([   
+                // Decompacte le tableau
+                ...NavigationFilamentHelper::registerNavigationsItems()
+            ])  
+
+            ;
+          
     }
 
     protected function getModuleNamespace(): string

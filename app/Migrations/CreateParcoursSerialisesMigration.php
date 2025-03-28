@@ -6,6 +6,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
+use Illuminate\Support\Facades\DB;
+
 class CreateParcoursSerialisesMigration extends Migration
 {
     public $prefix = '';
@@ -14,9 +16,20 @@ class CreateParcoursSerialisesMigration extends Migration
      */
     public function up(): void
     {
-        Schema::create($this->prefix . 'parcours_serialises', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->uuid('uuid');
+
+        $default_value = "";
+
+        if (DB::connection() instanceof \Illuminate\Database\PostgresConnection) {
+            $default_value = DB::raw('(gen_random_uuid())');
+        }
+        elseif (DB::connection() instanceof \Illuminate\Database\MySqlConnection){
+            $default_value = DB::raw('(UUID())');
+        }
+
+        Schema::create($this->prefix . 'parcours_serialises', function (Blueprint $table) use ($default_value) {
+            //$table->uuid('id')->primary();
+            $table->id();
+            $table->uuid('uuid')->default($default_value);
             $table->string('libelle_long');
             $table->string('libelle_court');
             $table->integer('version')->default(1);
