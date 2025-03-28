@@ -43,7 +43,7 @@ class SaveFcmMarinListener
         if ($marin){
 
             Log::info('Marin trouvé :', ['id'=>$marin->id]);
-
+            
             // FcmCentral
             FcmCentralMarin::updateorCreate(
                 // Condition pour trouver le marin
@@ -54,7 +54,14 @@ class SaveFcmMarinListener
                     'mentor_id' =>   $data['mentor_id'] ?? null,
                 ],
             );
-         
+            // Retour Log
+        Log::info('FcmCentral_marin  :', [
+            'rh_marin_id'=>$marin->id,
+            'nom'=>$marin->nom,
+            'uuid'=>$marin->uuid,
+            'cohorte_id' => $data['cohorte_id'] ?? null,
+            'mentor_id' =>   $data['mentor_id'] ?? null,
+        ]);
             // RH
             
             $existingData = $marin->data ?? [];
@@ -63,6 +70,19 @@ class SaveFcmMarinListener
             $marin->save();
             //dd($marin->data->toArray());
             //dd(json_encode($marin->data));
+
+              // Retour Log
+        Log::info('Flag Rh_Marin  true', [
+            'nom'=>$marin->nom,
+            'uuid'=>$marin->uuid,
+        ]);
+
+        // Notification Filament
+        Notification::make()
+        ->title('Mise à jour du suivi FCM')
+        ->success()
+        ->body("Le Marin {$marin->nom} est en suivi FCM ")
+        ->send();
 
         }else{
             Log::warning('Aucun Marin trouvé  UUID :'. $marin->uuid);

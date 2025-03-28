@@ -8,6 +8,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Modules\FcmCommun\Events\SuivreMarinFcmEvent;
 use Illuminate\Support\Facades\Log;
 use Modules\RH\Models\Marin as RhMarin;
+use Filament\Notifications\Notification;
 
 class SaveSuivreMarinFcmListener
 {
@@ -39,11 +40,34 @@ class SaveSuivreMarinFcmListener
             // RH
         
         $existingData = $marin->data ?? [];
+        if (isset($data['fcm']['en_fcm'])){
+            $existingData["fcm"] = ["en_fcm" => $data['fcm']['en_fcm'] ];
+        }else{
+            Log::error('Clé "fcm.en_fcm" manquant');
+        }
         
-        $existingData["fcm"] = ["en_fcm" => true ];
         $marin->data = $existingData;
         $marin->save();
-        
+
+        // Retour Log
+        Log::info('Marin clé à jour :', [
+            'id'=>$marin->id,
+            'nom'=>$marin->nom,
+            'uuid'=>$marin->uuid,
+            'data'=>$marin->data,
+        ]);
+
+        // Notification FIlament
+        $message = isset($data['fcm']['en_fcm']) && $data['fcm']['en_fcm']
+            ? 'est maintenant suivi en FCM'
+            : 'ne suit plus la FCM';
+
+        Notification::make()
+        ->title('Mise à jour du suivi FCM')
+        ->success()
+        ->body("Le Marin {$marin->nom} {$message}")
+        ->send();
+
         }else{
             Log::warning('Aucun Marin trouvé  UUID :'. $marin->uuid);
         }
