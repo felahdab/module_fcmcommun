@@ -3,16 +3,15 @@
 namespace Modules\FcmCommun\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
-use Modules\FcmCommun\Traits\HasTablePrefix;
+//use Modules\FcmCommun\Traits\HasTablePrefix;
 use Modules\RH\Models\Marin as RhMarin;
 
-use Modules\FcmCommun\Models\Marin;
+
 
 class MarinParcours extends Model
 {
-    use HasTablePrefix;
+    //use HasTablePrefix;
     //use HasUuids;
 
     /*
@@ -43,17 +42,17 @@ class MarinParcours extends Model
         'taux_global',
         'taux_stage',
         'taux_activite',
-        'parcours',
-        'mentor_id',
+        'parcoursmarin',
+        'parcoursserarialises_id',
     ];
 
     protected $casts = [
-        'parcours' => 'array',
+        'parcoursmarin' => 'array',
     ];
 
-    public function mentor()
-    {
-        return $this->belongsTo(RhMarin::class,'mentor_id');
-    }
+  
+
+
+   
    
 }

@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Schema;
 
 
 
-class CreateMarinMigration extends Migration
+class CreateFcmMarinMigration extends Migration
 {
     public $prefix = '';
     /**
@@ -17,12 +17,12 @@ class CreateMarinMigration extends Migration
 
      public function up(): void
      {
-         Schema::create($this->prefix . 'marins', function (Blueprint $table) {
+         Schema::create($this->prefix . 'fcm_marins', function (Blueprint $table) {
             $table->id('id');
             $table->foreignId('rh_marin_id')->constrained('rh_marins')->onDelete('cascade');
             $table->json('data')->nullable();
             $table->foreignId('mentor_id')->nullable()->constrained('rh_marins')->onDelete('cascade');
-            //$table->foreignId('mentor_id')->constrained('rh_marins')->onDelete('cascade');
+            
             $table->timestamps();
          });
      }

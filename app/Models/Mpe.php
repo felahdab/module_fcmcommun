@@ -12,25 +12,7 @@ class Mpe extends Model
     use HasTablePrefix;
     use HasUuids;
 
-    /*
-      The attributes that are mass assignable.
     
-
-
-    protected $fillable = [];
-    public function __construct(array $attributes = [])
-    {
-        parent::_construct($attributes);
-        // Init de fillable dans le constructeur
-        $this->fillable = [
-            $this->prefix . 'marin_id',
-            'rh_unite_id',
-            'sansdate',
-            'date_debut',
-            'date_fin',
-        ];
-    }
-     */
 
 
     protected $fillable = [

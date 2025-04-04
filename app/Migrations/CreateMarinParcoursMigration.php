@@ -19,7 +19,7 @@ class CreateMarinParcoursMigration extends Migration
         Schema::create($this->prefix . 'marin_parcours', function (Blueprint $table) {
             
             $table->id('id');
-            $table->foreignId('marin_id')->constrained($this->prefix . 'marins')->onDelete('cascade');
+            $table->foreignId('marin_id')->constrained($this->prefix . 'fcm_marins')->onDelete('cascade');
             $table->string('taux_global');
             $table->string('taux_stage');
             $table->string('taux_activite');

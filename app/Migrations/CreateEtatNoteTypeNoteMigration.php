@@ -32,7 +32,7 @@ class CreateEtatNoteTypeNoteMigration extends Migration
         $table->id();
         $table->uuid('uuid')->default($default_value);
         $table->string('libelle');
-        $table->foreignId('marin_id')->constrained($this->prefix . 'marins')->onDelete('cascade');
+        $table->foreignId('marin_id')->constrained($this->prefix . 'fcm_marins')->onDelete('cascade');
         $table->date('date')->nullable();
         $table->string('redacteur');
         $table->boolean('valide_bcf')->default(false);

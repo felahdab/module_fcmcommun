@@ -2,17 +2,15 @@
 
 namespace Modules\FcmCommun\Listeners\Save;
 
-use Modules\FcmCentral\Models\Marin as FcmCentralMarin;
-use Modules\FcmUnite\Models\Marin as FcmUniteMarin;
-use Modules\RH\Models\Marin as RhMarin;
+use Modules\FcmCentral\Models\FcmMarin as FcmCentralMarin;
+use Modules\FcmUnite\Models\FcmMarin as FcmUniteMarin;
+use Modules\FcmCommun\Models\Marin as Marin;
 
 use Modules\FcmCommun\Events\SaveFcmMarinEvent;
 use Illuminate\Support\Facades\Log;
 
 use Filament\Notifications\Notification;
 
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class SaveFcmMarinListener
 {
@@ -38,7 +36,7 @@ class SaveFcmMarinListener
         $data = $event->data;
         
         // Recuperer le marin via son UUID
-        $marin = RhMarin::where('uuid', $event->marin->uuid)->first();
+        $marin = Marin::where('uuid', $event->marin->uuid)->first();
         // Log
         if ($marin){
 
@@ -55,7 +53,7 @@ class SaveFcmMarinListener
                 ],
             );
             // Retour Log
-        Log::info('FcmCentral_marin  :', [
+        Log::info('FcmCentral_fmc_marin  :', [
             'rh_marin_id'=>$marin->id,
             'nom'=>$marin->nom,
             'uuid'=>$marin->uuid,
