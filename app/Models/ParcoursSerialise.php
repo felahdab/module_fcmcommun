@@ -4,12 +4,11 @@ namespace Modules\FcmCommun\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use  Illuminate\Support\Str;
-use Modules\FcmCentral\Traits\HasTablePrefix;
+
 
 class ParcoursSerialise extends Model
 {
-    use HasTablePrefix;
- 
+  
 
     /**
      * The attributes that are mass assignable.

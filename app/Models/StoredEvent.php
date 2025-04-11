@@ -2,7 +2,7 @@
 
 namespace Modules\FcmCommun\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 use Illuminate\Database\Eloquent\Model;
 
 
@@ -10,17 +10,17 @@ use Illuminate\Database\Eloquent\Model;
 use Modules\FcmCommun\DataObjects\UserGeneratedEvent;
 use Modules\FcmCommun\DataObjects\RemoteGeneratedEvent;
 
-use Modules\FcmCommun\Traits\HasTablePrefix;
+
 
 class StoredEvent extends Model
 {
-    use HasFactory;
-    use HasTablePrefix;
 
 
-    protected $primaryKey = 'id';
+
+
 
     protected $fillable = [
+        'id',
         'event_uuid',
         'event_type',
         'marin_id',

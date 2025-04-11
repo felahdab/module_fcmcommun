@@ -5,7 +5,7 @@ namespace Modules\FcmCommun\Models;
 use Illuminate\Database\Eloquent\Model;
 
 //use Modules\FcmCommun\Traits\HasTablePrefix;
-use Modules\RH\Models\Marin as RhMarin;
+
 
 
 
@@ -43,7 +43,7 @@ class MarinParcours extends Model
         'taux_stage',
         'taux_activite',
         'parcoursmarin',
-        'parcoursserarialises_id',
+        'parcoursserialise_id',
     ];
 
     protected $casts = [

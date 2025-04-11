@@ -52,13 +52,13 @@ class RefreshDbSeeder extends Command
 
         // Remettre à plat la base de données de test
         $this->info('Remise à plat de la base de données de test...');
-        $this->call('migrate:fresh', ['--env' => 'testing']);
-        $this->call('db:seed', ['--env' => 'testing']);
+        $this->call('migrate:fresh', ['--database' => 'testmysql']);
+        $this->call('db:seed', ['--database' => 'testmysql']);
         
         // Boucle Module Seeders
         foreach ($this->modules as $module){
             $this->info("Exécution des seeders pour le module (testing) : $module " );
-            $this->call('module:seed', ['module'=> $module, '--env' => 'testing']);
+            $this->call('module:seed', ['module'=> $module, '--database' => 'testmysql']);
         }
         
         // Si un module est spécifié en argument, exécuter les seeders de ce module

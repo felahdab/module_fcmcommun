@@ -39,10 +39,7 @@ class FcmMarin extends Model
     }
 
 
-    public function marinParcours()
-    {
-        return $this->hasMany(MarinParcours::class);
-    }
+ 
 
     public function mentor()
     {

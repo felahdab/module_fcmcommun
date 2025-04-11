@@ -20,9 +20,9 @@ class CreateFcmMarinMigration extends Migration
          Schema::create($this->prefix . 'fcm_marins', function (Blueprint $table) {
             $table->id('id');
             $table->foreignId('rh_marin_id')->constrained('rh_marins')->onDelete('cascade');
-            $table->json('data')->nullable();
-            $table->foreignId('mentor_id')->nullable()->constrained('rh_marins')->onDelete('cascade');
             
+            $table->foreignId('mentor_id')->nullable()->constrained('rh_marins')->onDelete('cascade');
+            $table->json('data')->nullable();
             $table->timestamps();
          });
      }
