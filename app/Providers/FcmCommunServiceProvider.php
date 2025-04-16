@@ -4,7 +4,10 @@ namespace Modules\FcmCommun\Providers;
 
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Console\Scheduling\Schedule;
+
 use Modules\FcmCommun\Console\RefreshDbSeeder;
+use Modules\FcmCommun\Console\RetreiveCohortesCommand;
 
 class FcmCommunServiceProvider extends ServiceProvider
 {
@@ -42,6 +45,7 @@ class FcmCommunServiceProvider extends ServiceProvider
     {
         $this->commands([
             RefreshDbSeeder::class,
+            RetreiveCohortesCommand::class
         ]);
     }
 
@@ -50,10 +54,10 @@ class FcmCommunServiceProvider extends ServiceProvider
      */
     protected function registerCommandSchedules(): void
     {
-        // $this->app->booted(function () {
-        //     $schedule = $this->app->make(Schedule::class);
-        //     $schedule->command('inspire')->hourly();
-        // });
+        $this->app->booted(function () {
+            $schedule = $this->app->make(Schedule::class);
+            $schedule->command('fcmcommun:update-cohortes')->daily();
+        });
     }
 
     /**
