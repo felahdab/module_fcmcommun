@@ -3,14 +3,12 @@
 namespace Modules\FcmCommun\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
-use Modules\FcmCommun\Traits\HasTablePrefix;
+
 
 
 class Note extends Model
 {
-    use HasTablePrefix;
-    use HasUuids;
+
     
     protected $fillable = [
         'libelle',
@@ -26,7 +24,7 @@ class Note extends Model
 
     public function marins()
     {
-        return $this->hasMany(Marin::class);
+        return $this->hasMany(FcmMarin::class);
     }
 
     public function typenote()

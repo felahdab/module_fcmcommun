@@ -1,8 +1,8 @@
 <?php
 
-namespace Modules\FcmCommun\Filament\Fcmcommun\Resources\MarinResource\Pages;
+namespace Modules\FcmCommun\Filament\Fcmcommun\Resources\FcmMarinResource\Pages;
 
-use Modules\FcmCommun\Filament\Fcmcommun\Resources\MarinResource;
+use Modules\FcmCommun\Filament\Fcmcommun\Resources\FcmMarinResource;
 
 use Filament\Resources\Pages\ViewRecord;
 
@@ -16,7 +16,7 @@ use Modules\FcmCommun\Http\Livewire\LivretDeTransformation as LivretDeTransforma
 
 class LivretDeTransformation extends ViewRecord
 {
-    protected static string $resource = MarinResource::class;
+    protected static string $resource = FcmMarinResource::class;
 
     public function form(Form $form): Form
     {

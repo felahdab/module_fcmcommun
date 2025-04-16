@@ -19,12 +19,13 @@ class CreateMarinParcoursMigration extends Migration
         Schema::create($this->prefix . 'marin_parcours', function (Blueprint $table) {
             
             $table->id('id');
-            $table->foreignId('marin_id')->constrained($this->prefix . 'marins')->onDelete('cascade');
-            $table->string('taux_global');
-            $table->string('taux_stage');
-            $table->string('taux_activite');
+            $table->foreignId('fcmmarin_id')->constrained($this->prefix . 'fcm_marins')->onDelete('cascade');
             // La relation ci-dessous emporte avec elle l'uuid du parcours et la version de celui-ci.
-            $table->foreignid('parcoursserarialises_id')->constrained($this->prefix . 'parcours_serialises')->onDelete('cascade');
+            $table->foreignid('parcoursserialise_id')->constrained($this->prefix . 'parcours_serialises')->onDelete('cascade');
+            $table->decimal('taux_global',5,2)->nullable();
+            $table->decimal('taux_stage',5,2)->nullable();
+            $table->decimal('taux_activite',5,2)->nullable();
+            
             $table->json('parcoursmarin')->nullable();
             $table->timestamps();
 

@@ -1,14 +1,14 @@
 <?php
 
-namespace Modules\FcmCommun\Filament\Fcmcommun\Resources\MarinResource\Pages;
+namespace Modules\FcmCommun\Filament\Fcmcommun\Resources\FcmMarinResource\Pages;
 
-use Modules\FcmCommun\Filament\Fcmcommun\Resources\MarinResource;
+use Modules\FcmCommun\Filament\Fcmcommun\Resources\FcmMarinResource;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
-class EditMarin extends EditRecord
+class EditFcmMarin extends EditRecord
 {
-    protected static string $resource = MarinResource::class;
+    protected static string $resource = FcmMarinResource::class;
 
     protected function getHeaderActions(): array
     {

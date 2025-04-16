@@ -2,7 +2,7 @@
 
 namespace Modules\FcmCommun\Events;
 
-use Modules\Rh\Models\Marin;
+use Modules\FcmCommun\Models\Marin;
 use Illuminate\Queue\SerializesModels;
 
 class SuivreMarinFcmEvent

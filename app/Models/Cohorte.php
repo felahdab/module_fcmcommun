@@ -4,8 +4,8 @@ namespace Modules\FcmCommun\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Modules\FcmCommun\Traits\HasTablePrefix;
-use Modules\FcmCentral\Models\Marin as FcmCentralMarin;
-use Modules\FcmUnite\Models\Marin as FcmUniteMarin;
+use Modules\FcmCentral\Models\FcmMarin as FcmCentralMarin;
+use Modules\FcmUnite\Models\FcmMarin as FcmUniteMarin;
 
 
 class Cohorte extends Model

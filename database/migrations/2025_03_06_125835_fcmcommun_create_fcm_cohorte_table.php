@@ -32,13 +32,13 @@ return new class extends Migration
             });
 
         // Laision avec table FcmCentralMarins et FcmCohortes
-        Schema::table('fcmcentral_marins', function (Blueprint $table){
+        Schema::table('fcmcentral_fcm_marins', function (Blueprint $table){
             $table->unsignedBigInteger('cohorte_id')->nullable()->after('data');
             $table->foreign('cohorte_id')->references('id')->on('fcmcommun_cohortes')->onDelete('cascade');
         });
 
         // Laision avec table FcmUniteMarins et FcmCohortes
-        Schema::table('fcmunite_marins', function (Blueprint $table){
+        Schema::table('fcmunite_fcm_marins', function (Blueprint $table){
             $table->unsignedBigInteger('cohorte_id')->nullable()->after('data');
             $table->foreign('cohorte_id')->references('id')->on('fcmcommun_cohortes')->onDelete('cascade');
         });

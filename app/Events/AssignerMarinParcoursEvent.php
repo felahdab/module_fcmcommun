@@ -2,33 +2,34 @@
 
 namespace Modules\FcmCommun\Events;
 
-use Illuminate\Broadcasting\Channel;
-use Illuminate\Broadcasting\InteractsWithSockets;
-use Illuminate\Broadcasting\PresenceChannel;
-use Illuminate\Broadcasting\PrivateChannel;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use Modules\FcmCommun\Models\FcmMarin;
+use Modules\FcmCommun\Models\ParcoursSerialise;
 
 class AssignerMarinParcoursEvent
 {
-    use Dispatchable, InteractsWithSockets, SerializesModels;
+    use Dispatchable, SerializesModels;
+
+
+    public $fcmMarin;
+    public $parcoursSerialise;
+    public $data;
 
     /**
-     * Create a new event instance.
+     * Creer un nouvel Event.
+     * 
+     * @param  Parcours|nulll $parcours a serialiser (ou null pour tous les parcours)
+     * @param array $data data annexe a sauvegarder
+     * 
+     * 
      */
-    public function __construct()
+    public function __construct(FcmMarin $fcmMarin, ParcoursSerialise $parcoursSerialise,?array $data=[]  )
     {
-        //
-    }
-
-    /**
-     * Get the channels the event should be broadcast on.
-     */
-    public function broadcastOn(): array
-    {
-        return [
-            new PrivateChannel('channel-name'),
-        ];
+        $this->fcmMarin             = $fcmMarin;
+        $this->parcoursSerialise    = $parcoursSerialise;
+        $this->data                 = $data;
+    
     }
 }

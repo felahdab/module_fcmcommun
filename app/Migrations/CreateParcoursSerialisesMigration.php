@@ -35,7 +35,8 @@ class CreateParcoursSerialisesMigration extends Migration
             $table->integer('version')->default(1);
             $table->date('date_debut')->nullable();
             $table->date('date_fin')->nullable();
-            $table->json('parcours');
+            $table->json('parcours')->nullable();
+            $table->foreignid('parcours_id')->constrained('fcmcentral_parcours');
             
             $table->timestamps();
 

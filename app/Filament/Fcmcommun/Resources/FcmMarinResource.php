@@ -2,14 +2,14 @@
 
 namespace Modules\FcmCommun\Filament\Fcmcommun\Resources;
 
-use Modules\FcmCommun\Filament\Fcmcommun\Resources\MarinResource\Pages;
+use Modules\FcmCommun\Filament\Fcmcommun\Resources\FcmMarinResource\Pages;
 use Modules\RH\Filament\RH\Resources\MarinResource\Pages as RhPages;
-use Modules\RH\Filament\RH\Resources as RhResource;
-use Modules\FcmCommun\Filament\Fcmcommun\Resources\MarinResource\RelationManagers;
-use App\Models\User;
-use Modules\RH\Models\Marin;
+
+use Modules\FcmCommun\Filament\Fcmcommun\Resources\FcmMarinResource\RelationManagers;
+
+
 use Modules\FcmCommun\Models\Cohorte;
-use Modules\FcmCentral\Models\Marin as FcmCentralMarin;
+use Modules\FcmCommun\Models\Marin as Marin;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -25,8 +25,10 @@ use Modules\FcmCentral\Events\SaveFcmMarinEvent;
 use Illuminate\Support\Facades\DB;
 
 
-class MarinResource extends Resource
+
+class FcmMarinResource extends Resource
 {
+    
     protected static ?string $model = Marin::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-academic-cap';
@@ -36,7 +38,7 @@ class MarinResource extends Resource
     public static function getNavigationBadge(): ?string
     {
         //return static::$model::count();
-        return FcmCentralMarin::count();
+        return \Modules\FcmCentral\Models\FcmMarin::count();
     }
 
     // Supprimer bouton Create
@@ -71,7 +73,7 @@ class MarinResource extends Resource
                    // ->disabledClick()
                     ,
 
-                TextColumn::make('grade.libelle_court')
+                    TextColumn::make('grade.libelle_court')
                     ->searchable()
                     ->badge(),
                 TextColumn::make('specialite.libelle_court')
@@ -99,28 +101,28 @@ class MarinResource extends Resource
                             $cohorte = $record->fcmCentralCohorte ?? null;
                             return $cohorte ? $cohorte->libelle_court  : ' / ';
                         }) ,
-                IconColumn::make('fcmCentral')
-                    ->label('FCM Central')
-                    ->boolean()
+                        IconColumn::make('fcmCentral')
+                        ->label('FCM Central')
+                        ->boolean()
+                        ->getStateUsing(function (Marin $record){
+                            return $record->fcmCentralMarin()->exists();
+                        }) ,
+                    TextColumn::make('mentor.nom')
+                        ->label('Mentor Central')
+                        ->searchable()
+    
                     ->getStateUsing(function (Marin $record){
-                        return $record->fcmCentralMarin()->exists();
+                        // recuperer le premier mentor associé
+                        $mentor = $record->directMentor ?? null;
+                        return $mentor ? $mentor->nom .' '.$mentor->prenom : ' / ';
                     }) ,
-                TextColumn::make('mentor.nom')
-                    ->label('Mentor Central')
-                    ->searchable()
-
-                ->getStateUsing(function (Marin $record){
-                    // recuperer le premier mentor associé
-                    $mentor = $record->directMentor ?? null;
-                    return $mentor ? $mentor->nom .' '.$mentor->prenom : ' / ';
-                }) ,
             ])
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make()
-                ->url(fn ($record)=>MarinResource::getUrl('edit', ['record'=> $record->id,'type'=>'fcmcommun']))
+                ->url(fn ($record)=>FcmMarinResource::getUrl('edit', ['record'=> $record->id,'type'=>'fcmcommun']))
                 ->label('')
                 ->icon('heroicon-o-pencil'),
                 Tables\Actions\Action::make('assignCohorte')
@@ -173,7 +175,7 @@ class MarinResource extends Resource
     {
         return [
            
-            'index' => Pages\ListMarins::route('/'),
+            'index' => Pages\ListFcmMarins::route('/'),
             //'create' => Pages\CreateMarin::route('/create'),
             //'edit' => Pages\EditMarin::route('/{record}/edit'),
             // Redirection vers pages RH MarinResource avec arg from pour dire d'ou on provient
