@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\FcmCommun\Filament\Fcmcommun\Widgets;
+namespace Modules\FcmCommun\Filament\Widgets;
 
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Filament\Widgets\StatsOverviewWidget\Stat;
