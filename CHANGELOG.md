@@ -1,3 +1,27 @@
+## 0.0.3 (April 16, 2025)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.2 –> 0.0.3
+- Merge branch 'tuleap-419581-refonte-tables-fcmcentral-fcmunite-rh-modification-filament-fcmcentral-fcmunite'
+- Ajustement PSR-4
+- implements art #419581
+- Implements art #419581 : Update et ParcoursSerialise
+- Merge remote-tracking branch 'origin/tuleap-419581-refonte-tables-fcmcentral-fcmunite-rh-modification-filament-fcmcentral-fcmunite'
+- Implements art #419581 : Mise a jour Events Listener pour Fcm Suivi Marin Creation des Events Listeners pour l'enregistrement des marins en FCM Notification avec Filament , logs ...
+- Refonte des Tables Migration + Seeders ligne commande : php artisan julien:refresh-db Gestion  des Parcours, page Parcours View Travaux sur plusieurs modules FcmCommun, FcmCentral, FcmUnite, RH
+- Suppression des widgets inutiles du dashboard
+- Merge branch 'master' of /home/coder/project3/Modules/FcmCommun
+- Ajout du champs data aux objets MarinParcours
+- On introduit les éléments de Saloon dans FcmCentral puisque ce module va devoir envoyer ses evenements par API
+- wip
+- wip
+- wip
+- wip
+- wip
+- Nettoyage
+- Nettoyage
+- Ajustements
+- La migration qui cree la table user_parcours prend desormais en parametre la table des utilisateurs ou marins.
+- Conversion vers un livret de transformation en full livewire.
+
 ## 0.0.2 (September 09, 2024)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.1 –> 0.0.2
 - ajout bump-version
