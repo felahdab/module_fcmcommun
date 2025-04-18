@@ -8,6 +8,7 @@ class NavigationFilamentHelper
 {
     public static function registerNavigationsItems()
     {
+        return [];
         return [
             NavigationItem::make('RH')
                     ->url(fn () => route('filament.RH.pages.dashboard'))
