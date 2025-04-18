@@ -1,3 +1,12 @@
+## 0.0.4 (April 18, 2025)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.3 –> 0.0.4
+- Suites aux modifications dans le modèle FcmCommun\Models\Marin, cette Ressource doit être revue. Eventuellement supprimée.
+- Désactivation du menu "Modules". L'implémentation doit être revue pour éviter les dépendances descendantes.
+- Suppression ancienne page de test devenue inutile
+- Retrait des méthodes inutiles. Création de l'attribut suiviEnFcm et du scope associé.
+- Standardisation du marquant suivi _en_fcm. Scope local associé. Test unitaires associés.
+- Création de la commande de mise à jour des cohortes depuis une instance distante. Insription de cette tache dans les taches récurrentes quotidiennes.
+
 ## 0.0.3 (April 16, 2025)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.2 –> 0.0.3
 - Merge branch 'tuleap-419581-refonte-tables-fcmcentral-fcmunite-rh-modification-filament-fcmcentral-fcmunite'
