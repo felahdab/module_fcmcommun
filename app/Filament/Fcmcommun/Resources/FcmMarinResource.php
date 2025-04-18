@@ -105,7 +105,7 @@ class FcmMarinResource extends Resource
                         ->label('FCM Central')
                         ->boolean()
                         ->getStateUsing(function (Marin $record){
-                            return $record->fcmCentralMarin()->exists();
+                            return "toto"; //$record->fcmCentralMarin()->exists();
                         }) ,
                     TextColumn::make('mentor.nom')
                         ->label('Mentor Central')
