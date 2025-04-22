@@ -12,8 +12,11 @@ class ActiviteDto extends Data
     public string $libelle_court;  
     public string $libelle_long;
     public ?string $url;
-    public string $duree_validite;
-    public string $prerequis;
+    public ?string $duree_validite;
+    public ?string $prerequis;
     public string $type;
-    public array $state = [ "checked" => false, "opened" => false];
+    public array $state = [ "checked" => false, "opened" => true];
+    public ?string $date_valid;
+    public ?string $valideur;
+
 }

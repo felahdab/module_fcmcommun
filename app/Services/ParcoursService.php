@@ -19,7 +19,7 @@ class ParcoursService
         if (! array_key_exists("state", $node)){
             $node["state"] = [
                 "checked" => false,
-                "opened" => false
+                "opened" => true
             ];
         }
 
@@ -40,7 +40,6 @@ class ParcoursService
         $arr = $this->adjust_node_state($arr);
 
         $content = $this->transform_for_treeview($content);
-
         $ret = array_merge([$arr], $content);
 
         return $ret;
@@ -97,8 +96,14 @@ class ParcoursService
             
             foreach($dto->fonctions as $fonction){
                 foreach($fonction->competences as $competence){
+                    $nb_sf=0;
+                    $nb_sf_valid=0;
                     foreach ($competence->savoirfaires as $savoirfaire){
+                        $nb_sf ++;
+                        $nb_activite=0;
+                        $nb_activite_valid=0;
                         foreach($savoirfaire->activites as $activite){
+                            $nb_activite++;
                             if (Arr::exists($changes, $activite->id)){
                                 $event = new $this->user_generated_event_class(
                                     event_type: $changes[$activite->id]["state"]["checked"] == "set" ? "valide_activite" : "invalide_activite",
@@ -114,9 +119,28 @@ class ParcoursService
                                 );
 
                                 event($event);
+                                if ($event->event_type == "valide_activite"){
+                                    $activite->date_valid = date('Y-m-d');
+                                    $activite->valideur = auth()->user()->display_name; 
+                                    $activite->state["checked"] = true;  
+                               }
+                                if ($event->event_type == "invalide_activite"){
+                                    $activite->date_valid = NULL;
+                                    $activite->valideur = NULL;   
+                                    $activite->state["checked"] = false; 
+                                }
                             }
+                            if ($activite->state["checked"] == true)  
+                                $nb_activite_valid ++;
+                            else
+                                $nb_activite_valid --;
                         }
-
+                        //pas d'initialisation à false car un sf peut être validé même si toutes les activités ne sont pas validées
+                        // dd($nb_activite_valid.' '.$nb_activite);
+                        if ($nb_activite_valid==$nb_activite){
+                            //toutes activité validées = sf validé
+                            $savoirfaire->state["checked"]=true;
+                        }
                         if (Arr::exists($changes, $savoirfaire->id)){
                             $event = new $this->user_generated_event_class(
                                 event_type: $changes[$savoirfaire->id]["state"]["checked"] == "set" ? "valide_savoirfaire" : "invalide_savoirfaire",
@@ -132,12 +156,31 @@ class ParcoursService
                             );
 
                             event($event);
+                            if ($event->event_type == "valide_savoirfaire"){
+                                $savoirfaire->date_valid = date('Y-m-d');
+                                $savoirfaire->valideur = auth()->user()->display_name;   
+                                $savoirfaire->state["checked"] = true; 
+                            }
+                            if ($event->event_type == "invalide_savoirfaire"){
+                                $savoirfaire->date_valid = NULL;
+                                $savoirfaire->valideur = NULL;    
+                                $savoirfaire->state["checked"] = false;
+                            }
                         }
-
+                        if ($savoirfaire->state["checked"] == true)  
+                            $nb_sf_valid ++;
+                        else
+                            $nb_sf_valid --;
+                        $competence->state["checked"]=false;
+                        if ($nb_sf_valid==$nb_sf){
+                            //tous sf validés = compétence validée
+                            $competence->state["checked"]=true;
+                        }
                     }
                 }
             }
             $marinparcours->parcours=$dto;
+            // dd($marinparcours->parcours);
             $marinparcours->save();
         }
     }
