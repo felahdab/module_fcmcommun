@@ -17,10 +17,7 @@ class SavoirFaireDto extends Data
     public string $url;
     public string $code_sicomp;
     public string $niveau;
-    public array $state = [ "checked" => false, "opened" => true];
-    public ?string $date_valid;
-    public ?string $valideur;
-
+    public array $state = [ "checked" => false, "opened" => false];
 
 
     /** @var Collection<int, ActiviteDto> */

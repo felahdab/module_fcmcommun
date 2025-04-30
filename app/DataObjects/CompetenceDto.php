@@ -16,7 +16,6 @@ class CompetenceDto extends Data
     public string $libelle_court;
     public string $url;
     public ?string $same;
-    public array $state = [ "checked" => false, "opened" => true];
 
     /** @var Collection<int, SavoirFaireDto> */
     public Collection $savoirfaires;

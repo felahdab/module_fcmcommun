@@ -20,12 +20,14 @@ class LivretService
         $dtos_as_array=$dtos->toArray();
 
         $nodes = Arr::keyBy($this->parcours_service->transform_for_treeview($dtos_as_array), "id" );
+
         $roots = $this->parcours_service->get_roots_for_treeview($dtos->toArray());
 
         $livret = [
                 "roots" => $roots,
                 "nodes" => $nodes
         ];
+
         return $livret;
     }
 
@@ -58,6 +60,7 @@ class LivretService
         }
 
         $changes=Arr::undot($changes);
+        
         $this->parcours_service->applyChanges($parcours, $changes, $commentaire);
 
         return;
