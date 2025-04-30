@@ -34,5 +34,26 @@ class ParcoursSerialise extends Model
             $model->uuid = (string) Str::uuid();
         });
     }
+
+
+    public static function findBy(array $critere)
+    {
+        return self::where($critere)->first();
+    }
+
+    public static function findAllBy(array $critere)
+    {
+        return self::where($critere)->get();
+    }
+
+    public function scopeByVersion($query,string $version)
+    {
+        return $query->where('version', $version);
+    }
+
+    public function scopeByParcoursId($query,string $parcoursId)
+    {
+        return $query->where('parcours_id', $parcoursId);
+    }
     
 }
