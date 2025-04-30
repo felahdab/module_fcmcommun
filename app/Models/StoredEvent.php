@@ -23,7 +23,8 @@ class StoredEvent extends Model
         'id',
         'event_uuid',
         'event_type',
-        'marin_id',
+        'marin_uuid',
+        'user_uuid',
         'object_class',
         'object_uuid',
         'detail'
@@ -36,15 +37,49 @@ class StoredEvent extends Model
         ];
     }
 
+    // Ancien code  Commandant (sauvegarde au cas ou)
+    // public static function createFromUserGeneratedEvent(UserGeneratedEvent|RemoteGeneratedEvent $event)
+    // {
+    //     $data = $event->toArray();
+    //     $detail = $data["detail"];
+    //     unset($data["detail"]);
+    //     $newmodel = static::create($data);
+
+    //     $newmodel->detail=$detail;
+    //     $newmodel->save();
+
+    // }
+
     public static function createFromUserGeneratedEvent(UserGeneratedEvent|RemoteGeneratedEvent $event)
-    {
-        $data = $event->toArray();
-        $detail = $data["detail"];
-        unset($data["detail"]);
-        $newmodel = static::create($data);
+{
+    $data = $event->toArray();
 
-        $newmodel->detail=$detail;
-        $newmodel->save();
-
+    // Vérifier si event_type est un tableau
+    if (is_array($data['event_type'])) {
+        foreach ($data['event_type'] as $type) {
+            // Créer une entrée distincte pour chaque type d'événement
+            static::create([
+                'event_uuid'    => $event->event_uuid,
+                'event_type'    => $type,
+                'user_uuid'     => $data['user_uuid'],
+                'marin_uuid'    => $data['marin_uuid'],
+                'object_class'  => $data['object_class'][$type] ?? null,
+                'object_uuid'   => $data['object_uuid'][$type] ?? null,
+                'detail'        => $data['detail'][$type] ?? null,
+            ]);
+        }
+    } else {
+        // Si event_type est une chaîne, insérer normalement
+        static::create([
+            'event_uuid'    => $event->event_uuid,
+            'event_type'    => $data['event_type'],
+            'user_uuid'     => $data['user_uuid'],
+            'marin_uuid'    => $data['marin_uuid'],
+            'object_class'  => $data['object_class'],
+            'object_uuid'   => $data['object_uuid'],
+            'detail'        => $data['detail'],
+        ]);
     }
+}
+
 }
