@@ -1,3 +1,13 @@
+## 0.0.5 (May 02, 2025)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.4 –> 0.0.5
+- Correction FcmMarinListener pour tenir compte de l'état courant du suivi_en_fcm. Simplification du ParcoursSerialiseMarinListener: normalement, on ne devrait plus travailler avec les objets FcmMarin, mais seulement avec des Marin. En outre, modification pour éviter de pouvoir rajouter plusieurs parcours à un Marin. Modification modèle Marin pour créér la ligne dans la table FcmMarin lorsque le Marin passe en suivi FCM.
+- Merge remote-tracking branch 'origin/master'
+- Implements art #463585 Creation Event Sauve
+- Merge remote-tracking branch 'origin/fldb-temp'
+- Revert "???"
+- Implements art #463585 Creation Event Sauve
+- ???
+
 ## 0.0.4 (April 18, 2025)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.3 –> 0.0.4
 - Suites aux modifications dans le modèle FcmCommun\Models\Marin, cette Ressource doit être revue. Eventuellement supprimée.
