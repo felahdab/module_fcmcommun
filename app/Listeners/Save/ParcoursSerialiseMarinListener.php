@@ -27,13 +27,15 @@ class ParcoursSerialiseMarinListener
         }
 
         // Récupérer le marin et les données
-        $record = $event->record;
+        $record = $event->record; // //$record: FcmCentral\Models\Marin
         $data = $event->data;
-        $prefix = $event->prefixTable;
-
-
-
-
+        /**
+         * array:2 [▼ // vendor/spatie/laravel-ignition/src/helpers.php:14
+        * "parcoursserialise_id" => "1"
+        *  "marinUuid" => "18195308-274c-11f0-a34a-0242ac190009"
+        *]
+         */
+        $prefix = $event->prefixTable; // "fcmcentral_" 
 
         // Vérifier si les données nécessaires sont présentes
         if (!isset($data['parcoursserialise_id'])) {
@@ -50,21 +52,21 @@ class ParcoursSerialiseMarinListener
             return;
         }
 
+        // Extrait du modèle FcmCentral\Models\Marin:
+        // * Grace à la définition de cet attribut, le developpeur peut utiliser les méthodes suivantes:
+        // * $marin->complements_fcm->cohorte
+        // * $marin->complements_fcm->mentor
+        // * $marin->complements_fcm->donnes_du_parcours->taux_global
+        // * $marin->complements_fcm->donnes_du_parcours->taux_stage
+        // * $marin->complements_fcm->donnes_du_parcours->taux_activite
+        // * $marin->complements_fcm->donnes_du_parcours->parcours_serialise
         // Si le record provient de Rh_Marins
-        if ($record->tableWithPrefix == 'rh_marins') {
-            $marin =   $record;
-            // Récupérer le FCM Marin
-            $fcmMarinClass = $this->getModelClass($prefix, 'FcmMarin');
-            $fcmMarin = $fcmMarinClass::where('rh_marin_id', $marin->id)->first();
+        
+        $fcmMarin = $record->complements_fcm;
 
-            if (!$fcmMarin) {
-                Log::warning('FCM Marin introuvable.', ['rh_marin_id' => $marin->id]);
-                return;
-            }
-        } else {
-            // Si ca vient de Fcm_Marin
-            $fcmMarin = $record;
-            $marin = $record->marin;
+        if (!$fcmMarin) {
+            Log::warning('FCM Marin introuvable.', ['rh_marin_id' => $record->id]);
+            return;
         }
 
         // Récupérer les taux et autres données
@@ -72,6 +74,12 @@ class ParcoursSerialiseMarinListener
         $tauxStage = $data['taux_stage'] ?? 0;
         $tauxActivite = $data['taux_activite'] ?? 0;
         $parcoursMarin = $data['parcoursmarin'] ?? null;
+
+        // Si un parcours sérialisé est déjà attaché, le détacher
+        if ($fcmMarin->parcoursSerialises->count())
+        {
+            $fcmMarin->parcoursSerialises()->detach();
+        }
 
         // Attacher le parcours serialisé au marin
         $fcmMarin->parcoursSerialises()->attach($parcoursSerialise->id, [
@@ -87,7 +95,7 @@ class ParcoursSerialiseMarinListener
             'parcoursserialise_id' => $parcoursSerialise->id,
         ]);
 
-        $notification = Constants::getMess(Constants::MARIN_PARCOURS, $marin->nom);
+        $notification = Constants::getMess(Constants::MARIN_PARCOURS, $record->nom);
 
         // Notification Filament
         Notification::make()

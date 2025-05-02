@@ -21,7 +21,7 @@ class EventTriggerService
     {
 
         $prefix = UserGeneratedEvent::getPrefixTable();
-        
+        Log::info('Prefixe:', ["prefix" => $prefix]);
          // Init Event
          $eventService = new EventDataService(
             new EventBuilderService(

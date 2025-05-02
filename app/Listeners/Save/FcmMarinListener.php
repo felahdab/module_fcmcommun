@@ -36,29 +36,20 @@ class FcmMarinListener
             return;
         }
 
-
-
-
-
         // Récupérer le marin et les données
+        
         $marin = $event->record;
         $data = $event->data;
 
         if ($marin) {
             Log::info('Marin trouvé :', ['id' => $marin->id]);
 
-            // Vérifier et mettre à jour le champ "en_fcm"
-            $existingData = $marin->data ?? [];
-            $isInFcm = $existingData['fcm']['en_fcm'] ?? false;
+            /**
+             * Si l'évènement demande à retirer le marin du suivi de la FCM est qu'il est effectivement suivi.
+             */
+            if (! $data["fcm"]["en_fcm"] && $marin->suivi_en_fcm) {
 
-            if ($isInFcm) {
-
-                // Si déjà en FCM, inverser l'état
-                $existingData['fcm']['en_fcm'] = false;
-
-                // Sauvegarder les données mises à jour
-                $marin->data = $existingData;
-                $marin->save();
+                $marin->suivi_en_fcm = false;
 
                 // Log de l'action
                 Log::info('Le marin a été retiré du suivi FCM', [
@@ -76,15 +67,14 @@ class FcmMarinListener
                     ->send();
 
 
-            } else {
+            } 
 
-                
-                // Si pas encore en FCM, activer le suivi
-                $existingData['fcm']['en_fcm'] = true;
+            /**
+             * Si l'évènement demande la mise en suivi et que le marin n'est pas déjà suivi:
+             */
+            if ( $data["fcm"]["en_fcm"] && ! $marin->suivi_en_fcm) {
 
-                // Sauvegarder les données mises à jour
-                $marin->data = $existingData;
-                $marin->save();
+                $marin->suivi_en_fcm = true;
 
                 // Log de l'action
                 Log::info('Le marin a été ajouté au suivi FCM', [
