@@ -54,6 +54,10 @@ class EventDataService
         // Gérer le Marin en FCM
         $this->handleMarinFcm($data, $record, $eventTypes, $objectClass, $objectUuid, $details);
 
+        // Gestion Marin Parcours 
+        $this->handleUpdateMarinParcours($data, $record, $eventTypes, $objectClass, $objectUuid, $details);
+
+
         Log::info('Donnees generes',[
             'eventTypes'    => $eventTypes,
             'details'       => $details,
@@ -178,6 +182,40 @@ class EventDataService
             
         }
     }
+
+
+    protected function handleUpdateMarinParcours(array $data, $record, array &$eventTypes, array &$objectClass, array &$objectUuid, array &$details): void
+    {
+        if (isset($data['selectedItems'])) {
+
+           switch($data['eventName']){
+            case 'valid' : $eventName =  EventTypeManager::VALID_ELMT_MARIN_PARCOURS; break;
+            case 'annul' : $eventName =  EventTypeManager::ANNUL_ELMT_MARIN_PARCOURS; break;
+            case 'propos' : $eventName =  EventTypeManager::PROPOS_ELMT_MARIN_PARCOURS; break;
+            case 'annul-propos' : $eventName =  EventTypeManager::ANNUL_PROPOS_ELMT_MARIN_PARCOURS; break;
+           }
+
+
+
+                $this->eventBuilder->addEventData(
+                    $eventName,
+                    $eventTypes,
+                    $objectClass,
+                    $objectUuid,
+                    $details,
+                    '',
+                    [
+                        "init" => $data['selectedItems']['init'],
+                        "sauve" => $data['selectedItems']['sauve'],
+                        "commentaire" => $data['commentaire'],
+                    ],
+                    $record,
+                    $this->prefix,
+                );
+            
+        }
+    }
+
 
     protected function handleMarinFcm(array $data, $record, array &$eventTypes, array &$objectClass, array &$objectUuid, array &$details): void
     {

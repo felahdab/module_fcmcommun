@@ -12,6 +12,10 @@ class EventTypeManager
     public const ATTRIBUER_MENTOR_MARIN                  = 'attribuer_mentor_marin';
     public const ATTRIBUER_PARCOURS_SERIALISE_MARIN      = 'attribuer_parcours_serialise_marin';
     public const CREATION_PARCOURS_SERIALISE             = 'creation_parcours_serialise';
+    public const VALID_ELMT_MARIN_PARCOURS               = 'valid_elmt_marin_parcours';
+    public const ANNUL_ELMT_MARIN_PARCOURS               = 'annul_elmt_marin_parcours';
+    public const PROPOS_ELMT_MARIN_PARCOURS              = 'propos_elmt_marin_parcours';
+    public const ANNUL_PROPOS_ELMT_MARIN_PARCOURS        = 'annul_propos_elmt_marin_parcours';
 
 
     // Tableau des Statuts des Evenements
@@ -79,8 +83,28 @@ class EventTypeManager
                 'object_class'  => 'MarinParcours',
                 'tache'         => $record
                 ? " Attribuer un Parcours a  {$record->nom} {$record->prenom}   "
-                : ' Attribuer un Parcours a un Marin  en FCM '
+                : ' Attribuer un Parcours a un Marin en FCM '
             ],
+
+            self::VALID_ELMT_MARIN_PARCOURS => [
+                'listener'      => 'Modules\FcmCommun\Listeners\Save\ValidMarinParcoursListener',
+                'event_type'    => self::VALID_ELMT_MARIN_PARCOURS,
+                'object_class'  => 'MarinParcours',
+                'tache'         => $record
+                ? " Mise a Jour du Parcours Marin de {$record->nom} {$record->prenom}   "
+                : ' Mise a Jour du Parcours Marin en FCM '
+            ],
+
+            self::ANNUL_ELMT_MARIN_PARCOURS => [
+                'listener'      => 'Modules\FcmCommun\Listeners\Save\UpdateMarinParcoursListener',
+                'event_type'    => self::ANNUL_ELMT_MARIN_PARCOURS,
+                'object_class'  => 'MarinParcours',
+                'tache'         => $record
+                ? " Annulation Element du Parcours Marin de {$record->nom} {$record->prenom}   "
+                : ' Annulation Element du Parcours Marin en FCM '
+            ],
+
+
         ];
     }
 

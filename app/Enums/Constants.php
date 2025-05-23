@@ -35,6 +35,11 @@ class Constants
         'title' => 'Attribution Marin - Parcours',
         'message' => 'Un parcours a été assigné au  marin %s .',
     ];
+
+    const VALID_MARIN_PARCOURS = [
+        'title' => 'Mise a Jour  Marin - Parcours',
+        'message' => 'Enregistrement un/des element(s) Marin Parcours au  marin %s .',
+    ];
     
 
     /**

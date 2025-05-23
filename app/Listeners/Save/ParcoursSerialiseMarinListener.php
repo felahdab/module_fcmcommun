@@ -69,17 +69,25 @@ class ParcoursSerialiseMarinListener
             return;
         }
 
+        // Recuperation Parcours Serialise pour le sauvegarder dans le champ parcoursmarin avec champ supplementaire
+        
+        $parcoursSerialiseJson = $parcoursSerialise->parcours;
+        $parcoursMarinInfos= $this->rajoutDataParcours($parcoursSerialiseJson);
+
+
         // Récupérer les taux et autres données
         $tauxGlobal = $data['taux_global'] ?? 0;
         $tauxStage = $data['taux_stage'] ?? 0;
         $tauxActivite = $data['taux_activite'] ?? 0;
-        $parcoursMarin = $data['parcoursmarin'] ?? null;
+        $parcoursMarin = json_encode($parcoursMarinInfos);
 
         // Si un parcours sérialisé est déjà attaché, le détacher
         if ($fcmMarin->parcoursSerialises->count())
         {
             $fcmMarin->parcoursSerialises()->detach();
         }
+
+        
 
         // Attacher le parcours serialisé au marin
         $fcmMarin->parcoursSerialises()->attach($parcoursSerialise->id, [
@@ -103,5 +111,33 @@ class ParcoursSerialiseMarinListener
             ->success()
             ->body($notification['message'])
             ->send();
+    }
+
+
+    /**
+     *  Injection de champ supplementaire dans chaque niveau
+     * @param array @data
+     * @return @array
+     */
+    private function rajoutDataParcours(array $data): array
+    {
+        // Champs a injecter
+        $data['commentaire']         = null;
+        $data['etat_valid']          = false;
+        $data['valideur']        = null;
+        $data['date_validation']     = null;
+        $data['commentaire_proposition']        = null;
+        $data['date_proposition']   = null;
+
+        // Boucle et traite
+        foreach(['fonctions','competences','savoirfaires','activites'] as $relation){
+            if (isset($data[$relation]) && is_array($data[$relation])){
+                foreach ($data[$relation] as $index => $child) {
+                    $data[$relation][$index] = $this->rajoutDataParcours($child);
+                }
+            }
+        }
+       return $data; 
+
     }
 }
