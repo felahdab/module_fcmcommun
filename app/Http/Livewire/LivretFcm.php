@@ -58,13 +58,22 @@ class LivretFcm extends Component
         $this->selectedItems = $service->toggleValidation($type, $id);
     }
 
-    public function decocheModal(string $type, int $id): void
+    public function annulModal(string $type, int $id): void
     {
         $this->popupData = compact('type', 'id');
         $this->dispatch('open-modal', id: 'annul');
         
         $service = new ParcoursValidationService($this->selectedItems, $this->selectedItems['map']);
         $this->selectedItems = $service->toggleAnnulation($type, $id);
+    }
+
+    public function proposModal(string $type, int $id): void
+    {
+        $this->popupData = compact('type', 'id');
+        $this->dispatch('open-modal', id: 'propos');
+        
+        $service = new ParcoursValidationService($this->selectedItems, $this->selectedItems['map']);
+        $this->selectedItems = $service->toggleProposition($type, $id);
     }
 
     // Fonctions pour ternir ou fermer les sections ouverts
@@ -86,7 +95,7 @@ class LivretFcm extends Component
     }
 
     // Fonction pour ouvrir le popup sur le bouton valider
-    public function openModal()
+    public function sauveModal()
     {
         $this->dispatch('open-modal', id: 'sauve');
     }
@@ -277,6 +286,21 @@ class LivretFcm extends Component
                 ];
                 $modal = 'annul';
                 break;
+                case "propos":
+                    $data = [
+                        'commentaire' => $this->comment,
+                        'selectedItems' => $this->selectedItems,
+                        'marinUuid' => $record->marin->uuid,
+                        'eventName' => 'propos',
+                        'objectUuid' => $record->parcoursSerialises[0]->uuid,
+                    ];
+                    $modal = 'propos';
+                    break; 
+                default:
+                $data =[];
+                $modal = "sauve";
+                break;
+
         }
         // Déclencher l'événement pour sauvegarder les données
 

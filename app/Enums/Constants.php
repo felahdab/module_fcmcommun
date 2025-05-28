@@ -45,6 +45,11 @@ class Constants
         'title' => 'Annulation Element  Marin - Parcours',
         'message' => 'Annulation un/des element(s) Marin Parcours au  marin %s .',
     ];
+
+    const PROPOS_ELMT_MARIN_PARCOURS = [
+        'title' => 'Proposition Element  Marin - Parcours',
+        'message' => 'Proposition un/des element(s) Marin Parcours au  marin %s .',
+    ];
     
 
     /**

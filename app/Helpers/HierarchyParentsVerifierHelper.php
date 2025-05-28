@@ -20,51 +20,62 @@ class HierarchyParentsVerifierHelper
         $this->hierarchyMap = $hierarchyMap;
     }
 
-
-
-        /**
-     * Traite l'annulation d'un élément spécifique
-     * À utiliser quand on vient d'ajouter UN élément dans annul
+    /**
+     * Traite l'action d'un élément spécifique (annulation ou proposition)
      */
-    public function handleSingleAnnulation(string $type, int $id): array
+    public function handleSingleAction(string $action, string $type, int $id): array
     {
-        // Traiter uniquement cet élément spécifique
-        if (isset($this->hierarchyMap['remontant'][$type][$id])) {
-            $elementData = $this->hierarchyMap['remontant'][$type][$id];
+        if (!isset($this->hierarchyMap['remontant'][$type][$id])) {
+            return $this->selectedItems;
+        }
+
+        $elementData = $this->hierarchyMap['remontant'][$type][$id];
+        
+        // Parcourir tous les types de parents possibles
+        foreach ($elementData as $key => $parentIds) {
+            if ($key === 'etat_valid') continue; // Ignorer etat_valid
             
-            // Parcourir tous les types de parents possibles
-            foreach ($elementData as $key => $parentIds) {
-                if ($key === 'etat_valid') continue; // Ignorer etat_valid
-                
-                $parentType = $key; // competences, fonctions, etc.
-                
-                // S'assurer que parentIds est un tableau
-                if (!is_array($parentIds)) {
-                    $parentIds = [$parentIds];
-                }
-                
-                // Dévalider chaque parent qui est actuellement valide
-                foreach ($parentIds as $parentId) {
-                    $this->devalidateParentIfValid($parentType, $parentId);
-                }
+            $parentType = $key; // competences, fonctions, etc.
+            
+            // S'assurer que parentIds est un tableau
+            if (!is_array($parentIds)) {
+                $parentIds = [$parentIds];
+            }
+            
+            // Appliquer l'action sur chaque parent
+            foreach ($parentIds as $parentId) {
+                $this->applyActionOnParent($action, $parentType, $parentId);
             }
         }
         
         return $this->selectedItems;
     }
 
+    /**
+     * Traite l'annulation d'un élément spécifique
+     */
+    public function handleSingleAnnulation(string $type, int $id): array
+    {
+        return $this->handleSingleAction('annulation', $type, $id);
+    }
 
-    
+    /**
+     * Traite la proposition d'un élément spécifique
+     */
+    public function handleSingleProposition(string $type, int $id): array
+    {
+        return $this->handleSingleAction('proposition', $type, $id);
+    }
+
     /**
      * Vérifie tous les parents selon l'action
      */
     public function verifyAll(string $action): array
     {
-        if ($action === 'annulation') {
-            // Pour l'annulation, on traite tous les niveaux en une fois
-            $this->handleAllAnnulationLevels();
+        if (in_array($action, ['annulation', 'proposition'])) {
+            $this->handleAllLevelsForAction($action);
         } else {
-            // Remonter la hiérarchie depuis les feuilles
+            // Remonter la hiérarchie depuis les feuilles pour validation
             $this->verifyLevel('savoirfaires', 'activites', $action);
             $this->verifyLevel('competences', 'savoirfaires', $action);
             $this->verifyLevel('fonctions', 'competences', $action);
@@ -74,15 +85,62 @@ class HierarchyParentsVerifierHelper
     }
 
     /**
-     * Gère l'annulation pour tous les niveaux de hiérarchie
+     * Gère tous les niveaux de hiérarchie pour une action donnée
      */
-    protected function handleAllAnnulationLevels(): void
+    protected function handleAllLevelsForAction(string $action): void
     {
         // Ordre de traitement : du plus bas vers le plus haut
         $levels = ['activites', 'savoirfaires', 'competences', 'fonctions'];
         
         foreach ($levels as $childType) {
-            $this->handleAnnulationLevel($childType);
+            $this->handleLevelForAction($action, $childType);
+        }
+    }
+
+    /**
+     * Gère un niveau pour une action donnée (annulation ou proposition)
+     */
+    protected function handleLevelForAction(string $action, string $childType): void
+    {
+        if (!isset($this->hierarchyMap['remontant'][$childType])) return;
+
+        // Parcourir tous les éléments de ce type ayant l'action correspondante
+        $actionKey = $action === 'annulation' ? 'annul' : 'propos';
+        if (!isset($this->selectedItems[$actionKey][$childType])) return;
+
+        foreach ($this->selectedItems[$actionKey][$childType] as $childId => $value) {
+            if (isset($this->hierarchyMap['remontant'][$childType][$childId])) {
+                $childData = $this->hierarchyMap['remontant'][$childType][$childId];
+                
+                // Parcourir tous les types de parents possibles
+                foreach ($childData as $key => $parentIds) {
+                    if ($key === 'etat_valid') continue; // Ignorer etat_valid
+                    
+                    $parentType = $key; // competences, fonctions, etc.
+                    
+                    // S'assurer que parentIds est un tableau
+                    if (!is_array($parentIds)) {
+                        $parentIds = [$parentIds];
+                    }
+                    
+                    // Appliquer l'action sur chaque parent
+                    foreach ($parentIds as $parentId) {
+                        $this->applyActionOnParent($action, $parentType, $parentId);
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Applique une action sur un parent (annulation ou proposition)
+     */
+    protected function applyActionOnParent(string $action, string $type, int $parentId): void
+    {
+        if ($action === 'annulation') {
+            $this->devalidateParentIfValid($type, $parentId);
+        } elseif ($action === 'proposition') {
+            $this->proposeParentIfEligible($type, $parentId);
         }
     }
 
@@ -91,9 +149,8 @@ class HierarchyParentsVerifierHelper
      */
     protected function verifyLevel(string $parentType, string $childType, string $action): void
     {
-        if ($action === 'annulation') {
-            // Pour l'annulation, on utilise une logique spéciale avec la map remontant
-            $this->handleAnnulationLevel($childType);
+        if (in_array($action, ['annulation', 'proposition'])) {
+            $this->handleLevelForAction($action, $childType);
             return;
         }
 
@@ -116,9 +173,6 @@ class HierarchyParentsVerifierHelper
             case 'validation':
                 return $this->areAllChildrenChecked($childType, $childrenIds);
             
-            case 'annulation':
-                return $this->shouldParentBeAnnulated($childType, $childrenIds);
-            
             case 'proposition':
                 return $this->shouldParentBeProposed($childType, $childrenIds);
         }
@@ -140,17 +194,6 @@ class HierarchyParentsVerifierHelper
     }
 
     /**
-     * Détermine si le parent doit être annulé
-     * CORRECTION: Utilise la map remontant pour identifier les parents à dévalider
-     */
-    protected function shouldParentBeAnnulated(string $type, array $childrenIds): bool
-    {
-        // Pour l'annulation, on va utiliser directement la logique dans updateParentAnnulationState
-        // Cette méthode n'est plus utilisée pour l'annulation
-        return false;
-    }
-
-    /**
      * Détermine si le parent doit être proposé
      */
     protected function shouldParentBeProposed(string $type, array $childrenIds): bool
@@ -168,18 +211,10 @@ class HierarchyParentsVerifierHelper
      */
     protected function updateParentState(string $type, int $id, string $action, bool $shouldUpdate): void
     {
-        switch ($action) {
-            case 'validation':
-                $this->updateParentValidationState($type, $id, $shouldUpdate);
-                break;
-            
-            case 'annulation':
-               // $this->updateParentAnnulationState($type, $id, $shouldUpdate);
-                break;
-            
-            case 'proposition':
-                $this->updateParentPropositionState($type, $id, $shouldUpdate);
-                break;
+        if ($action === 'validation') {
+            $this->updateParentValidationState($type, $id, $shouldUpdate);
+        } elseif ($action === 'proposition') {
+            $this->updateParentPropositionState($type, $id, $shouldUpdate);
         }
     }
 
@@ -204,54 +239,19 @@ class HierarchyParentsVerifierHelper
     }
 
     /**
-     * Gère l'annulation en utilisant la map remontant
-     */
-    protected function handleAnnulationLevel(string $childType): void
-    {
-        if (!isset($this->hierarchyMap['remontant'][$childType])) return;
-
-        // Parcourir tous les éléments annulés de ce type
-        if (!isset($this->selectedItems['annul'][$childType])) return;
-
-        foreach ($this->selectedItems['annul'][$childType] as $childId => $value) {
-            // Trouver les parents de cet élément annulé dans la map remontant
-            if (isset($this->hierarchyMap['remontant'][$childType][$childId])) {
-                $childData = $this->hierarchyMap['remontant'][$childType][$childId];
-                
-                // Parcourir tous les types de parents possibles
-                foreach ($childData as $key => $parentIds) {
-                    if ($key === 'etat_valid') continue; // Ignorer etat_valid
-                    
-                    $parentType = $key; // competences, fonctions, etc.
-                    
-                    // S'assurer que parentIds est un tableau
-                    if (!is_array($parentIds)) {
-                        $parentIds = [$parentIds];
-                    }
-                    
-                    // Dévalider chaque parent qui est actuellement valide
-                    foreach ($parentIds as $parentId) {
-                        $this->devalidateParentIfValid($parentType, $parentId);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Dévalide un parent s'il est actuellement valide et l'ajoute dans annul
      */
     protected function devalidateParentIfValid(string $type, int $parentId): void
     {
         // Vérifier si le parent est actuellement valide (dans gestion OU dans init)
-        $isInGestion = isset($this->selectedItems['gestion'][$type][$parentId]);
-        $isInInit = isset($this->selectedItems['init'][$type][$parentId]);
+        $isValid = isset($this->selectedItems['gestion'][$type][$parentId]) || 
+                   isset($this->selectedItems['init'][$type][$parentId]);
         
-        if ($isInGestion || $isInInit) {
-            // IMPORTANT: Ajouter le parent dans annul
+        if ($isValid) {
+            // Ajouter le parent dans annul
             $this->selectedItems['annul'][$type][$parentId] = true;
             
-            // Retirer de gestion (même si c'était dans init)
+            // Nettoyer les autres états
             unset($this->selectedItems['gestion'][$type][$parentId]);
             unset($this->selectedItems['sauve'][$type][$parentId]);
             unset($this->selectedItems['propos'][$type][$parentId]);
@@ -262,11 +262,32 @@ class HierarchyParentsVerifierHelper
     }
 
     /**
+     * Propose un parent s'il est éligible et l'ajoute dans propos
+     */
+    protected function proposeParentIfEligible(string $type, int $parentId): void
+    {
+        // Vérifier si le parent n'est pas déjà valide ou annulé
+        $isValid = isset($this->selectedItems['gestion'][$type][$parentId]) || 
+                   isset($this->selectedItems['init'][$type][$parentId]);
+        $isAnnul = isset($this->selectedItems['annul'][$type][$parentId]);
+        
+        // Si le parent n'est ni valide ni annulé, on peut le proposer
+        if (!$isValid && !$isAnnul) {
+            // Ajouter le parent dans propos
+            $this->selectedItems['propos'][$type][$parentId] = true;
+            
+            // Mettre à jour la map
+            $this->updateMapState($type, $parentId, 'proposed');
+        }
+    }
+
+    /**
      * Met à jour l'état de proposition du parent
      */
     protected function updateParentPropositionState(string $type, int $id, bool $shouldBeProposed): void
     {
-        $parentValid = isset($this->selectedItems['gestion'][$type][$id]) || isset($this->selectedItems['init'][$type][$id]);
+        $parentValid = isset($this->selectedItems['gestion'][$type][$id]) || 
+                       isset($this->selectedItems['init'][$type][$id]);
         $parentAnnul = isset($this->selectedItems['annul'][$type][$id]);
 
         if ($shouldBeProposed && !$parentValid && !$parentAnnul) {

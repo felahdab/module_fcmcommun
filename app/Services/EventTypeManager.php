@@ -82,7 +82,7 @@ class EventTypeManager
                 'event_type'    => self::ATTRIBUER_PARCOURS_SERIALISE_MARIN,
                 'object_class'  => 'MarinParcours',
                 'tache'         => $record
-                ? " Attribuer un Parcours a  {$record->nom} {$record->prenom}   "
+                ? " Attribuer un Parcours a  {$record->marin->nom} {$record->marin->prenom}   "
                 : ' Attribuer un Parcours a un Marin en FCM '
             ],
 
@@ -91,7 +91,7 @@ class EventTypeManager
                 'event_type'    => self::VALID_ELMT_MARIN_PARCOURS,
                 'object_class'  => 'MarinParcours',
                 'tache'         => $record
-                ? " Mise a Jour du Parcours Marin de {$record->nom} {$record->prenom}   "
+                ? " Mise a Jour du Parcours Marin de {$record->marin->nom} {$record->marin->prenom}   "
                 : ' Mise a Jour du Parcours Marin en FCM '
             ],
 
@@ -100,9 +100,19 @@ class EventTypeManager
                 'event_type'    => self::ANNUL_ELMT_MARIN_PARCOURS,
                 'object_class'  => 'MarinParcours',
                 'tache'         => $record
-                ? " Annulation Element du Parcours Marin de {$record->nom} {$record->prenom}   "
+                ? " Annulation Element du Parcours Marin de {$record->marin->nom} {$record->marin->prenom}   "
                 : ' Annulation Element du Parcours Marin en FCM '
             ],
+
+            self::PROPOS_ELMT_MARIN_PARCOURS => [
+                'listener'      => 'Modules\FcmCommun\Listeners\Save\ProposElementMarinParcoursListener',
+                'event_type'    => self::PROPOS_ELMT_MARIN_PARCOURS,
+                'object_class'  => 'MarinParcours',
+                'tache'         => $record
+                ? " Proposition Element du Parcours Marin de {$record->marin->nom} {$record->marin->prenom}   "
+                : ' Annulation Element du Parcours Marin en FCM '
+            ],
+
 
 
         ];
