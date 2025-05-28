@@ -87,7 +87,7 @@ class EventTypeManager
             ],
 
             self::VALID_ELMT_MARIN_PARCOURS => [
-                'listener'      => 'Modules\FcmCommun\Listeners\Save\ValidMarinParcoursListener',
+                'listener'      => 'Modules\FcmCommun\Listeners\Save\ValidElementMarinParcoursListener',
                 'event_type'    => self::VALID_ELMT_MARIN_PARCOURS,
                 'object_class'  => 'MarinParcours',
                 'tache'         => $record
@@ -96,7 +96,7 @@ class EventTypeManager
             ],
 
             self::ANNUL_ELMT_MARIN_PARCOURS => [
-                'listener'      => 'Modules\FcmCommun\Listeners\Save\UpdateMarinParcoursListener',
+                'listener'      => 'Modules\FcmCommun\Listeners\Save\AnnulElementMarinParcoursListener',
                 'event_type'    => self::ANNUL_ELMT_MARIN_PARCOURS,
                 'object_class'  => 'MarinParcours',
                 'tache'         => $record

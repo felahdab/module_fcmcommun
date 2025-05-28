@@ -36,9 +36,14 @@ class Constants
         'message' => 'Un parcours a été assigné au  marin %s .',
     ];
 
-    const VALID_MARIN_PARCOURS = [
+    const VALID_ELMT_MARIN_PARCOURS = [
         'title' => 'Mise a Jour  Marin - Parcours',
         'message' => 'Enregistrement un/des element(s) Marin Parcours au  marin %s .',
+    ];
+
+    const ANNUL_ELMT_MARIN_PARCOURS = [
+        'title' => 'Annulation Element  Marin - Parcours',
+        'message' => 'Annulation un/des element(s) Marin Parcours au  marin %s .',
     ];
     
 

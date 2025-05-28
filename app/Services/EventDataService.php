@@ -171,7 +171,7 @@ class EventDataService
                     $objectClass,
                     $objectUuid,
                     $details,
-                    '',
+                    $data['version'],
                     [
                         "parcours_serialise_version" => $data['version'],
                         "parcours_serialise_nom" => $data['libelle_court'],
@@ -189,11 +189,29 @@ class EventDataService
         if (isset($data['selectedItems'])) {
 
            switch($data['eventName']){
-            case 'valid' : $eventName =  EventTypeManager::VALID_ELMT_MARIN_PARCOURS; break;
-            case 'annul' : $eventName =  EventTypeManager::ANNUL_ELMT_MARIN_PARCOURS; break;
-            case 'propos' : $eventName =  EventTypeManager::PROPOS_ELMT_MARIN_PARCOURS; break;
-            case 'annul-propos' : $eventName =  EventTypeManager::ANNUL_PROPOS_ELMT_MARIN_PARCOURS; break;
+            case 'valid' : 
+                $eventName =  EventTypeManager::VALID_ELMT_MARIN_PARCOURS; 
+                $selectedKey = 'sauve'; 
+            break;
+            case 'annul' : 
+                $eventName =  EventTypeManager::ANNUL_ELMT_MARIN_PARCOURS; 
+                $selectedKey = 'annul';
+            break;
+            case 'propos' : 
+                $eventName =  EventTypeManager::PROPOS_ELMT_MARIN_PARCOURS; 
+                $selectedKey = 'propos';
+            break;
+            case 'annul-propos' : 
+                $eventName =  EventTypeManager::ANNUL_PROPOS_ELMT_MARIN_PARCOURS;
+                $selectedKey = 'propos';
+            break;
+            default :
+                $selectedKey = 'save';
+            break;
+
            }
+
+           $objectUuid = [$data['objectUuid']];
 
 
 
@@ -203,11 +221,11 @@ class EventDataService
                     $objectClass,
                     $objectUuid,
                     $details,
-                    '',
+                    $data['objectUuid'],
                     [
-                        "init" => $data['selectedItems']['init'],
-                        "sauve" => $data['selectedItems']['sauve'],
-                        "commentaire" => $data['commentaire'],
+                        "init" => $data['selectedItems']['init'] ?? [],
+                        $selectedKey => $data['selectedItems'][$selectedKey] ?? [],
+                        "commentaire" => $data['commentaire'] ?? '',
                     ],
                     $record,
                     $this->prefix,
