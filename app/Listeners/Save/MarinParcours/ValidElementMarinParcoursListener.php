@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\FcmCommun\Listeners\Save;
+namespace Modules\FcmCommun\Listeners\Save\MarinParcours;
 
 use Illuminate\Support\Facades\Log;
 use Filament\Notifications\Notification;

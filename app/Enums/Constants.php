@@ -50,6 +50,26 @@ class Constants
         'title' => 'Proposition Element  Marin - Parcours',
         'message' => 'Proposition un/des element(s) Marin Parcours au  marin %s .',
     ];
+
+    const ANNUL_PROPOS_ELMT_MARIN_PARCOURS = [
+        'title' => 'Proposition Element  Marin - Parcours',
+        'message' => 'Validation Proposition un/des element(s) Marin Parcours au  marin %s .',
+    ];
+
+    const VALID_PROPOS_ELMT_MARIN_PARCOURS = [
+        'title' => 'Validation Proposition Element  Marin - Parcours',
+        'message' => 'Validation Proposition un/des element(s) Marin Parcours au  marin %s .',
+    ];
+
+    const RESTORE_ELMT_MARIN_PARCOURS = [
+        'title' => 'Restore Data Event  Marin - Parcours',
+        'message' => 'Restore data event   Marin Parcours au  marin %s .',
+    ];
+
+    const REBOOT_ELMT_MARIN_PARCOURS = [
+        'title' => 'Reboot Data Event  Marin - Parcours',
+        'message' => 'Reboot data event   Marin Parcours au  marin %s .',
+    ];
     
 
     /**

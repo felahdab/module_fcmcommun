@@ -2,6 +2,12 @@
 
 namespace Modules\FcmCommun\Services;
 
+
+/**
+ *  Service pour  LivretFCM : Creation d'un map descendant et remontant pour les relations ManyToMany  et savoir qui est les parents et enfants
+ *  Utilise surtout dans selectedItems du LIvewire FCMLivret
+ * 
+ */
 class HierarchyMapGeneratorService
 {
 

@@ -6,16 +6,19 @@ class EventTypeManager
 {
     
     
-    public const ATTRIBUER_COHORTE_MARIN                 = 'attribuer_cohorte_marin';
-    public const MARIN_EN_FCM                            = 'marin_en_fcm';
-    public const MARIN_PAS_FCM                           = 'marin_pas_fcm';
-    public const ATTRIBUER_MENTOR_MARIN                  = 'attribuer_mentor_marin';
-    public const ATTRIBUER_PARCOURS_SERIALISE_MARIN      = 'attribuer_parcours_serialise_marin';
-    public const CREATION_PARCOURS_SERIALISE             = 'creation_parcours_serialise';
-    public const VALID_ELMT_MARIN_PARCOURS               = 'valid_elmt_marin_parcours';
-    public const ANNUL_ELMT_MARIN_PARCOURS               = 'annul_elmt_marin_parcours';
-    public const PROPOS_ELMT_MARIN_PARCOURS              = 'propos_elmt_marin_parcours';
-    public const ANNUL_PROPOS_ELMT_MARIN_PARCOURS        = 'annul_propos_elmt_marin_parcours';
+    public const ATTRIBUER_COHORTE_MARIN                    = 'attribuer_cohorte_marin';
+    public const MARIN_EN_FCM                               = 'marin_en_fcm';
+    public const MARIN_PAS_FCM                              = 'marin_pas_fcm';
+    public const ATTRIBUER_MENTOR_MARIN                     = 'attribuer_mentor_marin';
+    public const ATTRIBUER_PARCOURS_SERIALISE_MARIN         = 'attribuer_parcours_serialise_marin';
+    public const CREATION_PARCOURS_SERIALISE                = 'creation_parcours_serialise';
+    public const VALID_ELMT_MARIN_PARCOURS                  = 'valid_elmt_marin_parcours';
+    public const ANNUL_ELMT_MARIN_PARCOURS                  = 'annul_elmt_marin_parcours';
+    public const PROPOS_ELMT_MARIN_PARCOURS                 = 'propos_elmt_marin_parcours';
+    public const ANNUL_PROPOS_ELMT_MARIN_PARCOURS           = 'annul_propos_elmt_marin_parcours';
+    public const VALID_PROPOS_ELMT_MARIN_PARCOURS           = 'valid_propos_elmt_marin_parcours';
+    public const RESTORE_ELMT_MARIN_PARCOURS                = 'restore_elmt_marin_parcours';
+    public const REBOOT_ELMT_MARIN_PARCOURS                 = 'reboot_elmt_marin_parcours';
 
 
     // Tableau des Statuts des Evenements
@@ -87,7 +90,7 @@ class EventTypeManager
             ],
 
             self::VALID_ELMT_MARIN_PARCOURS => [
-                'listener'      => 'Modules\FcmCommun\Listeners\Save\ValidElementMarinParcoursListener',
+                'listener'      => 'Modules\FcmCommun\Listeners\Save\MarinParcours\ValidElementMarinParcoursListener',
                 'event_type'    => self::VALID_ELMT_MARIN_PARCOURS,
                 'object_class'  => 'MarinParcours',
                 'tache'         => $record
@@ -96,7 +99,7 @@ class EventTypeManager
             ],
 
             self::ANNUL_ELMT_MARIN_PARCOURS => [
-                'listener'      => 'Modules\FcmCommun\Listeners\Save\AnnulElementMarinParcoursListener',
+                'listener'      => 'Modules\FcmCommun\Listeners\Save\MarinParcours\AnnulElementMarinParcoursListener',
                 'event_type'    => self::ANNUL_ELMT_MARIN_PARCOURS,
                 'object_class'  => 'MarinParcours',
                 'tache'         => $record
@@ -105,12 +108,48 @@ class EventTypeManager
             ],
 
             self::PROPOS_ELMT_MARIN_PARCOURS => [
-                'listener'      => 'Modules\FcmCommun\Listeners\Save\ProposElementMarinParcoursListener',
+                'listener'      => 'Modules\FcmCommun\Listeners\Save\MarinParcours\ProposElementMarinParcoursListener',
                 'event_type'    => self::PROPOS_ELMT_MARIN_PARCOURS,
                 'object_class'  => 'MarinParcours',
                 'tache'         => $record
                 ? " Proposition Element du Parcours Marin de {$record->marin->nom} {$record->marin->prenom}   "
-                : ' Annulation Element du Parcours Marin en FCM '
+                : ' Proposition Element du Parcours Marin en FCM '
+            ],
+
+            self::ANNUL_PROPOS_ELMT_MARIN_PARCOURS => [
+                'listener'      => 'Modules\FcmCommun\Listeners\Save\MarinParcours\AnnulProposElementMarinParcoursListener',
+                'event_type'    => self::ANNUL_PROPOS_ELMT_MARIN_PARCOURS,
+                'object_class'  => 'MarinParcours',
+                'tache'         => $record
+                ? " Annulation Proposition Element du Parcours Marin de {$record->marin->nom} {$record->marin->prenom}   "
+                : ' Annulation Proposition Element du Parcours Marin en FCM '
+            ],
+
+            self::VALID_PROPOS_ELMT_MARIN_PARCOURS => [
+                'listener'      => 'Modules\FcmCommun\Listeners\Save\MarinParcours\ValidProposElementMarinParcoursListener',
+                'event_type'    => self::VALID_PROPOS_ELMT_MARIN_PARCOURS,
+                'object_class'  => 'MarinParcours',
+                'tache'         => $record
+                ? " Validation Proposition Element du Parcours Marin de {$record->marin->nom} {$record->marin->prenom}   "
+                : ' Validation Proposition Element du Parcours Marin en FCM '
+            ],
+
+            self::RESTORE_ELMT_MARIN_PARCOURS => [
+                'listener'      => 'Modules\FcmCommun\Listeners\Save\MarinParcours\RestoreElementMarinParcoursListener',
+                'event_type'    => self::RESTORE_ELMT_MARIN_PARCOURS,
+                'object_class'  => 'MarinParcours',
+                'tache'         => $record
+                ? " Restore Element du Parcours Marin de {$record->marin->nom} {$record->marin->prenom}   "
+                : ' Restore Element du Parcours Marin en FCM '
+            ],
+
+            self::REBOOT_ELMT_MARIN_PARCOURS => [
+                'listener'      => 'Modules\FcmCommun\Listeners\Save\MarinParcours\RebootElementMarinParcoursListener',
+                'event_type'    => self::REBOOT_ELMT_MARIN_PARCOURS,
+                'object_class'  => 'MarinParcours',
+                'tache'         => $record
+                ? " Reboot Element du Parcours Marin de {$record->marin->nom} {$record->marin->prenom}   "
+                : ' Reboot Element du Parcours Marin en FCM '
             ],
 
 

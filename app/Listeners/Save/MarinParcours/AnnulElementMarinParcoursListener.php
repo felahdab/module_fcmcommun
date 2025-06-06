@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\FcmCommun\Listeners\Save;
+namespace Modules\FcmCommun\Listeners\Save\MarinParcours;
 
 use Illuminate\Support\Facades\Log;
 use Filament\Notifications\Notification;
@@ -9,7 +9,7 @@ use Modules\FcmCommun\Services\EventTypeManager;
 use Modules\FcmCommun\Traits\LoadsModelsDynamically;
 use Modules\FcmCommun\Enums\Constants;
 
-class ProposElementMarinParcoursListener
+class AnnulElementMarinParcoursListener
 {
     use LoadsModelsDynamically;
 
@@ -25,7 +25,7 @@ class ProposElementMarinParcoursListener
     public function handle(UserGeneratedEvent $event): void
     {
         // Vérifier si l'événement est du bon type
-        if (!$event->isOfType(EventTypeManager::PROPOS_ELMT_MARIN_PARCOURS)) {
+        if (!$event->isOfType(EventTypeManager::ANNUL_ELMT_MARIN_PARCOURS)) {
             return;
         }
 
@@ -42,7 +42,7 @@ class ProposElementMarinParcoursListener
 
 
             // Mise a jour en fonction de selectedItems
-            foreach ($this->selectedItems['propos'] as $type => $items) {
+            foreach ($this->selectedItems['annul'] as $type => $items) {
                 $this->updateParcoursMarinItems($parcoursMarin, $type, $items, $record->marin->displayName ?? $record->marin->nom . ' ' . $record->marin->prenom . ' ' . $record->marin->grade);
             }
 
@@ -58,7 +58,7 @@ class ProposElementMarinParcoursListener
         // ->success()
         // ->send();
 
-        $notification = Constants::getMess(Constants::PROPOS_ELMT_MARIN_PARCOURS, $record->marin->nom);
+        $notification = Constants::getMess(Constants::ANNUL_ELMT_MARIN_PARCOURS, $record->marin->nom);
 
         // Notification Filament
         Notification::make()
@@ -82,9 +82,9 @@ class ProposElementMarinParcoursListener
         // --- TRAITEMENT DIRECT DES FONCTIONS ---
         if ($type === 'fonctions' && isset($items[$fonction['id']])) {
             $fonction['etat_valid'] = false;
-            $fonction['commentaire_proposition'] = $this->comment;
-            $fonction['date_proposition'] = \Carbon\Carbon::now()->toDateTimeString();
-            
+            $fonction['commentaire'] = $this->comment;
+            $fonction['date_validation'] = \Carbon\Carbon::now()->toDateTimeString();
+            $fonction['valideur'] = $displayName;
         }
 
         // --- TRAITEMENT DES AUTRES TYPES ---
@@ -92,9 +92,9 @@ class ProposElementMarinParcoursListener
             foreach ($fonction[$type] as &$element) {
                 if (isset($items[$element['id']])) {
                     $element['etat_valid'] = false;
-                    $element['commentaire_proposition'] = $this->comment;
-                    $element['date_proposition'] = \Carbon\Carbon::now()->toDateTimeString();
-                   /// $element['valideur'] = $displayName;
+                    $element['commentaire'] = $this->comment;
+                    $element['date_validation'] = \Carbon\Carbon::now()->toDateTimeString();
+                    $element['valideur'] = $displayName;
                 }
             }
         }
@@ -104,17 +104,17 @@ class ProposElementMarinParcoursListener
             foreach ($fonction['competences'] as &$competence) {
                 if ($type === 'competences' && isset($items[$competence['id']])) {
                     $competence['etat_valid'] = false;
-                    $competence['commentaire_proposition'] = $this->comment;
-                    $competence['date_proposition'] = \Carbon\Carbon::now()->toDateTimeString();
-                    //$competence['valideur'] = $displayName;
+                    $competence['commentaire'] = $this->comment;
+                    $competence['date_validation'] = \Carbon\Carbon::now()->toDateTimeString();
+                    $competence['valideur'] = $displayName;
                 }
                 if (isset($competence[$type])) {
                     foreach ($competence[$type] as &$element) {
                         if (isset($items[$element['id']])) {
                             $element['etat_valid'] = false;
-                            $element['commentaire_proposition'] = $this->comment;
-                            $element['date_proposition'] = \Carbon\Carbon::now()->toDateTimeString();
-                           // $element['valideur'] = $displayName;
+                            $element['commentaire'] = $this->comment;
+                            $element['date_validation'] = \Carbon\Carbon::now()->toDateTimeString();
+                            $element['valideur'] = $displayName;
                         }
                     }
                 }
@@ -122,17 +122,17 @@ class ProposElementMarinParcoursListener
                     foreach ($competence['savoirfaires'] as &$savoirFaire) {
                         if ($type === 'savoirfaires' && isset($items[$savoirFaire['id']])) {
                             $savoirFaire['etat_valid'] = false;
-                            $savoirFaire['commentaire_proposition'] = $this->comment;
-                            $savoirFaire['date_proposition'] = \Carbon\Carbon::now()->toDateTimeString();
-                            //$savoirFaire['valideur'] = $displayName;
+                            $savoirFaire['commentaire'] = $this->comment;
+                            $savoirFaire['date_validation'] = \Carbon\Carbon::now()->toDateTimeString();
+                            $savoirFaire['valideur'] = $displayName;
                         }
                         if (isset($savoirFaire[$type])) {
                             foreach ($savoirFaire[$type] as &$element) {
                                 if (isset($items[$element['id']])) {
                                     $element['etat_valid'] = false;
-                                    $element['commentaire_proposition'] = $this->comment;
-                                    $element['date_proposition'] = \Carbon\Carbon::now()->toDateTimeString();
-                                    //$element['valideur'] = $displayName;
+                                    $element['commentaire'] = $this->comment;
+                                    $element['date_validation'] = \Carbon\Carbon::now()->toDateTimeString();
+                                    $element['valideur'] = $displayName;
                                 }
                             }
                         }

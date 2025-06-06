@@ -201,9 +201,21 @@ class EventDataService
                 $eventName =  EventTypeManager::PROPOS_ELMT_MARIN_PARCOURS; 
                 $selectedKey = 'propos';
             break;
-            case 'annul-propos' : 
+            case 'annulPropos' : 
                 $eventName =  EventTypeManager::ANNUL_PROPOS_ELMT_MARIN_PARCOURS;
-                $selectedKey = 'propos';
+                $selectedKey = 'aValiderPropos';
+            break;
+            case 'validPropos' : 
+                $eventName =  EventTypeManager::VALID_PROPOS_ELMT_MARIN_PARCOURS;
+                $selectedKey = 'aValiderPropos';
+            break;
+            case 'restore' : 
+                $eventName =  EventTypeManager::RESTORE_ELMT_MARIN_PARCOURS;
+                $selectedKey = 'restore';
+            break;
+            case 'reboot' : 
+                $eventName =  EventTypeManager::REBOOT_ELMT_MARIN_PARCOURS;
+                $selectedKey = 'reboot';
             break;
             default :
                 $selectedKey = 'save';

@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\FcmCommun\Listeners\Save;
+namespace Modules\FcmCommun\Listeners\Save\MarinParcours;
 
 use Illuminate\Support\Facades\Log;
 use Filament\Notifications\Notification;
@@ -9,7 +9,7 @@ use Modules\FcmCommun\Services\EventTypeManager;
 use Modules\FcmCommun\Traits\LoadsModelsDynamically;
 use Modules\FcmCommun\Enums\Constants;
 
-class AnnulElementMarinParcoursListener
+class AnnulProposElementMarinParcoursListener
 {
     use LoadsModelsDynamically;
 
@@ -25,7 +25,7 @@ class AnnulElementMarinParcoursListener
     public function handle(UserGeneratedEvent $event): void
     {
         // Vérifier si l'événement est du bon type
-        if (!$event->isOfType(EventTypeManager::ANNUL_ELMT_MARIN_PARCOURS)) {
+        if (!$event->isOfType(EventTypeManager::ANNUL_PROPOS_ELMT_MARIN_PARCOURS)) {
             return;
         }
 
@@ -42,8 +42,8 @@ class AnnulElementMarinParcoursListener
 
 
             // Mise a jour en fonction de selectedItems
-            foreach ($this->selectedItems['annul'] as $type => $items) {
-                $this->updateParcoursMarinItems($parcoursMarin, $type, $items, $record->marin->displayName ?? $record->marin->nom . ' ' . $record->marin->prenom . ' ' . $record->marin->grade);
+            foreach ($this->selectedItems['aValiderPropos'] as $type => $items) {
+                $this->annulPropositions($parcoursMarin, $type, $items, $record->marin->displayName ?? $record->marin->nom . ' ' . $record->marin->prenom . ' ' . $record->marin->grade);
             }
 
 
@@ -58,7 +58,7 @@ class AnnulElementMarinParcoursListener
         // ->success()
         // ->send();
 
-        $notification = Constants::getMess(Constants::ANNUL_ELMT_MARIN_PARCOURS, $record->marin->nom);
+        $notification = Constants::getMess(Constants::ANNUL_PROPOS_ELMT_MARIN_PARCOURS, $record->marin->nom);
 
         // Notification Filament
         Notification::make()
@@ -76,25 +76,24 @@ class AnnulElementMarinParcoursListener
     /**
      * Mettre à jour les éléments imbriqués dans la structure.
      */
-    protected function updateParcoursMarinItems(&$parcoursMarin, $type, $items, $displayName)
+    protected function annulPropositions(&$parcoursMarin, $type, $items)
 {
     foreach ($parcoursMarin['fonctions'] as &$fonction) {
         // --- TRAITEMENT DIRECT DES FONCTIONS ---
         if ($type === 'fonctions' && isset($items[$fonction['id']])) {
-            $fonction['etat_valid'] = false;
-            $fonction['commentaire'] = $this->comment;
-            $fonction['date_validation'] = \Carbon\Carbon::now()->toDateTimeString();
-            $fonction['valideur'] = $displayName;
+            $fonction['commentaire_proposition'] = null;
+            $fonction['date_proposition'] = null;
+            $fonction['etat_propos'] = null;
         }
 
         // --- TRAITEMENT DES AUTRES TYPES ---
         if (isset($fonction[$type])) {
             foreach ($fonction[$type] as &$element) {
-                if (isset($items[$element['id']])) {
-                    $element['etat_valid'] = false;
-                    $element['commentaire'] = $this->comment;
-                    $element['date_validation'] = \Carbon\Carbon::now()->toDateTimeString();
-                    $element['valideur'] = $displayName;
+                // Ici, on vérifie directement si l'ID existe comme clé dans $items
+                if (array_key_exists($element['id'], $items)) {
+                    $element['commentaire_proposition'] = null;
+                    $element['date_proposition'] = null;
+                    $element['etat_propos'] = null;
                 }
             }
         }
@@ -102,37 +101,33 @@ class AnnulElementMarinParcoursListener
         // --- SOUS-NIVEAUX ---
         if (isset($fonction['competences'])) {
             foreach ($fonction['competences'] as &$competence) {
-                if ($type === 'competences' && isset($items[$competence['id']])) {
-                    $competence['etat_valid'] = false;
-                    $competence['commentaire'] = $this->comment;
-                    $competence['date_validation'] = \Carbon\Carbon::now()->toDateTimeString();
-                    $competence['valideur'] = $displayName;
+                if ($type === 'competences' && array_key_exists($competence['id'], $items)) {
+                    $competence['commentaire_proposition'] = null;
+                    $competence['date_proposition'] = null;
+                    $competence['etat_propos'] = null;
                 }
                 if (isset($competence[$type])) {
                     foreach ($competence[$type] as &$element) {
-                        if (isset($items[$element['id']])) {
-                            $element['etat_valid'] = false;
-                            $element['commentaire'] = $this->comment;
-                            $element['date_validation'] = \Carbon\Carbon::now()->toDateTimeString();
-                            $element['valideur'] = $displayName;
+                        if (array_key_exists($element['id'], $items)) {
+                            $element['commentaire_proposition'] = null;
+                            $element['date_proposition'] = null;
+                            $element['etat_propos'] = null;
                         }
                     }
                 }
                 if (isset($competence['savoirfaires'])) {
                     foreach ($competence['savoirfaires'] as &$savoirFaire) {
-                        if ($type === 'savoirfaires' && isset($items[$savoirFaire['id']])) {
-                            $savoirFaire['etat_valid'] = false;
-                            $savoirFaire['commentaire'] = $this->comment;
-                            $savoirFaire['date_validation'] = \Carbon\Carbon::now()->toDateTimeString();
-                            $savoirFaire['valideur'] = $displayName;
+                        if ($type === 'savoirfaires' && array_key_exists($savoirFaire['id'], $items)) {
+                            $savoirFaire['commentaire_proposition'] = null;
+                            $savoirFaire['date_proposition'] = null;
+                            $savoirFaire['etat_propos'] = null;
                         }
                         if (isset($savoirFaire[$type])) {
                             foreach ($savoirFaire[$type] as &$element) {
-                                if (isset($items[$element['id']])) {
-                                    $element['etat_valid'] = false;
-                                    $element['commentaire'] = $this->comment;
-                                    $element['date_validation'] = \Carbon\Carbon::now()->toDateTimeString();
-                                    $element['valideur'] = $displayName;
+                                if (array_key_exists($element['id'], $items)) {
+                                    $element['commentaire_proposition'] = null;
+                                    $element['date_proposition'] = null;
+                                    $element['etat_propos'] = null;
                                 }
                             }
                         }
@@ -142,5 +137,6 @@ class AnnulElementMarinParcoursListener
         }
     }
 }
+
 
 }

@@ -8,6 +8,7 @@ use Modules\FcmCommun\DataObjects\UserGeneratedEvent;
 use Modules\FcmCommun\Services\EventTypeManager;
 use Modules\FcmCommun\Traits\LoadsModelsDynamically;
 use Modules\FcmCommun\Enums\Constants;
+use Modules\FcmCommun\Helpers\DataParcoursMarinHelper;
 
 class ParcoursSerialiseMarinListener
 {
@@ -72,7 +73,7 @@ class ParcoursSerialiseMarinListener
         // Recuperation Parcours Serialise pour le sauvegarder dans le champ parcoursmarin avec champ supplementaire
         
         $parcoursSerialiseJson = $parcoursSerialise->parcours;
-        $parcoursMarinInfos= $this->rajoutDataParcours($parcoursSerialiseJson);
+        $parcoursMarinInfos = DataParcoursMarinHelper::rajoutChampSupplementaire($parcoursSerialiseJson, null, 'init');
 
 
         // Récupérer les taux et autres données
@@ -114,30 +115,4 @@ class ParcoursSerialiseMarinListener
     }
 
 
-    /**
-     *  Injection de champ supplementaire dans chaque niveau
-     * @param array @data
-     * @return @array
-     */
-    private function rajoutDataParcours(array $data): array
-    {
-        // Champs a injecter
-        $data['commentaire']         = null;
-        $data['etat_valid']          = false;
-        $data['valideur']        = null;
-        $data['date_validation']     = null;
-        $data['commentaire_proposition']        = null;
-        $data['date_proposition']   = null;
-
-        // Boucle et traite
-        foreach(['fonctions','competences','savoirfaires','activites'] as $relation){
-            if (isset($data[$relation]) && is_array($data[$relation])){
-                foreach ($data[$relation] as $index => $child) {
-                    $data[$relation][$index] = $this->rajoutDataParcours($child);
-                }
-            }
-        }
-       return $data; 
-
-    }
 }

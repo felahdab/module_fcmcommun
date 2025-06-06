@@ -5,6 +5,11 @@ namespace Modules\FcmCommun\Services;
 use Modules\FcmCommun\Helpers\HierarchyPropagatorHelper;
 use Modules\FcmCommun\Helpers\HierarchyParentsVerifierHelper;
 
+
+/**
+ *  Service pour  LivretFCM : Pour la gestion de l'affichage checked/unchecked de la Page LivretFCM (sauve, annul, proposition, valid/annul proposition), 
+ * 
+ */
 class ParcoursValidationService
 {
 
@@ -32,7 +37,9 @@ class ParcoursValidationService
         $this->propagateToDescendants($action, $type, $id, $newState);
 
         // 3. Vérifier et corriger les parents
+        if (in_array($action,['validation','annulation'])){
         $this->verifyAllParents($action);
+        }
 
         return $this->selectedItems;
     }

@@ -19,6 +19,7 @@ class LivretFcm extends Component
     public $fcmMarinId;
     public $tablePrefix;
     public $fcmMarinModel;
+    public $fcmMarin;
     public $parcours;
 
     // État de l'interface
@@ -26,7 +27,7 @@ class LivretFcm extends Component
     public $openSections = [];
     public $comment = '';
     public $popupData = [];
-    public $restoreId;
+    public $selectedRestoreEvent=null;
     public $restore = [];
 
 
@@ -36,15 +37,23 @@ class LivretFcm extends Component
         $this->fcmMarinId = $fcmMarinId;
         $this->tablePrefix = $tablePrefix;
         $this->fcmMarinModel = $this->getModelClass($this->tablePrefix, 'FcmMarin');
-        
+        // Affichage Parcours
         $this->loadParcoursMarin();
         $this->loadRestoreData();
+        ////////////////////////////////
+        // Note : Concernant l'affichage on load de la poposition Mentor/Marin , il se trouve dans  
+        // fcmcentral::filament.fcmcentral.livewire.parcours.layouts.parcoursDetailsValidation.modal 
+        // (activation avec js click le bouton display none dans  script.blade.php)
+        ////////////////////////////////
     }
+
 
     public function render()
     {
         return view('fcmcentral::filament.fcmcentral.livewire.parcours.parcours-details-validation', [
             'parcours' => $this->parcours,
+            'fcmMarin' => $this->fcmMarin,
+            'restore'   => $this->restore,
         ]);
     }
 
@@ -58,6 +67,22 @@ class LivretFcm extends Component
         $this->selectedItems = $service->toggleValidation($type, $id);
     }
 
+     // Fonctions pour ternir ou fermer les sections ouverts
+    public function toggleSection($sectionId)
+    {
+ 
+        if (isset($this->openSections[$sectionId])) {
+            unset($this->openSections[$sectionId]);
+        } else {
+            $this->openSections[$sectionId] = true;
+        }
+    }
+
+    // ========================================
+    // MODALS
+    // ========================================
+
+    // Modal Annulation
     public function annulModal(string $type, int $id): void
     {
         $this->popupData = compact('type', 'id');
@@ -67,6 +92,7 @@ class LivretFcm extends Component
         $this->selectedItems = $service->toggleAnnulation($type, $id);
     }
 
+    // Modal Proposition
     public function proposModal(string $type, int $id): void
     {
         $this->popupData = compact('type', 'id');
@@ -74,17 +100,6 @@ class LivretFcm extends Component
         
         $service = new ParcoursValidationService($this->selectedItems, $this->selectedItems['map']);
         $this->selectedItems = $service->toggleProposition($type, $id);
-    }
-
-    // Fonctions pour ternir ou fermer les sections ouverts
-    public function toggleSection($sectionId)
-    {
-
-        if (isset($this->openSections[$sectionId])) {
-            unset($this->openSections[$sectionId]);
-        } else {
-            $this->openSections[$sectionId] = true;
-        }
     }
 
     // Modal Informations
@@ -100,6 +115,7 @@ class LivretFcm extends Component
         $this->dispatch('open-modal', id: 'sauve');
     }
 
+
     // ========================================
     // MÉTHODES DE CHARGEMENT DES DONNÉES
     // ========================================
@@ -107,6 +123,7 @@ class LivretFcm extends Component
     protected function loadParcoursMarin()
     {
         $fcmMarin = $this->fcmMarinModel::with('parcoursSerialises')->find($this->fcmMarinId);
+        $this->fcmMarin = $fcmMarin;
 
         if ($fcmMarin && $fcmMarin->parcoursSerialises->isNotEmpty()) {
             $this->parcours = $this->formatParcours($fcmMarin->parcoursSerialises);
@@ -130,6 +147,10 @@ class LivretFcm extends Component
             ];
         })->toArray();
     }
+
+    // ========================================
+    // INIT DES DONNÉES
+    // ========================================
 
     protected function initializeSelectedItems()
     {
@@ -174,59 +195,87 @@ class LivretFcm extends Component
             $this->selectedItems['init'][$type][$element['id']] = true;
             $this->selectedItems['gestion'][$type][$element['id']] = true;
         }
+
+        // Pour la  (Validation||Annulation)Proposition Mentor||User
+        if (!empty($element['date_proposition'])){
+        
+            $this->selectedItems['aValiderPropos'][$type][$element['id']] = [
+                'date_proposition' =>  $element['date_proposition'],
+                'commentaire_proposition' => $element['commentaire_proposition'],
+                'libelle_court' => $element['libelle_court'] ,
+                'libelle_long' => $element['libelle_long'] ,
+            ];      
+        }
+        
     }
+
+
+
+    // ========================================
+    // RESTORE DATA
+    // ========================================
 
     protected function loadRestoreData()
     {
-        $fcmMarin = $this->fcmMarinModel::with('parcoursSerialises')->find($this->fcmMarinId);
+        //$fcmMarin = $this->fcmMarinModel::with('parcoursSerialises')->find($this->fcmMarinId);
+        $fcmMarin = $this->fcmMarin;
         $storeEvents = $this->getModelClass($this->tablePrefix, 'StoredEvent');
         
-        $this->restore = $storeEvents::where('event_type', 'valid_elmt_marin_parcours')
-            ->where('marin_uuid', $fcmMarin->marin->uuid)
+        $this->restore = $storeEvents::where('marin_uuid', $fcmMarin->marin->uuid)
             ->where('object_uuid', $fcmMarin->parcoursSerialises[0]->uuid)
+            ->whereIn('event_type', [
+                'valid_elmt_marin_parcours',
+                'annul_elmt_marin_parcours',
+                //'propos_elmt_marin_parcours',
+            ])
+            ->orderBy('created_at','DESC')
             ->get();
+          
     }
 
+    public function restoreFromEvent()
+    {
+        if (!$this->selectedRestoreEvent){
+            return;
+        }
 
+        //$selectedEvent = $this->restore->firstWhere('id',$this->selectedRestoreEvent);
+        $storeEvents = $this->getModelClass($this->tablePrefix, 'StoredEvent');
+        $selectedEvent =  $storeEvents::find($this->selectedRestoreEvent);
 
+        if($selectedEvent){
+           //$this->selectedItems= $selectedEvent->detail;
+           switch($selectedEvent->event_type){
+            case 'valid_elmt_marin_parcours' : $eventType='sauve'; break;
+            case 'annul_elmt_marin_parcours' : $eventType='annul'; break;
+            case 'propos_elmt_marin_parcours' : $eventType='propos'; break;
+            default:  $eventType='valid'; break;
+           }
+           $init = $selectedEvent->detail['init'] ?? [];
+           $tab = $selectedEvent->detail[$eventType] ?? [];
+           $restored =[];
+           // Merger chaque type individuellement
+           foreach(['activites','competences','savoirfaires','fonctions'] as $item){
+             $initItems = $init[$item] ?? [];
+             $tabItems = $tab[$item] ?? [];
+             if ($eventType== 'annul'){
+                $restored[$item]=array_diff_key($initItems,$tabItems);
+             }else{
+                $restored[$item]=$initItems + $tabItems;
+             }
 
-    
+           }
+           $this->selectedItems['restore']=$restored;
+           $this->selectedItems['type']=$eventType;
+           $this->selectedItems['commentaire']= $selectedEvent->detail['commentaire'] ?? 'Restore Data';
+           $this->selectedItems['date_restore']= $selectedEvent->created_at->format('Y-m-d');
+          // dd($this->selectedItems,$selectedEvent->detail);
+        $this->save('restore');
 
+        }
+    }
 
-
-    
-
-
-   
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    
-
-    
-
-
-
-
-
+  
 
 
 
@@ -252,8 +301,8 @@ class LivretFcm extends Component
 
         
 
-        $record  = $this->fcmMarinModel::with('parcoursSerialises')
-            ->find($this->fcmMarinId);
+        //$record  = $this->fcmMarinModel::with('parcoursSerialises')->find($this->fcmMarinId);
+        $record = $this->fcmMarin;
 
         if (!$record) {
             Notification::make()
@@ -296,14 +345,54 @@ class LivretFcm extends Component
                     ];
                     $modal = 'propos';
                     break; 
+                case "annulPropos":
+                    $data = [
+                        'commentaire' => ' Annulation de la Proposition',
+                        'selectedItems' => $this->selectedItems,
+                        'marinUuid' => $record->marin->uuid,
+                        'eventName' => 'annulPropos',
+                        'objectUuid' => $record->parcoursSerialises[0]->uuid,
+                    ];
+                    $modal = 'aValiderModal';
+                    break;   
+                case "validPropos":
+                    $data = [
+                        'commentaire' => ' Validation de la Proposition',
+                        'selectedItems' => $this->selectedItems,
+                        'marinUuid' => $record->marin->uuid,
+                        'eventName' => 'validPropos',
+                        'objectUuid' => $record->parcoursSerialises[0]->uuid,
+                    ];
+                    $modal = 'aValiderModal';
+                    break;    
+                case "restore":
+                    $data = [
+                        //'commentaire' => $this->comment,
+                        'commentaire' => $this->selectedItems['commentaire'],
+                        'selectedItems' => $this->selectedItems,
+                        'marinUuid' => $record->marin->uuid,
+                        'eventName' => 'restore',
+                        'objectUuid' => $record->parcoursSerialises[0]->uuid,
+                    ];
+                    $modal = 'restoreModal';
+                    break;   
+                case "reboot":
+                        $data = [
+                            'commentaire' => ' Reboot Data',
+                            'selectedItems' => $this->selectedItems,
+                            'marinUuid' => $record->marin->uuid,
+                            'eventName' => 'reboot',
+                            'objectUuid' => $record->parcoursSerialises[0]->uuid,
+                        ];
+                        $modal = 'rebootModal';
+                        break;                                     
                 default:
-                $data =[];
-                $modal = "sauve";
+                    $data =[];
+                    $modal = "sauve";
                 break;
 
         }
         // Déclencher l'événement pour sauvegarder les données
-
         //dd($record,$data);
         EventTriggerService::triggerEvent($data, $record);
 
@@ -311,6 +400,8 @@ class LivretFcm extends Component
         $this->selectedItems['sauve'] = [];
         $this->selectedItems['annul'] = [];
         $this->selectedItems['propos'] = [];
+        $this->selectedItems['aValiderPropos'] = [];
+        $this->selectedItems['restore'] = [];
         $this->comment = [];
 
         // Fermer le modal
