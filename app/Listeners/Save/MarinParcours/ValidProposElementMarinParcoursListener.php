@@ -9,6 +9,7 @@ use Modules\FcmCommun\Services\EventTypeManager;
 use Modules\FcmCommun\Traits\LoadsModelsDynamically;
 use Modules\FcmCommun\Enums\Constants;
 use Modules\FcmCommun\Helpers\HierarchyParentsVerifierHelper;
+use Modules\FcmCommun\Services\CalculTauxParcoursService;
 
 class ValidProposElementMarinParcoursListener
 {
@@ -60,6 +61,10 @@ class ValidProposElementMarinParcoursListener
                 // 4. Appliquer les changements aux parents dans le parcours
                 $this->applyParentValidationToParcours($parcoursMarin, $updatedSelectedItems, $displayName);
             }
+
+             // Recalcul des taux
+             $calculTauxParcoursService = app(CalculTauxParcoursService::class);
+             $calculTauxParcoursService->mettreAJourTaux($parcoursMarin);
 
             // Sauvegarder les données
             $parcours->pivot->parcoursmarin = json_encode($parcoursMarin);

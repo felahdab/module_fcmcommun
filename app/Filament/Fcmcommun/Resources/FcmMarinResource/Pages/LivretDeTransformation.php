@@ -12,7 +12,7 @@ use Filament\Forms\Components\Section;
 use Filament\Forms\Components\Grid;
 use Filament\Forms\Components\Livewire;
 
-use Modules\FcmCommun\Http\Livewire\LivretDeTransformation as LivretDeTransformationLivewire;
+use Modules\FcmCommun\Http\Livewire\LivretFcm as LivretDeTransformationLivewire;
 
 class LivretDeTransformation extends ViewRecord
 {

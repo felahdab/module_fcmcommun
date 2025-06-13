@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 
 use Modules\FcmCommun\Console\RefreshDbSeeder;
+use Modules\FcmCommun\Console\GenerateParcoursSeederCommand;
 use Modules\FcmCommun\Console\RetreiveCohortesCommand;
 
 class FcmCommunServiceProvider extends ServiceProvider
@@ -45,6 +46,7 @@ class FcmCommunServiceProvider extends ServiceProvider
     {
         $this->commands([
             RefreshDbSeeder::class,
+            GenerateParcoursSeederCommand::class,
             RetreiveCohortesCommand::class
         ]);
     }

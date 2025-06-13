@@ -9,6 +9,7 @@ use Modules\FcmCommun\Services\EventTypeManager;
 use Modules\FcmCommun\Traits\LoadsModelsDynamically;
 use Modules\FcmCommun\Enums\Constants;
 use Modules\FcmCommun\Helpers\DataParcoursMarinHelper;
+use Modules\FcmCommun\Services\CalculTauxParcoursService;
 
 class RebootElementMarinParcoursListener
 {
@@ -71,6 +72,9 @@ class RebootElementMarinParcoursListener
 
         $fcmMarin->parcoursSerialises()->updateExistingPivot($parcoursSerialise->id,[
             'parcoursmarin' => $parcoursMarin,
+            'taux_global'=> 0,
+            'taux_activite'=> 0,
+            'taux_stage'=> 0,
             'updated_at' => now()
         ]);
 

@@ -8,6 +8,7 @@ use Modules\FcmCommun\DataObjects\UserGeneratedEvent;
 use Modules\FcmCommun\Services\EventTypeManager;
 use Modules\FcmCommun\Traits\LoadsModelsDynamically;
 use Modules\FcmCommun\Enums\Constants;
+use Modules\FcmCommun\Services\CalculTauxParcoursService;
 
 class RestoreElementMarinParcoursListener
 {
@@ -53,6 +54,10 @@ class RestoreElementMarinParcoursListener
             foreach ($this->selectedItems['restore'] as $type => $items) {
                 $this->updateParcoursMarinItems($parcoursMarin, $type, $items,  $record->marin->displayName ?? $record->marin->nom . ' ' . $record->marin->prenom . ' ' . $record->marin->grade);
             }
+
+             // Recalcul des taux
+             $calculTauxParcoursService = app(CalculTauxParcoursService::class);
+             $calculTauxParcoursService->mettreAJourTaux($parcoursMarin);
 
 
             // Sauvegarder les données d'origine avec les modifications dans selectedItems
