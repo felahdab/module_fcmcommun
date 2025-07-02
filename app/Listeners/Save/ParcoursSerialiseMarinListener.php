@@ -80,7 +80,7 @@ class ParcoursSerialiseMarinListener
         $tauxGlobal = $data['taux_global'] ?? 0;
         $tauxStage = $data['taux_stage'] ?? 0;
         $tauxActivite = $data['taux_activite'] ?? 0;
-        $parcoursMarin = json_encode($parcoursMarinInfos);
+        $parcoursMarin = json_encode($parcoursMarinInfos, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
 
         // Si un parcours sérialisé est déjà attaché, le détacher
         if ($fcmMarin->parcoursSerialises->count())

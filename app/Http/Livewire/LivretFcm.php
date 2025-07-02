@@ -17,10 +17,12 @@ class LivretFcm extends Component
     use LoadsModelsDynamically;
 
     public $fcmMarinId;
+    public $parcoursId;
     public $tablePrefix;
     public $fcmMarinModel;
     public $fcmMarin;
     public $parcours;
+    public $parcoursMarin; 
 
     // État de l'interface
     public $selectedItems = [];
@@ -32,30 +34,54 @@ class LivretFcm extends Component
 
 
 
-    public function mount($fcmMarinId, $tablePrefix)
+    public function mount($fcmMarinId, $tablePrefix, $parcoursMarin)
     {
+        $startTime = microtime(true);
+        Log::info("=== MOUNT LIVEWIRE OPTIMISÉ ===", ['fcmMarinId' => $fcmMarinId]);
+ 
         $this->fcmMarinId = $fcmMarinId;
         $this->tablePrefix = $tablePrefix;
-        $this->fcmMarinModel = $this->getModelClass($this->tablePrefix, 'FcmMarin');
-        // Affichage Parcours
-        $this->loadParcoursMarin();
+        $this->parcoursMarin = $parcoursMarin;
+        
+        // ✅ VÉRIFIER QUE LES DONNÉES SONT PRÉSENTES
+        if (!$parcoursMarin || !isset($parcoursMarin['fcmMarin'])) {
+            Log::error("Données parcoursMarin manquantes pour marin: {$fcmMarinId}");
+            $this->parcours = [];
+            $this->selectedItems = [];
+            return;
+        }
+ 
+        // ✅ CHARGER DIRECTEMENT DEPUIS LES DONNÉES PRÉ-CHARGÉES
+        $this->fcmMarin = $parcoursMarin['fcmMarin'];
+        
+        if ($parcoursMarin['parcoursSerialises']->isNotEmpty()) {
+            $this->parcours = $this->formatParcours($parcoursMarin['parcoursSerialises']);
+            $this->initializeSelectedItems();
+        } else {
+            $this->parcours = [];
+            $this->selectedItems = [];
+            Log::info("Aucun parcours sérialisé trouvé pour marin: {$fcmMarinId}");
+        }
+ 
+        // ✅ CHARGER RESTORE DATA
         $this->loadRestoreData();
-        ////////////////////////////////
-        // Note : Concernant l'affichage on load de la poposition Mentor/Marin , il se trouve dans  
-        // fcmcentral::filament.fcmcentral.livewire.parcours.layouts.parcoursDetailsValidation.modal 
-        // (activation avec js click le bouton display none dans  script.blade.php)
-        ////////////////////////////////
+ 
+        $mountTime = round((microtime(true) - $startTime) * 1000, 2);
+        Log::info("Mount ultra-rapide terminé en: {$mountTime}ms");
     }
-
-
+ 
     public function render()
     {
-        return view('fcmcentral::filament.fcmcentral.livewire.parcours.parcours-details-validation', [
+        return view('fcmcommun::livewire.parcours.parcours-details-validation', [
             'parcours' => $this->parcours,
             'fcmMarin' => $this->fcmMarin,
-            'restore'   => $this->restore,
+            'restore' => $this->restore,
         ]);
     }
+
+
+ 
+ 
 
     // ========================================
     // MÉTHODES PRINCIPALES SIMPLIFIÉES
@@ -63,20 +89,68 @@ class LivretFcm extends Component
 
     public function toggleCheck(string $type, int $id)
     {
+        $startTime = microtime(true);
+        $memoryStart = memory_get_usage(true);
+        
+        Log::info("=== DIAGNOSTIC DÉLAI LIVEWIRE ===", [
+            'method' => 'toggleCheck',
+            'type' => $type,
+            'id' => $id,
+            'memory_start' => $memoryStart,
+            'timestamp' => now()->toDateTimeString()
+        ]);
+        
+
+           // 1. Toggle immédiat
         $service = new ParcoursValidationService($this->selectedItems, $this->selectedItems['map']);
-        $this->selectedItems = $service->toggleValidation($type, $id);
+          $this->selectedItems = $service->toggleValidation($type, $id);
+        
+    // // 2. Pas de re-render
+    // $this->skipRender();
+
+
+    // // Envoyer  selectedItems json pour javascript
+    // $selectedItemsJson = json_encode($this->selectedItems['gestion']);
+
+    // // 3. Passer par javascript pour refaire affichage page
+   
+    // $this->js("
+    //     document.dispatchEvent(new CustomEvent('parcours-update', {
+    //         detail: {$selectedItemsJson}
+    //     }));
+    // ");
+
+    
+  
+
+      /////
+
+     
+      
+     
+          
+          $processingTime = round((microtime(true) - $startTime) * 1000, 2);
+          $memoryEnd = memory_get_usage(true);
+          
+          Log::info("=== RÉSULTAT DIAGNOSTIC ===", [
+              'processing_time' => $processingTime . 'ms',
+              'memory_used' => ($memoryEnd - $memoryStart) . ' bytes',
+              'memory_peak' => memory_get_peak_usage(true),
+              'timestamp' => now()->toDateTimeString()
+              
+          ]);
+          
+      
+  
+
+      //////
+    
+       
+
+     
     }
 
-     // Fonctions pour ternir ou fermer les sections ouverts
-    public function toggleSection($sectionId)
-    {
- 
-        if (isset($this->openSections[$sectionId])) {
-            unset($this->openSections[$sectionId]);
-        } else {
-            $this->openSections[$sectionId] = true;
-        }
-    }
+    
 
     // ========================================
     // MODALS
@@ -120,19 +194,44 @@ class LivretFcm extends Component
     // MÉTHODES DE CHARGEMENT DES DONNÉES
     // ========================================
 
-    protected function loadParcoursMarin()
-    {
-        $fcmMarin = $this->fcmMarinModel::with('parcoursSerialises')->find($this->fcmMarinId);
-        $this->fcmMarin = $fcmMarin;
+    protected function loadParcoursMarin($parcoursId = '')
+{
+   
+   
+    $startTime = microtime(true);
+    
+    // ✅ SÉLECTION DES CHAMPS SPÉCIFIQUES
+    $fcmMarin = $this->fcmMarinModel::select([
+        'id',
+        'rh_marin_id',
+        // Ajoutez d'autres champs si nécessaires pour votre logique
+    ])
+    ->with([
+        'parcoursSerialises:id,libelle_court',
+        //'parcoursSerialises.pivot:fcmmarin_id,parcoursserialise_id,parcoursmarin,taux_global,taux_stage,taux_activite',
+        'marin:id,uuid,nom,prenom'
+    ])
+    ->find($this->fcmMarinId);
 
-        if ($fcmMarin && $fcmMarin->parcoursSerialises->isNotEmpty()) {
-            $this->parcours = $this->formatParcours($fcmMarin->parcoursSerialises);
-            $this->initializeSelectedItems();
-        } else {
-            $this->parcours = [];
-            $this->selectedItems = [];
-        }
+ 
+    $this->fcmMarin = $fcmMarin;
+    
+    if ($fcmMarin && $fcmMarin->parcoursSerialises->isNotEmpty()) {
+        $this->parcours = $this->formatParcours($fcmMarin->parcoursSerialises);
+        $this->initializeSelectedItems();
+    } else {
+        $this->parcours = [];
+        $this->selectedItems = [];
+        Log::info("No parcours found for marin: {$this->fcmMarinId}");
     }
+    
+    $loadTime = round((microtime(true) - $startTime) * 1000, 2);
+    Log::info("loadParcoursMarin optimized: {$loadTime}ms", [
+        'fcmMarinId' => $this->fcmMarinId,
+        'parcours_count' => count($this->parcours)
+    ]);
+}
+
 
     protected function formatParcours($parcoursSerialises)
     {

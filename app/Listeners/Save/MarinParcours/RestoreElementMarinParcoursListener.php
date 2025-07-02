@@ -55,9 +55,11 @@ class RestoreElementMarinParcoursListener
                 $this->updateParcoursMarinItems($parcoursMarin, $type, $items,  $record->marin->displayName ?? $record->marin->nom . ' ' . $record->marin->prenom . ' ' . $record->marin->grade);
             }
 
-             // Recalcul des taux
-             $calculTauxParcoursService = app(CalculTauxParcoursService::class);
-             $calculTauxParcoursService->mettreAJourTaux($parcoursMarin);
+            // Recalcul des taux
+            $resultatCalcul = CalculTauxParcoursService::mettreAJourTaux($parcoursMarin);
+            $parcours->pivot->taux_global= $parcoursMarin['taux_global'];
+            $parcours->pivot->taux_stage= $parcoursMarin['taux_stage'];
+            $parcours->pivot->taux_activite= $parcoursMarin['taux_activite'];
 
 
             // Sauvegarder les données d'origine avec les modifications dans selectedItems

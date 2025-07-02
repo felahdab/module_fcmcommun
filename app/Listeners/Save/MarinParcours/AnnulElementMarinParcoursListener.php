@@ -49,8 +49,11 @@ class AnnulElementMarinParcoursListener
             }
 
             // Recalcul des taux
-            $calculTauxParcoursService = app(CalculTauxParcoursService::class);
-            $calculTauxParcoursService->mettreAJourTaux($parcoursMarin);
+            $resultatCalcul = CalculTauxParcoursService::mettreAJourTaux($parcoursMarin);
+            $parcours->pivot->taux_global= $parcoursMarin['taux_global'];
+            $parcours->pivot->taux_stage= $parcoursMarin['taux_stage'];
+            $parcours->pivot->taux_activite= $parcoursMarin['taux_activite'];
+            
             // Sauvegarder les données d'origine avec les modifications dans selectedItems
             $parcours->pivot->parcoursmarin = json_encode($parcoursMarin);
             $parcours->pivot->save();

@@ -182,7 +182,7 @@ class FcmMarinResource extends Resource
             'create' => RhPages\CreateMarin::route('/create'),
             'edit' =>   RhPages\EditMarin::route('/{record}/edit'),
             
-            'livret' => Pages\LivretDeTransformation::route('/{record}/livret-de-fcm')
+           
         ];
     }
 }

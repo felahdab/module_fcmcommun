@@ -23,8 +23,8 @@ class CalculTauxParcoursService
             }
 
             $parcoursMarin['taux_global'] = $this->calculerTauxGlobal($parcoursMarin);
-            $parcoursMarin['taux_stages'] = $this->calculerTauxStages($parcoursMarin);
-            $parcoursMarin['taux_activites'] = $this->calculerTauxActivites($parcoursMarin);
+            $parcoursMarin['taux_stage'] = $this->calculerTauxStages($parcoursMarin);
+            $parcoursMarin['taux_activite'] = $this->calculerTauxActivites($parcoursMarin);
             //$parcoursMarin['date_maj_taux'] = now()->toDateTimeString();
             
             return true;
