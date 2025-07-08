@@ -72,12 +72,12 @@
         <p>Aucun parcours Sérialisé trouvé pour ce marin</p>
     @endif
 
-    <div class="mt-6">
+    {{-- <div class="mt-6">
         <pre class="bg-gray-400 p-4 rounded">
             {{ json_encode($selectedItems , JSON_PRETTY_PRINT)}}
            
         </pre>
-    </div> 
+    </div>  --}}
     
   
  
