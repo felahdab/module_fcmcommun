@@ -57,7 +57,7 @@ class EventDataService
         // Gestion Marin Parcours 
         $this->handleUpdateMarinParcours($data, $record, $eventTypes, $objectClass, $objectUuid, $details);
 
-
+        if ( $eventTypes     != []){
         Log::info('Donnees generes',[
             'eventTypes'    => $eventTypes,
             'details'       => $details,
@@ -67,7 +67,9 @@ class EventDataService
             'marinUuid'     => $marinUuid,
 
         ]);
-
+    }else{
+        Log::warning('Donnees NON generes');
+    }
 
         // Retourner les données nécessaires pour l'événement
         return [
@@ -129,6 +131,7 @@ class EventDataService
                 );
             }
         }
+        Log::info('EventBuilder Data handleMentor genere');
     }
 
 

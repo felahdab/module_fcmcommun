@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 use Modules\FcmCommun\DataObjects\UserGeneratedEvent;
 use Modules\FcmCommun\DataObjects\RemoteGeneratedEvent;
+use Illuminate\Support\Facades\Log;
 
 
 
@@ -68,6 +69,7 @@ class StoredEvent extends Model
                 'detail'        => $data['detail'][$type] ?? null,
             ]);
         }
+        Log::info('CreateFromUserGeneratedEvent Array cree');
     } else {
         // Si event_type est une chaîne, insérer normalement
         static::create([
@@ -79,7 +81,9 @@ class StoredEvent extends Model
             'object_uuid'   => $data['object_uuid'],
             'detail'        => $data['detail'],
         ]);
+        Log::info('CreateFromUserGeneratedEvent String cree');
     }
+    
 }
 
 }

@@ -31,6 +31,8 @@ class MentorMarinListener
             return;
         }
         
+        
+
        //dd($event->marin_uuid);
 
         //Recupere le Marin  et les données
@@ -42,7 +44,7 @@ class MentorMarinListener
         // $marin = Marin::where('uuid',  $marin_uuid)->first();
         // Log
         if ($marin) {
-
+            Log::info('MentorMarinListener appele', ['marinUuid' => $marin->uuid]);
             Log::info('Marin trouvé :', ['id' => $marin->id]);
 
             // FcmCentral

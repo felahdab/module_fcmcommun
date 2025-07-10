@@ -33,7 +33,7 @@ class CohorteFactory extends Factory
         $liblong    =  self::$libelle.' '.self::$counter++.' : n°'.$this->faker->numberBetween(1,11).',  '.$this->faker->sentence(6);
 
         return [
-            
+            'uuid'          =>  $this->faker->uuid,
             "libelle_court" => $libcourt,
             "libelle_long"  => $liblong,
        

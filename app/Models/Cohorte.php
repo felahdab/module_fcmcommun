@@ -16,6 +16,7 @@ class Cohorte extends Model
     
     
     protected $fillable = [
+        'uuid',
         'libelle_long',
         'libelle_court', 
         'date_sortie_cours',

@@ -31,7 +31,7 @@ class EventTriggerService
         );
 
         // Construire les données de l'événement
-        Log::info('Trigger Appelé',['data'=>$data,'record'=>$record]);
+        Log::info('EventTrigger appele',['data'=>$data,'record'=>$record]);
         $eventData = $eventService->buildEventData($data, $record);
 
         if (!empty($eventData['eventTypes'])) {
@@ -48,11 +48,11 @@ class EventTriggerService
                 record: $record,
             );
 
-            Log::info('Event Cree', ['event'=>$event]);
+            Log::info('Event cree', ['event'=>$event]);
            //dd($event);
             // Déclencher l'événement
             event($event);
-            Log::warning('Aucun type event trouvé',['data'=>$data]);
+            //Log::warning('Aucun type event trouvé',['data'=>$data]);
         }
     }
 }
