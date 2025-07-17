@@ -3,6 +3,7 @@
 namespace Modules\FcmCommun\Services;
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Modules\FcmCommun\Services\EventTypeManager;
 
 
@@ -40,6 +41,9 @@ class EventBuilderService
         $record = null,
         string $prefix = '',
     ): void {
+        Log::info('addEventData appele',['eventType'=>$eventType,'uuid'=>$uuid]);
+        
+        try{
         $detail = $this->eventTypeManager->getEventTypeDetails($eventType,$record);
 
         $eventTypes[]               = $detail['event_type'];
@@ -52,7 +56,11 @@ class EventBuilderService
             "prefix"        => $prefix,
         ], $additionalDetails);
        
+        Log::info('addEventData charge complet ok');
 
+    } catch (\Exception $e){
+        Log::error('addEventData echec',['error' => $e->getMessage()]);
+        throw $e;
     }
 }
-
+}

@@ -49,7 +49,7 @@ class CohorteMarinListener
        
         // Log
         if ($marin) {
-
+            Log::info('CohorteMarinListener appele', ['marinUuid' => $marin->uuid]);
             Log::info('Marin trouvé :', ['id' => $marin->id]);
 
             // FcmCentral

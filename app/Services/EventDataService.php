@@ -49,6 +49,7 @@ class EventDataService
         $this->handleParcoursSerialiseMarin($data, $record, $eventTypes, $objectClass, $objectUuid, $details);
 
         // Creation d'un parcours serialisé
+       
         $this->handleCreationParcoursSerialise($data, $record, $eventTypes, $objectClass, $objectUuid, $details);
 
         // Gérer le Marin en FCM
@@ -104,6 +105,7 @@ class EventDataService
                     $this->prefix,
                 );
             }
+            Log::info('EventBuilder Data handleCohorte genere');
         }
     }
 
@@ -130,8 +132,8 @@ class EventDataService
                     $this->prefix,
                 );
             }
+            Log::info('EventBuilder Data handleMentor genere');
         }
-        Log::info('EventBuilder Data handleMentor genere');
     }
 
 
@@ -157,14 +159,16 @@ class EventDataService
                     $this->prefix,
                 );
             }
+            Log::info('EventBuilder Data handleParcoursSerialiseMarin genere');
         }
     }
 
     protected function handleCreationParcoursSerialise(array $data, $record, array &$eventTypes, array &$objectClass, array &$objectUuid, array &$details): void
-    {
+    {   
+      
         if (isset($data['libelle_court'],$data['version'])) {
 
-           
+            Log::info('tatayoyo2',['lb'=>$data['libelle_court'],'v'=>$data['version']]);
 
 
 
@@ -174,7 +178,7 @@ class EventDataService
                     $objectClass,
                     $objectUuid,
                     $details,
-                    $data['version'],
+                    $record->uuid,
                     [
                         "parcours_serialise_version" => $data['version'],
                         "parcours_serialise_nom" => $data['libelle_court'],
@@ -182,7 +186,8 @@ class EventDataService
                     $record,
                     $this->prefix,
                 );
-            
+              
+                Log::info('EventBuilder Data handleCreationParcoursSerialise genere');
         }
     }
 
