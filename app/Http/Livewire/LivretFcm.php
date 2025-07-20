@@ -2,14 +2,20 @@
 
 namespace Modules\FcmCommun\Http\Livewire;
 
-use Livewire\Component;
-use Modules\FcmCommun\Traits\LoadsModelsDynamically;
-use Filament\Notifications\Notification;
-use Modules\FcmCommun\Services\EventTriggerService;
+use Carbon\Carbon;
+
 use Illuminate\Support\Facades\Log;
+
+use Livewire\Component;
+
+use Filament\Notifications\Notification;
+
+use Modules\FcmCommun\Traits\LoadsModelsDynamically;
+use Modules\FcmCommun\Services\EventTriggerService;
 use Modules\FcmCommun\Services\HierarchyMapGeneratorService;
 use Modules\FcmCommun\Services\ParcoursValidationService;
-
+use Modules\FcmCommun\DataObjects\Enums\ObjectClasses;
+use Modules\FcmCommun\DataObjects\Enums\UserGeneratedEventTypes;
 
 class LivretFcm extends Component
 {
@@ -24,6 +30,8 @@ class LivretFcm extends Component
     public $parcours;
     public $parcoursMarin; 
 
+    public $eventClass;
+
     // État de l'interface
     public $selectedItems = [];
     public $openSections = [];
@@ -34,7 +42,7 @@ class LivretFcm extends Component
 
 
 
-    public function mount($fcmMarinId, $tablePrefix, $parcoursMarin)
+    public function mount($fcmMarinId, $tablePrefix, $parcoursMarin, $eventClass)
     {
         $startTime = microtime(true);
         Log::info("=== MOUNT LIVEWIRE OPTIMISÉ ===", ['fcmMarinId' => $fcmMarinId]);
@@ -42,6 +50,7 @@ class LivretFcm extends Component
         $this->fcmMarinId = $fcmMarinId;
         $this->tablePrefix = $tablePrefix;
         $this->parcoursMarin = $parcoursMarin;
+        $this->eventClass = $eventClass;
         
         // ✅ VÉRIFIER QUE LES DONNÉES SONT PRÉSENTES
         if (!$parcoursMarin || !isset($parcoursMarin['fcmMarin'])) {
@@ -87,7 +96,7 @@ class LivretFcm extends Component
     // MÉTHODES PRINCIPALES SIMPLIFIÉES
     // ========================================
 
-    public function toggleCheck(string $type, int $id)
+    public function toggleCheck(string $type, string $uuid)
     {
         $startTime = microtime(true);
         $memoryStart = memory_get_usage(true);
@@ -95,7 +104,7 @@ class LivretFcm extends Component
         Log::info("=== DIAGNOSTIC DÉLAI LIVEWIRE ===", [
             'method' => 'toggleCheck',
             'type' => $type,
-            'id' => $id,
+            'uuid' => $uuid,
             'memory_start' => $memoryStart,
             'timestamp' => now()->toDateTimeString()
         ]);
@@ -103,7 +112,7 @@ class LivretFcm extends Component
 
            // 1. Toggle immédiat
         $service = new ParcoursValidationService($this->selectedItems, $this->selectedItems['map']);
-          $this->selectedItems = $service->toggleValidation($type, $id);
+          $this->selectedItems = $service->toggleValidation($type, $uuid);
         
     // // 2. Pas de re-render
     // $this->skipRender();
@@ -157,29 +166,29 @@ class LivretFcm extends Component
     // ========================================
 
     // Modal Annulation
-    public function annulModal(string $type, int $id): void
+    public function annulModal(string $type, string $uuid): void
     {
-        $this->popupData = compact('type', 'id');
+        $this->popupData = compact('type', 'uuid');
         $this->dispatch('open-modal', id: 'annul');
         
         $service = new ParcoursValidationService($this->selectedItems, $this->selectedItems['map']);
-        $this->selectedItems = $service->toggleAnnulation($type, $id);
+        $this->selectedItems = $service->toggleAnnulation($type, $uuid);
     }
 
     // Modal Proposition
-    public function proposModal(string $type, int $id): void
+    public function proposModal(string $type, string $uuid): void
     {
-        $this->popupData = compact('type', 'id');
+        $this->popupData = compact('type', 'uuid');
         $this->dispatch('open-modal', id: 'propos');
         
         $service = new ParcoursValidationService($this->selectedItems, $this->selectedItems['map']);
-        $this->selectedItems = $service->toggleProposition($type, $id);
+        $this->selectedItems = $service->toggleProposition($type, $uuid);
     }
 
     // Modal Informations
-    public function infosModal(string $type, int $id, string $dateValidation, string $displayName, string $commentaire, string $libelleCourt, string $libelleLong, string $duree,): void
+    public function infosModal(string $type, int $uuid, string $dateValidation, string $displayName, string $commentaire, string $libelleCourt, string $libelleLong, string $duree,): void
     {
-        $this->popupData = compact('type', 'id', 'dateValidation', 'displayName', 'commentaire', 'libelleCourt', 'libelleLong', 'duree');
+        $this->popupData = compact('type', 'id', 'uuid', 'dateValidation', 'displayName', 'commentaire', 'libelleCourt', 'libelleLong', 'duree');
         $this->dispatch('open-modal', id: 'infosModal');
     }
 
@@ -238,6 +247,7 @@ class LivretFcm extends Component
         return $parcoursSerialises->map(function ($parcours) {
             return [
                 'id' => $parcours->id,
+                'uuid' => $parcours->uuid,
                 'libelle_court' => $parcours->libelle_court,
                 'parcours' => json_decode($parcours->pivot->parcoursmarin, true),
                 'taux_global' => $parcours->pivot->taux_global,
@@ -291,14 +301,14 @@ class LivretFcm extends Component
     protected function processInitialElement(string $type, array $element)
     {
         if (!empty($element['etat_valid'])) {
-            $this->selectedItems['init'][$type][$element['id']] = true;
-            $this->selectedItems['gestion'][$type][$element['id']] = true;
+            $this->selectedItems['init'][$type][$element['uuid']] = true;
+            $this->selectedItems['gestion'][$type][$element['uuid']] = true;
         }
 
         // Pour la  (Validation||Annulation)Proposition Mentor||User
         if (!empty($element['date_proposition'])){
         
-            $this->selectedItems['aValiderPropos'][$type][$element['id']] = [
+            $this->selectedItems['aValiderPropos'][$type][$element['uuid']] = [
                 'date_proposition' =>  $element['date_proposition'],
                 'commentaire_proposition' => $element['commentaire_proposition'],
                 'libelle_court' => $element['libelle_court'] ,
@@ -320,8 +330,8 @@ class LivretFcm extends Component
         $fcmMarin = $this->fcmMarin;
         $storeEvents = $this->getModelClass($this->tablePrefix, 'StoredEvent');
         
-        $this->restore = $storeEvents::where('marin_uuid', $fcmMarin->marin->uuid)
-            ->where('object_uuid', $fcmMarin->parcoursSerialises[0]->uuid)
+        $this->restore = $storeEvents::where('object_uuid', $fcmMarin->marin->uuid)
+            //->where('object_uuid', $fcmMarin->parcoursSerialises[0]->uuid)
             ->whereIn('event_type', [
                 'valid_elmt_marin_parcours',
                 'annul_elmt_marin_parcours',
@@ -389,17 +399,6 @@ class LivretFcm extends Component
 
     public function save(string $type)
     {
-        // Recalculer les taux globaux pour tous les parcours
-        //  foreach ($this->parcours as $parcoursItem) {
-        //      // $this->calculerTauxGlobal($parcoursItem['id']);
-        //  }
-
-        // Charger le modèle MarinParcours
-        // $marinParcoursClass = $this->getModelClass($this->tablePrefix, 'MarinParcours');
-        // $record = $marinParcoursClass::with('parcoursSerialises')->find($this->fcmMarinId);
-
-        
-
         //$record  = $this->fcmMarinModel::with('parcoursSerialises')->find($this->fcmMarinId);
         $record = $this->fcmMarin;
 
@@ -418,8 +417,10 @@ class LivretFcm extends Component
                 $data = [
                     'commentaire' => $this->comment,
                     'selectedItems' => $this->selectedItems,
+                    'key'           => 'sauve',
                     'marinUuid' => $record->marin->uuid,
                     'eventName' => 'valid',
+                    'eventType' => UserGeneratedEventTypes::VALID_ELMT_MARIN_PARCOURS,
                     'objectUuid' => $record->parcoursSerialises[0]->uuid,
                 ];
                 $modal = 'sauve';
@@ -428,72 +429,101 @@ class LivretFcm extends Component
                 $data = [
                     'commentaire' => $this->comment,
                     'selectedItems' => $this->selectedItems,
+                    'key'           => 'annul',
                     'marinUuid' => $record->marin->uuid,
                     'eventName' => 'annul',
+                    'eventType' => UserGeneratedEventTypes::ANNUL_ELMT_MARIN_PARCOURS,
                     'objectUuid' => $record->parcoursSerialises[0]->uuid,
                 ];
                 $modal = 'annul';
                 break;
-                case "propos":
+            case "propos":
+                $data = [
+                    'commentaire' => $this->comment,
+                    'selectedItems' => $this->selectedItems,
+                    'key'           => 'propos',
+                    'marinUuid' => $record->marin->uuid,
+                    'eventName' => 'propos',
+                    'eventType' => UserGeneratedEventTypes::PROPOS_ELMT_MARIN_PARCOURS,
+                    'objectUuid' => $record->parcoursSerialises[0]->uuid,
+                ];
+                $modal = 'propos';
+                break; 
+            case "annulPropos":
+                $data = [
+                    'commentaire' => ' Annulation de la Proposition',
+                    'selectedItems' => $this->selectedItems,
+                    'key'           => 'aValiderPropos',
+                    'marinUuid' => $record->marin->uuid,
+                    'eventName' => 'annulPropos',
+                    'eventType' => UserGeneratedEventTypes::ANNUL_PROPOS_ELMT_MARIN_PARCOURS,
+                    'objectUuid' => $record->parcoursSerialises[0]->uuid,
+                ];
+                $modal = 'aValiderModal';
+                break;   
+            case "validPropos":
+                $data = [
+                    'commentaire' => ' Validation de la Proposition',
+                    'selectedItems' => $this->selectedItems,
+                    'key'           => 'aValiderPropos',
+                    'marinUuid' => $record->marin->uuid,
+                    'eventName' => 'validPropos',
+                    'objectUuid' => $record->parcoursSerialises[0]->uuid,
+                ];
+                $modal = 'aValiderModal';
+                break;    
+            case "restore":
+                $data = [
+                    //'commentaire' => $this->comment,
+                    'commentaire' => $this->selectedItems['commentaire'],
+                    'selectedItems' => $this->selectedItems,
+                    'marinUuid' => $record->marin->uuid,
+                    'eventName' => 'restore',
+                    'objectUuid' => $record->parcoursSerialises[0]->uuid,
+                ];
+                $modal = 'restoreModal';
+                break;   
+            case "reboot":
                     $data = [
-                        'commentaire' => $this->comment,
+                        'commentaire' => ' Reboot Data',
                         'selectedItems' => $this->selectedItems,
                         'marinUuid' => $record->marin->uuid,
-                        'eventName' => 'propos',
+                        'eventName' => 'reboot',
                         'objectUuid' => $record->parcoursSerialises[0]->uuid,
                     ];
-                    $modal = 'propos';
-                    break; 
-                case "annulPropos":
-                    $data = [
-                        'commentaire' => ' Annulation de la Proposition',
-                        'selectedItems' => $this->selectedItems,
-                        'marinUuid' => $record->marin->uuid,
-                        'eventName' => 'annulPropos',
-                        'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                    ];
-                    $modal = 'aValiderModal';
-                    break;   
-                case "validPropos":
-                    $data = [
-                        'commentaire' => ' Validation de la Proposition',
-                        'selectedItems' => $this->selectedItems,
-                        'marinUuid' => $record->marin->uuid,
-                        'eventName' => 'validPropos',
-                        'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                    ];
-                    $modal = 'aValiderModal';
-                    break;    
-                case "restore":
-                    $data = [
-                        //'commentaire' => $this->comment,
-                        'commentaire' => $this->selectedItems['commentaire'],
-                        'selectedItems' => $this->selectedItems,
-                        'marinUuid' => $record->marin->uuid,
-                        'eventName' => 'restore',
-                        'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                    ];
-                    $modal = 'restoreModal';
-                    break;   
-                case "reboot":
-                        $data = [
-                            'commentaire' => ' Reboot Data',
-                            'selectedItems' => $this->selectedItems,
-                            'marinUuid' => $record->marin->uuid,
-                            'eventName' => 'reboot',
-                            'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                        ];
-                        $modal = 'rebootModal';
-                        break;                                     
-                default:
-                    $data =[];
-                    $modal = "sauve";
+                    $modal = 'rebootModal';
+                    break;                                     
+            default:
+                $data =[];
+                $modal = "sauve";
                 break;
 
         }
         // Déclencher l'événement pour sauvegarder les données
-        //dd($record,$data);
-        EventTriggerService::triggerEvent($data, $record);
+        $key = $data["key"];
+        $items_a_mettre_a_jour = $data["selectedItems"][$key];
+
+        $marin = $this->fcmMarin->marin;
+        //dd($items_a_mettre_a_jour["activites"]);
+        foreach($items_a_mettre_a_jour["activites"] as $activite_a_mettre_a_jour => $bool)
+        {
+
+            $event = new $this->eventClass(
+                event_type: $data['eventType'],
+                user_uuid: auth()->user()->uuid,
+                object_class: ObjectClasses::MARIN,
+                object_uuid: $marin->uuid,
+                detail: [
+                    "type_element" => "activite", 
+                    "uuid_element" => $activite_a_mettre_a_jour, 
+                    "date" => Carbon::now(), 
+                    "commentaire" => $this->comment, 
+                ]
+            );
+            event($event);
+
+        }
+        //EventTriggerService::triggerEvent($data, $record);
 
         // Réinitialiser les données après la sauvegarde
         $this->selectedItems['sauve'] = [];
@@ -512,32 +542,12 @@ class LivretFcm extends Component
         // Recharge mais n'attends pas EventTrigger voir methode broadcats websockets echo
         //return redirect()->route('filament.admin.resources.marins.livrect-de-fcm', ['record'=> $record->id]);
 
-
-
-
-        // 
-
-
-
-
     }
-
-
-
-
-
-
-
-
-
-
 
     /**
      *  Partie Taux et cochage
      *
      */
-
-
 
     public function calculerTauxGlobal($parcoursId)
     {

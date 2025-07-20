@@ -63,7 +63,7 @@
 
             <!-- Bouton Submit -->
             <div class="mt-6">
-                <x-filament::button wire:click="sauveModal" >
+                <x-filament::button wire:click="$dispatch('open-modal', { id: 'sauve' })" >
                Sauvegarder
             </x-filament::button>
             </div>

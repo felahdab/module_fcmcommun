@@ -5,6 +5,7 @@
         'parcoursId'    => $parcoursId,
         'type'          => 'competences',
         'id'            => $competence['id'],
+        'uuid'          => $competence['uuid'],
         'label'         => 'Competence : ' . $competence['libelle_court'],
         //'libelleLong'   => $competence['libelle_long'],
         'libelleLong'   => '',

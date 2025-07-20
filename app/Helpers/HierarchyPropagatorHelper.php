@@ -23,14 +23,14 @@ class HierarchyPropagatorHelper
     /**
      * Propage un état vers les descendants
      */
-    public function propagate(string $type, int $id, string $action, bool $state): array
+    public function propagate(string $type, string $uuid, string $action, bool $state): array
     {
         $childrenType = $this->childrenTypes[$type] ?? null;
-        if (!$childrenType || !isset($this->hierarchyMap['descendant'][$type][$id][$childrenType])) {
+        if (!$childrenType || !isset($this->hierarchyMap['descendant'][$type][$uuid][$childrenType])) {
             return $this->selectedItems;
         }
 
-        foreach ($this->hierarchyMap['descendant'][$type][$id][$childrenType] as $childId) {
+        foreach ($this->hierarchyMap['descendant'][$type][$uuid][$childrenType] as $childId) {
             $this->updateChildState($childrenType, $childId, $action, $state);
             $this->propagate($childrenType, $childId, $action, $state);
         }
@@ -41,17 +41,17 @@ class HierarchyPropagatorHelper
     /**
      * Met à jour l'état d'un enfant selon l'action
      */
-    public function updateChildState(string $type, int $id, string $action, bool $state): void
+    public function updateChildState(string $type, string $uuid, string $action, bool $state): void
     {
         switch ($action) {
             case 'validation':
-                $this->updateValidationState($type, $id, $state);
+                $this->updateValidationState($type, $uuid, $state);
                 break;
             case 'annulation':
-                $this->updateAnnulationState($type, $id, $state);
+                $this->updateAnnulationState($type, $uuid, $state);
                 break;
             case 'proposition':
-                $this->updatePropositionState($type, $id, $state);
+                $this->updatePropositionState($type, $uuid, $state);
                 break;
         }
     }
@@ -59,41 +59,41 @@ class HierarchyPropagatorHelper
     /**
      * Mise à jour pour validation
      */
-    protected function updateValidationState(string $type, int $id, bool $state): void
+    protected function updateValidationState(string $type, string $uuid, bool $state): void
     {
-        $this->updateMapState($type, $id, $state);
+        $this->updateMapState($type, $uuid, $state);
 
         if ($state) {
-            $this->selectedItems['gestion'][$type][$id] = true;
-            if (!isset($this->selectedItems['init'][$type][$id])) {
-                $this->selectedItems['sauve'][$type][$id] = true;
+            $this->selectedItems['gestion'][$type][$uuid] = true;
+            if (!isset($this->selectedItems['init'][$type][$uuid])) {
+                $this->selectedItems['sauve'][$type][$uuid] = true;
             }
         } else {
-            if (!isset($this->selectedItems['init'][$type][$id])) {
-                unset($this->selectedItems['gestion'][$type][$id]);
+            if (!isset($this->selectedItems['init'][$type][$uuid])) {
+                unset($this->selectedItems['gestion'][$type][$uuid]);
             }
-            unset($this->selectedItems['sauve'][$type][$id]);
+            unset($this->selectedItems['sauve'][$type][$uuid]);
         }
     }
 
     /**
      * Mise à jour pour annulation
      */
-    protected function updateAnnulationState(string $type, int $id, bool $annulState): void
+    protected function updateAnnulationState(string $type, string $uuid, bool $annulState): void
     {
-        $this->updateMapState($type, $id, !$annulState);
+        $this->updateMapState($type, $uuid, !$annulState);
 
         if ($annulState) {
-            $this->selectedItems['annul'][$type][$id] = true;
-            if (!isset($this->selectedItems['init'][$type][$id])) {
-                unset($this->selectedItems['gestion'][$type][$id]);
+            $this->selectedItems['annul'][$type][$uuid] = true;
+            if (!isset($this->selectedItems['init'][$type][$uuid])) {
+                unset($this->selectedItems['gestion'][$type][$uuid]);
             }
-            unset($this->selectedItems['sauve'][$type][$id]);
-            unset($this->selectedItems['propos'][$type][$id]);
+            unset($this->selectedItems['sauve'][$type][$uuid]);
+            unset($this->selectedItems['propos'][$type][$uuid]);
         } else {
-            unset($this->selectedItems['annul'][$type][$id]);
-            if (isset($this->selectedItems['init'][$type][$id])) {
-                $this->selectedItems['gestion'][$type][$id] = true;
+            unset($this->selectedItems['annul'][$type][$uuid]);
+            if (isset($this->selectedItems['init'][$type][$uuid])) {
+                $this->selectedItems['gestion'][$type][$uuid] = true;
             }
         }
     }
@@ -101,35 +101,35 @@ class HierarchyPropagatorHelper
     /**
      * Mise à jour pour proposition
      */
-    protected function updatePropositionState(string $type, int $id, bool $proposState): void
+    protected function updatePropositionState(string $type, string $uuid, bool $proposState): void
     {
         // Ne proposer que si pas déjà validé ou annulé
-        $isValid = isset($this->selectedItems['gestion'][$type][$id]) || isset($this->selectedItems['init'][$type][$id]);
-        $isAnnul = isset($this->selectedItems['annul'][$type][$id]);
+        $isValid = isset($this->selectedItems['gestion'][$type][$uuid]) || isset($this->selectedItems['init'][$type][$uuid]);
+        $isAnnul = isset($this->selectedItems['annul'][$type][$uuid]);
 
         if ($isValid || $isAnnul) {
             return;
         }
 
         if ($proposState) {
-            $this->selectedItems['propos'][$type][$id] = true;
-            $this->updateMapState($type, $id, 'proposed');
+            $this->selectedItems['propos'][$type][$uuid] = true;
+            $this->updateMapState($type, $uuid, 'proposed');
         } else {
-            unset($this->selectedItems['propos'][$type][$id]);
-            $this->updateMapState($type, $id, false);
+            unset($this->selectedItems['propos'][$type][$uuid]);
+            $this->updateMapState($type, $uuid, false);
         }
     }
 
     /**
      * Met à jour l'état dans la map
      */
-    protected function updateMapState(string $type, int $id, $state): void
+    protected function updateMapState(string $type, string $uuid, $state): void
     {
-        if (isset($this->hierarchyMap['descendant'][$type][$id])) {
-            $this->hierarchyMap['descendant'][$type][$id]['etat_valid'] = $state;
+        if (isset($this->hierarchyMap['descendant'][$type][$uuid])) {
+            $this->hierarchyMap['descendant'][$type][$uuid]['etat_valid'] = $state;
         }
-        if (isset($this->hierarchyMap['remontant'][$type][$id])) {
-            $this->hierarchyMap['remontant'][$type][$id]['etat_valid'] = $state;
+        if (isset($this->hierarchyMap['remontant'][$type][$uuid])) {
+            $this->hierarchyMap['remontant'][$type][$uuid]['etat_valid'] = $state;
         }
     }
 

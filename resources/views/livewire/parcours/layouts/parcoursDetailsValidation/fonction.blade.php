@@ -5,6 +5,7 @@
         'parcoursId'    => $parcoursId,
         'type'          => 'fonctions',
         'id'            => $fonction['id'],
+        'uuid'          => $fonction['uuid'],
         'label'         => 'Fonction : ' . $fonction['libelle_court'],
         //'libelleLong'   => $fonction['libelle_long'],
         'libelleLong'   => '',

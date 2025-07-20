@@ -25,16 +25,16 @@ class ParcoursValidationService
     /**
      * Point d'entrée générique pour tous les toggles
      */
-    public function toggle(string $action, string $type, int $id): array
+    public function toggle(string $action, string $type, string $uuid): array
     {
-        $currentState = $this->getCurrentState($action, $type, $id);
+        $currentState = $this->getCurrentState($action, $type, $uuid);
         $newState = !$currentState;
 
         // 1. Mettre à jour l'élément principal
-        $this->updateElementState($action, $type, $id, $newState);
+        $this->updateElementState($action, $type, $uuid, $newState);
 
         // 2. Propager aux descendants
-        $this->propagateToDescendants($action, $type, $id, $newState);
+        $this->propagateToDescendants($action, $type, $uuid, $newState);
 
         // 3. Vérifier et corriger les parents
         if (in_array($action,['validation','annulation'])){
@@ -47,33 +47,33 @@ class ParcoursValidationService
     /**
      * Méthodes spécifiques pour compatibilité
      */
-    public function toggleValidation(string $type, int $id): array
+    public function toggleValidation(string $type, string $uuid): array
     {
-        return $this->toggle('validation', $type, $id);
+        return $this->toggle('validation', $type, $uuid);
     }
 
-    public function toggleAnnulation(string $type, int $id): array
+    public function toggleAnnulation(string $type, string $uuid): array
     {
-        return $this->toggle('annulation', $type, $id);
+        return $this->toggle('annulation', $type, $uuid);
     }
 
-    public function toggleProposition(string $type, int $id): array
+    public function toggleProposition(string $type, string $uuid): array
     {
-        return $this->toggle('proposition', $type, $id);
+        return $this->toggle('proposition', $type, $uuid);
     }
 
     /**
      * Obtient l'état actuel selon l'action
      */
-    protected function getCurrentState(string $action, string $type, int $id): bool
+    protected function getCurrentState(string $action, string $type, string $uuid): bool
     {
         switch ($action) {
             case 'validation':
-                return isset($this->selectedItems['gestion'][$type][$id]);
+                return isset($this->selectedItems['gestion'][$type][$uuid]);
             case 'annulation':
-                return isset($this->selectedItems['annul'][$type][$id]);
+                return isset($this->selectedItems['annul'][$type][$uuid]);
             case 'proposition':
-                return isset($this->selectedItems['propos'][$type][$id]);
+                return isset($this->selectedItems['propos'][$type][$uuid]);
         }
         return false;
     }
@@ -81,19 +81,19 @@ class ParcoursValidationService
     /**
      * Met à jour l'état de l'élément principal
      */
-    protected function updateElementState(string $action, string $type, int $id, bool $newState): void
+    protected function updateElementState(string $action, string $type, string $uuid, bool $newState): void
     {
         $propagator = new HierarchyPropagatorHelper($this->selectedItems, $this->hierarchyMap);
-        $propagator->updateChildState($type, $id, $action, $newState);
+        $propagator->updateChildState($type, $uuid, $action, $newState);
     }
 
     /**
      * Propage aux descendants
      */
-    protected function propagateToDescendants(string $action, string $type, int $id, bool $state): void
+    protected function propagateToDescendants(string $action, string $type, string $uuid, bool $state): void
     {
         $propagator = new HierarchyPropagatorHelper($this->selectedItems, $this->hierarchyMap);
-        $this->selectedItems = $propagator->propagate($type, $id, $action, $state);
+        $this->selectedItems = $propagator->propagate($type, $uuid, $action, $state);
     }
 
     /**

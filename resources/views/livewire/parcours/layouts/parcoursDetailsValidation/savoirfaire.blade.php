@@ -5,6 +5,7 @@
         'parcoursId'    => $parcoursId,
         'type'          => 'savoirfaires',
         'id'            => $savoirFaire['id'],
+        'uuid'          => $savoirFaire['uuid'],
         'label'         => 'Savoir Faire : ' . $savoirFaire['libelle_court'],
         //'libelleLong'   => $savoirFaire['libelle_long'],
          'libelleLong'   => '',

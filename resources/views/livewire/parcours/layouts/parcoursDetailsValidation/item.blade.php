@@ -1,5 +1,5 @@
 @props([
-    'parcoursId', 'type', 'id', 'label', 'libelleLong', 'libelleCourt', 
+    'parcoursId', 'type', 'id', 'uuid', 'label', 'libelleLong', 'libelleCourt', 
     'etatValid', 'dateValidation', 'dateProposition', 'valideur', 
     'commentaire', 'commentaireProposition', 'finDeCourse', 'infos'
 ])
@@ -15,7 +15,7 @@
     'default' =>'',
    };
 
-   $isOpen = isset($openSections[$type.'_'.$id]) && $openSections[$type.'_'.$id];
+   $isOpen = isset($openSections[$type.'_'.$uuid]) && $openSections[$type.'_'.$uuid];
 
   
    $isChecked = $etatValid?? false;
@@ -28,7 +28,7 @@
    // Auth 
 
    
-   $sectionId = $type.'_'.$id;
+   $sectionId = $type.'_'.$uuid;
 
 
 @endphp
@@ -46,9 +46,9 @@
                 {{-- 
                      //trop instable que des soucis lors des cliques
                     <x-filament::input.checkbox
-                        wire:click="toggleCheck('{{$type}}',{{$id}});"
-                        :checked="isset($this->selectedItems[$type][$id])"
-                        data-id="{{$type}}-{{$id}}"
+                        wire:click="toggleCheck('{{$type}}','{{$uuid}}');"
+                        :checked="isset($this->selectedItems[$type][$uuid])"
+                        data-id="{{$type}}-'{{$uuid}}'"
                         onchange="checkboxEtat(event);"
                         class="mr1"
                 />  --}}
@@ -64,7 +64,7 @@
             @if (!$isChecked)
 
                 {{-- Boucle Etat bouton --}}
-                @if (isset($selectedItems['gestion'][$type][$id]) && $selectedItems['gestion'][$type][$id])
+                @if (isset($selectedItems['gestion'][$type][$uuid]) && $selectedItems['gestion'][$type][$uuid])
 
                     <x-filament::icon-button
                         size="lg"
@@ -72,7 +72,7 @@
                         {{-- icon="heroicon-c-x-circle" --}}
                         icon="heroicon-o-check-circle"
                         tooltip="Tout décocher"
-                        wire:click="toggleCheck('{{$type}}', {{$id}});"
+                        wire:click="toggleCheck('{{$type}}', '{{$uuid}}');"
                        
                         class="tree-checkbox"
                         {{-- x-on:click="setTimeout(() => enforceCheckedState(@entangle('selectedItems').defer), 300)" --}}
@@ -85,7 +85,7 @@
                         color="gray"
                         icon="heroicon-o-check-circle"
                         tooltip="Tout cocher"
-                        wire:click="toggleCheck('{{$type}}', {{$id}});"
+                        wire:click="toggleCheck('{{$type}}', '{{$uuid}}');"
                       
                         
                     />
@@ -101,7 +101,7 @@
                                 color="gray"
                                 icon="heroicon-c-document-plus"
                                 tooltip="Proposition"
-                                wire:click="proposModal('{{$type}}', {{$id}})"
+                                wire:click="proposModal('{{$type}}', '{{$uuid}}')"
                             /> 
                       
                     @else
@@ -130,7 +130,7 @@
                     color="warning"
                     icon="heroicon-s-x-circle"
                     tooltip="Décochez"
-                    wire:click="annulModal('{{$type}}', {{$id}})"
+                    wire:click="annulModal('{{$type}}', '{{$uuid}}')"
                 />
 
            
@@ -160,7 +160,7 @@
                 {{-- icon="heroicon-c-check-badge" --}}
                 icon="heroicon-c-information-circle"
                 tooltip="Voir les infos "
-                wire:click="infosModal('{{$type}}', {{$id}}, '{{ $dateValidation ?? '' }}', '{{ $valideur ?? 'Inconnu' }}', '{{ $commentaire ?? '' }}','{{ $libelleCourt }}','{{ $libelleLong }}','{{$duree}}')"
+                wire:click="infosModal('{{$type}}', '{{$uuid}}', '{{ $dateValidation ?? '' }}', '{{ $valideur ?? 'Inconnu' }}', '{{ $commentaire ?? '' }}','{{ $libelleCourt }}','{{ $libelleLong }}','{{$duree}}')"
             />
             @endif
 
@@ -171,7 +171,7 @@
                 tooltip="{{ $isOpen ?'Réduire':'Développer' }}"
                 icon="{{ $isOpen ?'heroicon-c-chevron-up':'heroicon-c-chevron-down' }}"
                 
-                wire:click="toggleSection('{{ $type.'_'.$id }}')" 
+                wire:click="toggleSection('{{ $type.'_'.$uuid }}')" 
                 
 
                 /> --}}

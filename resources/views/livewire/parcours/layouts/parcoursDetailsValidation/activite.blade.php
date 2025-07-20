@@ -5,6 +5,7 @@
         'parcoursId'    => $parcoursId,
         'type'          => 'activites',
         'id'            => $activite['id'],
+        'uuid'          => $activite['uuid'],
         'label'         => 'Activite : ' . $activite['libelle_court'],
         //'libelleLong'   => $activite['libelle_long'],
         'libelleLong'   => '',
