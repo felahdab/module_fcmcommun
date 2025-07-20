@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Builder;
 
 use Modules\RH\Models\Marin as RhMarin;
 
-use Modules\FcmCentral\Models\FcmMarin;
 
 /**
  * Model etendue a RhMarin pour eviter d'inclure les parties FCM dans le model RH Marin
@@ -36,9 +35,6 @@ class Marin extends RhMarin
         $this->data = $data;
         $this->save();
 
-        FcmMarin::firstOrCreate([
-         "rh_marin_id" => $this->id,
-        ]);
         return $this;
      }
 
