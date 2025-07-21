@@ -34,29 +34,29 @@ class DataParcoursMarinHelper
         // Mode 'init', injection des champs stantards et supplementaires
         if ($mode==='init'){
             // Champs a injecter fixe
-        $data['commentaire']                = null;
-        $data['etat_valid']                 = false;
-        $data['valideur']                   = null;
-        $data['date_validation']            = null;
-        $data['commentaire_proposition']    = null;
-        $data['date_proposition']           = null;
+            $data['commentaire']                = null;
+            $data['etat_valid']                 = false;
+            $data['valideur']                   = null;
+            $data['date_validation']            = null;
+            $data['commentaire_proposition']    = null;
+            $data['date_proposition']           = null;
 
-        // Champ a injecter personnalisé
-        if ($addFields !== null){
+            // Champ a injecter personnalisé
+            if ($addFields !== null){
+                foreach ($addFields as $field => $value ){
+                    $data[$field]           = $value;
+                }
+            }
+        }
+        // Si mode 'rajout' pour ajouter seulement champ supp dans existant
+        elseif ($mode==='rajout' && $addFields!==null){
+            // Ajout seulement des champs add sans ecraser les autres
             foreach ($addFields as $field => $value ){
-                $data[$field]           = $value;
+                if (!array_key_exists($field,$data)){
+                    $data[$field]           = $value;
+                }
             }
         }
-    }
-    // Si mode 'rajout' pour ajouter seulement champ supp dans existant
-    elseif ($mode==='rajout' && $addFields!==null){
-        // Ajout seulement des champs add sans ecraser les autres
-        foreach ($addFields as $field => $value ){
-            if (!array_key_exists($field,$data)){
-            $data[$field]           = $value;
-            }
-        }
-    }
 
 
         // Boucle et traite
