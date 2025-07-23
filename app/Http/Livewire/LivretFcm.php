@@ -502,24 +502,23 @@ class LivretFcm extends Component
     $items_a_mettre_a_jour = $data["selectedItems"][$key] ?? [];
     $marin = $this->fcmMarin->marin;
  
-    // ✅ CRÉER UN SEUL ÉVÉNEMENT AVEC TOUTES LES DONNÉES
-    $event = new $this->eventClass(
-        event_type: $data['eventType'],
-        user_uuid: auth()->user()->uuid,
-        object_class: ObjectClasses::MARIN,
-        object_uuid: $marin->uuid,
-        detail: [
-            "date" => Carbon::now(), 
-            "commentaire" => $data['commentaire'],
-            // ✅ TOUTES LES DONNÉES D'UN COUP
-            "init" => $data['selectedItems']['init'] ?? [],
-            $key => $data['selectedItems'][$key] ?? [],
-            "selectedItems_full" => $data['selectedItems'],
-            "action_type" => $data['eventName'],
-        ]
-    );
-    
-    event($event);
+    foreach($items_a_mettre_a_jour["activites"] as $activite_a_mettre_a_jour => $bool)
+        {
+            $event = new $this->eventClass(
+                event_type: $data['eventType'],
+                user_uuid: auth()->user()->uuid,
+                object_class: ObjectClasses::MARIN,
+                object_uuid: $marin->uuid,
+                detail: [
+                    "type_element" => "activite", 
+                    "uuid_element" => $activite_a_mettre_a_jour, 
+                    "date" => Carbon::now(), 
+                    "commentaire" => $this->comment, 
+                ]
+            );
+            event($event);
+
+        }
  
     // Réinitialiser les données après la sauvegarde
     $this->selectedItems['sauve'] = [];
