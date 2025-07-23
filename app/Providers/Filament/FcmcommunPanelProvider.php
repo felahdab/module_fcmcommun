@@ -30,7 +30,6 @@ use Filament\Navigation\NavigationItem;
 use Filament\Pages\Dashboard;
 use Filament\Navigation\NavigationGroup;
 use Illuminate\Support\Facades\Route;
-use  Modules\FcmCommun\Helpers\NavigationFilamentHelper;
 
 class FcmcommunPanelProvider extends PanelProvider
 {
@@ -77,14 +76,7 @@ class FcmcommunPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             // Menu Side Bar Haut
-            ->topNavigation()
-            // Appel du Helper pour le Menu Modules
-            ->navigationItems([   
-                // Decompacte le tableau
-                ...NavigationFilamentHelper::registerNavigationsItems()
-            ])  
-
-            ;
+            ->topNavigation();
           
     }
 
