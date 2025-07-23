@@ -23,7 +23,7 @@ class HierarchyParentsVerifierHelper
     /**
      * Traite l'action d'un élément spécifique (annulation ou proposition)
      */
-    public function handleSingleAction(string $action, string $type, int $id): array
+    public function handleSingleAction(string $action, string $type, string $id): array
     {
         if (!isset($this->hierarchyMap['remontant'][$type][$id])) {
             return $this->selectedItems;
@@ -54,7 +54,7 @@ class HierarchyParentsVerifierHelper
     /**
      * Traite l'annulation d'un élément spécifique
      */
-    public function handleSingleAnnulation(string $type, int $id): array
+    public function handleSingleAnnulation(string $type, string $id): array
     {
         return $this->handleSingleAction('annulation', $type, $id);
     }
@@ -62,7 +62,7 @@ class HierarchyParentsVerifierHelper
     /**
      * Traite la proposition d'un élément spécifique
      */
-    public function handleSingleProposition(string $type, int $id): array
+    public function handleSingleProposition(string $type, string $id): array
     {
         return $this->handleSingleAction('proposition', $type, $id);
     }
@@ -135,7 +135,7 @@ class HierarchyParentsVerifierHelper
     /**
      * Applique une action sur un parent (annulation ou proposition)
      */
-    protected function applyActionOnParent(string $action, string $type, int $parentId): void
+    protected function applyActionOnParent(string $action, string $type, string $parentId): void
     {
         if ($action === 'annulation') {
             $this->devalidateParentIfValid($type, $parentId);
@@ -209,7 +209,7 @@ class HierarchyParentsVerifierHelper
     /**
      * Met à jour l'état du parent selon l'action
      */
-    protected function updateParentState(string $type, int $id, string $action, bool $shouldUpdate): void
+    protected function updateParentState(string $type, string $id, string $action, bool $shouldUpdate): void
     {
         if ($action === 'validation') {
             $this->updateParentValidationState($type, $id, $shouldUpdate);
@@ -221,7 +221,7 @@ class HierarchyParentsVerifierHelper
     /**
      * Met à jour l'état de validation du parent
      */
-    protected function updateParentValidationState(string $type, int $id, bool $allChildrenChecked): void
+    protected function updateParentValidationState(string $type, string $id, bool $allChildrenChecked): void
     {
         $this->updateMapState($type, $id, $allChildrenChecked);
 
@@ -241,7 +241,7 @@ class HierarchyParentsVerifierHelper
     /**
      * Dévalide un parent s'il est actuellement valide et l'ajoute dans annul
      */
-    protected function devalidateParentIfValid(string $type, int $parentId): void
+    protected function devalidateParentIfValid(string $type, string $parentId): void
     {
         // Vérifier si le parent est actuellement valide (dans gestion OU dans init)
         $isValid = isset($this->selectedItems['gestion'][$type][$parentId]) || 
@@ -264,7 +264,7 @@ class HierarchyParentsVerifierHelper
     /**
      * Propose un parent s'il est éligible et l'ajoute dans propos
      */
-    protected function proposeParentIfEligible(string $type, int $parentId): void
+    protected function proposeParentIfEligible(string $type, string $parentId): void
     {
         // Vérifier si le parent n'est pas déjà valide ou annulé
         $isValid = isset($this->selectedItems['gestion'][$type][$parentId]) || 
@@ -284,7 +284,7 @@ class HierarchyParentsVerifierHelper
     /**
      * Met à jour l'état de proposition du parent
      */
-    protected function updateParentPropositionState(string $type, int $id, bool $shouldBeProposed): void
+    protected function updateParentPropositionState(string $type, string $id, bool $shouldBeProposed): void
     {
         $parentValid = isset($this->selectedItems['gestion'][$type][$id]) || 
                        isset($this->selectedItems['init'][$type][$id]);
@@ -302,7 +302,7 @@ class HierarchyParentsVerifierHelper
     /**
      * Met à jour l'état dans la map
      */
-    protected function updateMapState(string $type, int $id, $state): void
+    protected function updateMapState(string $type, string $id, $state): void
     {
         if (isset($this->hierarchyMap['descendant'][$type][$id])) {
             $this->hierarchyMap['descendant'][$type][$id]['etat_valid'] = $state;

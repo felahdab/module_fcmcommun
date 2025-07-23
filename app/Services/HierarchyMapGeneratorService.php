@@ -56,7 +56,7 @@ class HierarchyMapGeneratorService
     protected function processHierarchy(array $parcours, array &$parentMap): void
     {
         foreach ($parcours['fonctions'] ?? [] as $fonction) {
-            $fId = $fonction['id'] ?? null;
+            $fId = $fonction['uuid'] ?? null;
             if (!$fId) continue;
 
             // Traitement de la fonction
@@ -71,7 +71,7 @@ class HierarchyMapGeneratorService
      * @param int $fId
      * @param array &$parentMap
      */
-    protected function processFonction(array $fonction, int $fId, array &$parentMap): void
+    protected function processFonction(array $fonction, string $fId, array &$parentMap): void
     {
         $etatValid = $fonction['etat_valid'] ?? false;
 
@@ -88,7 +88,7 @@ class HierarchyMapGeneratorService
 
         // Traitement des compétences liées à cette fonction
         foreach ($fonction['competences'] ?? [] as $competence) {
-            $cId = $competence['id'] ?? null;
+            $cId = $competence['uuid'] ?? null;
             if (!$cId) continue;
 
             $this->processCompetence($competence, $cId, $fId, $parentMap);
@@ -99,11 +99,11 @@ class HierarchyMapGeneratorService
      * Traite une compétence et ses éléments enfants
      *
      * @param array $competence
-     * @param int $cId
-     * @param int $fId
+     * @param string $cId
+     * @param string $fId
      * @param array &$parentMap
      */
-    protected function processCompetence(array $competence, int $cId, int $fId, array &$parentMap): void
+    protected function processCompetence(array $competence, string $cId, string $fId, array &$parentMap): void
     {
         $etatValid = $competence['etat_valid'] ?? false;
 
@@ -124,7 +124,7 @@ class HierarchyMapGeneratorService
 
         // Traitement des savoir-faire liés à cette compétence
         foreach ($competence['savoirfaires'] ?? [] as $savoirfaire) {
-            $sId = $savoirfaire['id'] ?? null;
+            $sId = $savoirfaire['uuid'] ?? null;
             if (!$sId) continue;
 
             $this->processSavoirFaire($savoirfaire, $sId, $cId, $parentMap);
@@ -135,11 +135,11 @@ class HierarchyMapGeneratorService
      * Traite un savoir-faire et ses éléments enfants
      *
      * @param array $savoirfaire
-     * @param int $sId
-     * @param int $cId
+     * @param string $sId
+     * @param string $cId
      * @param array &$parentMap
      */
-    protected function processSavoirFaire(array $savoirfaire, int $sId, int $cId, array &$parentMap): void
+    protected function processSavoirFaire(array $savoirfaire, string $sId, string $cId, array &$parentMap): void
     {
         $etatValid = $savoirfaire['etat_valid'] ?? false;
 
@@ -163,7 +163,7 @@ class HierarchyMapGeneratorService
 
         // Traitement des activités liées à ce savoir-faire
         foreach ($savoirfaire['activites'] ?? [] as $activite) {
-            $aId = $activite['id'] ?? null;
+            $aId = $activite['uuid'] ?? null;
             if (!$aId) continue;
 
             $this->processActivite($activite, $aId, $sId, $parentMap);
@@ -174,11 +174,11 @@ class HierarchyMapGeneratorService
      * Traite une activité
      *
      * @param array $activite
-     * @param int $aId
-     * @param int $sId
+     * @param string $aId
+     * @param string $sId
      * @param array &$parentMap
      */
-    protected function processActivite(array $activite, int $aId, int $sId, array &$parentMap): void
+    protected function processActivite(array $activite, string $aId, string $sId, array &$parentMap): void
     {
         $etatValid = $activite['etat_valid'] ?? false;
 
