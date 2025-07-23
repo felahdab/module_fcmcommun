@@ -1,3 +1,25 @@
+## 0.0.6 (July 23, 2025)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.5 –> 0.0.6
+- Restauration du fonctionnement du livret pour générer une série d'évènements uniques plutôt qu'un évènement groupé.
+- Merge remote-tracking branch 'origin/julien-simplification-events' into fldb-simplification-events
+- Commit  LivretFCM MAJ + Validation
+- Merge branch 'master' into fldb-simplification-events
+- Retrait de la référence au NavigationHelper dans le panneau FcmCommun.
+- Suppression du NavigationFilamentHelper, remplacé par la déclaration des accès rapides.
+- Ajustement mise en forme pour lisibilité du code.
+- Modifications diverses du livret pour travailler sur les uuid et pas les id.
+- Début de simplification des évènements FCM. Reste notamment à traiter le cas du livret de transformation.
+- Réintégration modification de la migration StoredEvent dans la migration initiale.
+- Implements art #480061 : Amelioration Test Unitaire pour EventTrigger
+- Implements art #480061 : Modification des Test Unitaire pour EventTrigger
+- Implements art #480061 : Debut des Test Unitaires
+- Implements art #480061 : Optimisation Livret FCM
+- Implements art #480061 : Livret FCM
+- Implements art #480061 : Livret FCM  Proposition Restore Reboot
+- Implements art  #480061 : Livret FCM v3 (proposition)
+- implements art #480061  : Livret FCM v2 (Validation, Annulation)
+- Implements art #480061 : Mise a jour Livret FCM Gestion du parcours + sauvegarde event Difficulte sur les many to many avec ascendants et descendants mais c'est ok Toute la logique est mis dans le Livewire pour eviter d'inserer du jquery Soucis sur FcmCentral_stored car il cherche le uuid du Marin_Parcours Rafraichissement ne fonctionne pas apres mise a jour doit faire Annulation cas unique et Proposition && Annul_Proposition (juste event a construire) etude a venir sur la presentation du parcours Rajout champ supplementaire sur le Parcours Serialise
+
 ## 0.0.5 (May 02, 2025)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.4 –> 0.0.5
 - Correction FcmMarinListener pour tenir compte de l'état courant du suivi_en_fcm. Simplification du ParcoursSerialiseMarinListener: normalement, on ne devrait plus travailler avec les objets FcmMarin, mais seulement avec des Marin. En outre, modification pour éviter de pouvoir rajouter plusieurs parcours à un Marin. Modification modèle Marin pour créér la ligne dans la table FcmMarin lorsque le Marin passe en suivi FCM.
