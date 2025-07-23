@@ -318,6 +318,7 @@ class LivretFcm extends Component
         
     }
 
+  
 
 
     // ========================================
@@ -395,155 +396,148 @@ class LivretFcm extends Component
      *
      * PARTIE SAUVEGARDE A REFAIRE AVEC EVENT
      */
+    
 
-
-    public function save(string $type)
-    {
-        //$record  = $this->fcmMarinModel::with('parcoursSerialises')->find($this->fcmMarinId);
-        $record = $this->fcmMarin;
-
-        if (!$record) {
-            Notification::make()
-                ->title('Erreur')
-                ->body('Impossible de trouver le marin ou ses parcours.')
-                ->danger()
-                ->send();
-            return;
-        }
-
-
-        switch ($type) {
-            case "valid":
-                $data = [
-                    'commentaire' => $this->comment,
-                    'selectedItems' => $this->selectedItems,
-                    'key'           => 'sauve',
-                    'marinUuid' => $record->marin->uuid,
-                    'eventName' => 'valid',
-                    'eventType' => UserGeneratedEventTypes::VALID_ELMT_MARIN_PARCOURS,
-                    'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                ];
-                $modal = 'sauve';
-                break;
-            case "annul":
-                $data = [
-                    'commentaire' => $this->comment,
-                    'selectedItems' => $this->selectedItems,
-                    'key'           => 'annul',
-                    'marinUuid' => $record->marin->uuid,
-                    'eventName' => 'annul',
-                    'eventType' => UserGeneratedEventTypes::ANNUL_ELMT_MARIN_PARCOURS,
-                    'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                ];
-                $modal = 'annul';
-                break;
-            case "propos":
-                $data = [
-                    'commentaire' => $this->comment,
-                    'selectedItems' => $this->selectedItems,
-                    'key'           => 'propos',
-                    'marinUuid' => $record->marin->uuid,
-                    'eventName' => 'propos',
-                    'eventType' => UserGeneratedEventTypes::PROPOS_ELMT_MARIN_PARCOURS,
-                    'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                ];
-                $modal = 'propos';
-                break; 
-            case "annulPropos":
-                $data = [
-                    'commentaire' => ' Annulation de la Proposition',
-                    'selectedItems' => $this->selectedItems,
-                    'key'           => 'aValiderPropos',
-                    'marinUuid' => $record->marin->uuid,
-                    'eventName' => 'annulPropos',
-                    'eventType' => UserGeneratedEventTypes::ANNUL_PROPOS_ELMT_MARIN_PARCOURS,
-                    'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                ];
-                $modal = 'aValiderModal';
-                break;   
-            case "validPropos":
-                $data = [
-                    'commentaire' => ' Validation de la Proposition',
-                    'selectedItems' => $this->selectedItems,
-                    'key'           => 'aValiderPropos',
-                    'marinUuid' => $record->marin->uuid,
-                    'eventName' => 'validPropos',
-                    'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                ];
-                $modal = 'aValiderModal';
-                break;    
-            case "restore":
-                $data = [
-                    //'commentaire' => $this->comment,
-                    'commentaire' => $this->selectedItems['commentaire'],
-                    'selectedItems' => $this->selectedItems,
-                    'marinUuid' => $record->marin->uuid,
-                    'eventName' => 'restore',
-                    'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                ];
-                $modal = 'restoreModal';
-                break;   
-            case "reboot":
-                    $data = [
-                        'commentaire' => ' Reboot Data',
-                        'selectedItems' => $this->selectedItems,
-                        'marinUuid' => $record->marin->uuid,
-                        'eventName' => 'reboot',
-                        'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                    ];
-                    $modal = 'rebootModal';
-                    break;                                     
-            default:
-                $data =[];
-                $modal = "sauve";
-                break;
-
-        }
-        // Déclencher l'événement pour sauvegarder les données
-        $key = $data["key"];
-        $items_a_mettre_a_jour = $data["selectedItems"][$key];
-
-        $marin = $this->fcmMarin->marin;
-        //dd($items_a_mettre_a_jour["activites"]);
-        foreach($items_a_mettre_a_jour["activites"] as $activite_a_mettre_a_jour => $bool)
-        {
-
-            $event = new $this->eventClass(
-                event_type: $data['eventType'],
-                user_uuid: auth()->user()->uuid,
-                object_class: ObjectClasses::MARIN,
-                object_uuid: $marin->uuid,
-                detail: [
-                    "type_element" => "activite", 
-                    "uuid_element" => $activite_a_mettre_a_jour, 
-                    "date" => Carbon::now(), 
-                    "commentaire" => $this->comment, 
-                ]
-            );
-            event($event);
-
-        }
-        //EventTriggerService::triggerEvent($data, $record);
-
-        // Réinitialiser les données après la sauvegarde
-        $this->selectedItems['sauve'] = [];
-        $this->selectedItems['annul'] = [];
-        $this->selectedItems['propos'] = [];
-        $this->selectedItems['aValiderPropos'] = [];
-        $this->selectedItems['restore'] = [];
-        $this->comment = [];
-
-        // Fermer le modal
-        $this->dispatch('close-modal', id: $modal);
-
-        // Rafraichir le Livewire
-        //$this->dispatch('redirect-to-livret', id: $record->id);
-        $this->js('window.location.reload()');
-        // Recharge mais n'attends pas EventTrigger voir methode broadcats websockets echo
-        //return redirect()->route('filament.admin.resources.marins.livrect-de-fcm', ['record'=> $record->id]);
-
+     public function save(string $type)
+{
+    $record = $this->fcmMarin;
+ 
+    if (!$record) {
+        Notification::make()
+            ->title('Erreur')
+            ->body('Impossible de trouver le marin ou ses parcours.')
+            ->danger()
+            ->send();
+        return;
     }
+ 
+    switch ($type) {
+        case "valid":
+            $data = [
+                'commentaire' => $this->comment,
+                'selectedItems' => $this->selectedItems,
+                'key' => 'sauve',
+                'marinUuid' => $record->marin->uuid,
+                'eventName' => 'valid',
+                'eventType' => UserGeneratedEventTypes::VALID_ELMT_MARIN_PARCOURS,
+                'objectUuid' => $record->parcoursSerialises[0]->uuid,
+            ];
+            $modal = 'sauve';
+            break;
+        case "annul":
+            $data = [
+                'commentaire' => $this->comment,
+                'selectedItems' => $this->selectedItems,
+                'key' => 'annul',
+                'marinUuid' => $record->marin->uuid,
+                'eventName' => 'annul',
+                'eventType' => UserGeneratedEventTypes::ANNUL_ELMT_MARIN_PARCOURS,
+                'objectUuid' => $record->parcoursSerialises[0]->uuid,
+            ];
+            $modal = 'annul';
+            break;
+        case "propos":
+            $data = [
+                'commentaire' => $this->comment,
+                'selectedItems' => $this->selectedItems,
+                'key' => 'propos',
+                'marinUuid' => $record->marin->uuid,
+                'eventName' => 'propos',
+                'eventType' => UserGeneratedEventTypes::PROPOS_ELMT_MARIN_PARCOURS,
+                'objectUuid' => $record->parcoursSerialises[0]->uuid,
+            ];
+            $modal = 'propos';
+            break; 
+        case "annulPropos":
+            $data = [
+                'commentaire' => 'Annulation de la Proposition',
+                'selectedItems' => $this->selectedItems,
+                'key' => 'aValiderPropos',
+                'marinUuid' => $record->marin->uuid,
+                'eventName' => 'annulPropos',
+                'eventType' => UserGeneratedEventTypes::ANNUL_PROPOS_ELMT_MARIN_PARCOURS,
+                'objectUuid' => $record->parcoursSerialises[0]->uuid,
+            ];
+            $modal = 'aValiderModal';
+            break;   
+        case "validPropos":
+            $data = [
+                'commentaire' => 'Validation de la Proposition',
+                'selectedItems' => $this->selectedItems,
+                'key' => 'aValiderPropos',
+                'marinUuid' => $record->marin->uuid,
+                'eventName' => 'validPropos',
+                'objectUuid' => $record->parcoursSerialises[0]->uuid,
+            ];
+            $modal = 'aValiderModal';
+            break;    
+        case "restore":
+            $data = [
+                'commentaire' => $this->selectedItems['commentaire'],
+                'selectedItems' => $this->selectedItems,
+                'marinUuid' => $record->marin->uuid,
+                'eventName' => 'restore',
+                'objectUuid' => $record->parcoursSerialises[0]->uuid,
+            ];
+            $modal = 'restoreModal';
+            break;   
+        case "reboot":
+            $data = [
+                'commentaire' => 'Reboot Data',
+                'selectedItems' => $this->selectedItems,
+                'marinUuid' => $record->marin->uuid,
+                'eventName' => 'reboot',
+                'objectUuid' => $record->parcoursSerialises[0]->uuid,
+            ];
+            $modal = 'rebootModal';
+            break;                                     
+        default:
+            $data = [];
+            $modal = "sauve";
+            break;
+    }
+ 
+    // ✅ UN SEUL ÉVÉNEMENT AVEC TOUS LES ÉLÉMENTS
+    $key = $data["key"];
+    $items_a_mettre_a_jour = $data["selectedItems"][$key] ?? [];
+    $marin = $this->fcmMarin->marin;
+ 
+    // ✅ CRÉER UN SEUL ÉVÉNEMENT AVEC TOUTES LES DONNÉES
+    $event = new $this->eventClass(
+        event_type: $data['eventType'],
+        user_uuid: auth()->user()->uuid,
+        object_class: ObjectClasses::MARIN,
+        object_uuid: $marin->uuid,
+        detail: [
+            "date" => Carbon::now(), 
+            "commentaire" => $data['commentaire'],
+            // ✅ TOUTES LES DONNÉES D'UN COUP
+            "init" => $data['selectedItems']['init'] ?? [],
+            $key => $data['selectedItems'][$key] ?? [],
+            "selectedItems_full" => $data['selectedItems'],
+            "action_type" => $data['eventName'],
+        ]
+    );
+    
+    event($event);
+ 
+    // Réinitialiser les données après la sauvegarde
+    $this->selectedItems['sauve'] = [];
+    $this->selectedItems['annul'] = [];
+    $this->selectedItems['propos'] = [];
+    $this->selectedItems['aValiderPropos'] = [];
+    $this->selectedItems['restore'] = [];
+    $this->comment = '';
+ 
+    // Fermer le modal
+    $this->dispatch('close-modal', id: $modal);
+ 
+    // Rafraichir le Livewire
+    $this->js('window.location.reload()');
+}
 
+
+   
     /**
      *  Partie Taux et cochage
      *

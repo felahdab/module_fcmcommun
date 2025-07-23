@@ -2,7 +2,7 @@
 
 namespace Modules\FcmCommun\DataObjects\Enums;
 
-enum UserGeneratedEventTypes: string
+enum UserGeneratedEventTypes:string
 {
        
     case ATTRIBUER_COHORTE_MARIN                    = 'attribuer_cohorte_marin';

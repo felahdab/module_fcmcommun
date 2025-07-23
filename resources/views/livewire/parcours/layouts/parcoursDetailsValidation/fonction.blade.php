@@ -24,7 +24,7 @@
         {{-- <ul class="collapsible ml2 mb1" style="display:{{ isset($openSections['fonctions_'.$fonction['id']]) ? 'block' : 'none' }}"> --}}
             <ul
             class="collapsible ml2 mb1 transition-all duration-300"
-            x-show="isOpen('fonctions_{{ $fonction['id'] }}')"
+            x-show="isOpen('fonctions_{{ $fonction['uuid'] }}')"
             x-transition.duration.300ms
             >
             @foreach ($fonction['competences'] as $competence)

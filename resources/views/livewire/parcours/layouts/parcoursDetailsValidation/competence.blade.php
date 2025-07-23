@@ -24,7 +24,7 @@
         {{-- <ul class="collapsible highlight" style="display:{{ isset($openSections['competences_'.$competence['id']]) ? 'block' : 'none' }}"> --}}
             <ul
             class="collapsible ml2 mb1 transition-all duration-300"
-            x-show="isOpen('competences_{{ $competence['id'] }}')"
+            x-show="isOpen('competences_{{ $competence['uuid'] }}')"
             x-transition.duration.300ms
             >
             @foreach ($competence['savoirfaires'] as $savoirFaire)
