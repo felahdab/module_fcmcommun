@@ -1,3 +1,7 @@
+## 0.0.8 (July 25, 2025)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.7 –> 0.0.8
+- Ajustement livret pour émtettre les évènements de validation des éléments du parcours déjà proposés par le marin.
+
 ## 0.0.7 (July 25, 2025)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.6 –> 0.0.7
 - Merge branch 'julien-recalcul-etat-parcours-apres-evenement-metier'
