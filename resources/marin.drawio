@@ -1,0 +1,72 @@
+<mxfile host="65bd71144e">
+    <diagram id="crGEQM37mIQT3CIECYBn" name="Page-1">
+        <mxGraphModel dx="594" dy="1603" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="Modules\Fcm*\Models\Marin" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="360" y="120" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" style="edgeStyle=orthogonalEdgeStyle;curved=1;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="3" target="2">
+                    <mxGeometry relative="1" as="geometry">
+                        <Array as="points">
+                            <mxPoint x="150" y="80"/>
+                            <mxPoint x="360" y="80"/>
+                        </Array>
+                    </mxGeometry>
+                </mxCell>
+                <mxCell id="3" value="Modules\RH\Models\Marin" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="30" y="120" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="&lt;div style=&quot;color: rgb(41, 41, 41); background-color: rgb(255, 255, 255); font-family: Consolas, &amp;quot;Courier New&amp;quot;, monospace; font-weight: normal; font-size: 14px; line-height: 19px;&quot;&gt;&lt;div&gt;&lt;span style=&quot;color: #5e2cbc;&quot;&gt;cast_as_eloquent_descendant&lt;/span&gt;&lt;span style=&quot;color: #292929;&quot;&gt;(&lt;/span&gt;&lt;span style=&quot;color: #001080;&quot;&gt;$model&lt;/span&gt;&lt;span style=&quot;color: #292929;&quot;&gt;, &lt;/span&gt;&lt;span style=&quot;color: #001080;&quot;&gt;$destination_class&lt;/span&gt;&lt;span style=&quot;color: #292929;&quot;&gt;)&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="110" y="40" width="290" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="Je bénéficie alors des méthodes de la FCM" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="345" y="200" width="150" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="$marin-&amp;gt;complements_fcm" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="530" y="90" width="170" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="objet FcmMarin associé à ce marin" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="650" y="-40" width="150" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="$marin-&amp;gt;complements_fcm-&amp;gt;cohorte" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="740" y="10" width="230" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="La cohorte attribuée au marin ou null" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="750" y="30" width="210" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="$marin-&amp;gt;complements_fcm-&amp;gt;mentor" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="740" y="79" width="230" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="Le mentor (Marin) du marin ou null" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="750" y="104" width="210" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="$marin-&amp;gt;complements_fcm-&amp;gt;donnees_du_parcours" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="740" y="190" width="230" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="14" value="Objet MarinParcours associé" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="930" y="150" width="210" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="15" value="$marin-&amp;gt;complements_fcm-&amp;gt;donnees_du_parcours-&amp;gt;taux_global, taux_stage et taux_activite" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="1040" y="190" width="340" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="16" value="Les taux d'avancement du PPA du marin" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="1040" y="230" width="350" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="17" value="$marin-&amp;gt;complements_fcm-&amp;gt;donnees_du_parcours-&amp;gt;parcoursmarin" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="1040" y="280" width="340" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="18" value="Le PPA du marin dans sa forme sérialisée et mise à jour au gré des évènements de validation d'éléments" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="1040" y="320" width="350" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="19" value="$marin-&amp;gt;complements_fcm-&amp;gt;donnees_du_parcours-&amp;gt;parcours_serialise" style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="1040" y="390" width="340" height="30" as="geometry"/>
+                </mxCell>
+                <mxCell id="20" value="Objet de classe ParcoursSerialise: le parcours de référence attribué au Marin. Ce parcours est donc copié dans parcoursmarin lors de l'attribution du parcours. " style="text;strokeColor=none;align=center;fillColor=none;html=1;verticalAlign=middle;whiteSpace=wrap;rounded=0;" vertex="1" parent="1">
+                    <mxGeometry x="1040" y="430" width="350" height="50" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
