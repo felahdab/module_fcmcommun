@@ -1,3 +1,8 @@
+## 0.0.9 (July 25, 2025)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.8 –> 0.0.9
+- Retrait des classes de génération des events devenues obsolètes
+- TRetrait des anciens tests EventTriggerService
+
 ## 0.0.8 (July 25, 2025)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.7 –> 0.0.8
 - Ajustement livret pour émtettre les évènements de validation des éléments du parcours déjà proposés par le marin.
