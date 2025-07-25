@@ -467,6 +467,7 @@ class LivretFcm extends Component
                 'key' => 'aValiderPropos',
                 'marinUuid' => $record->marin->uuid,
                 'eventName' => 'validPropos',
+                'eventType' => UserGeneratedEventTypes::VALID_ELMT_MARIN_PARCOURS,
                 'objectUuid' => $record->parcoursSerialises[0]->uuid,
             ];
             $modal = 'aValiderModal';
@@ -500,6 +501,7 @@ class LivretFcm extends Component
     // ✅ UN SEUL ÉVÉNEMENT AVEC TOUS LES ÉLÉMENTS
     $key = $data["key"];
     $items_a_mettre_a_jour = $data["selectedItems"][$key] ?? [];
+    //ddd($items_a_mettre_a_jour["activites"], $data['eventType'], $this->comment);
     $marin = $this->fcmMarin->marin;
  
     foreach($items_a_mettre_a_jour["activites"] as $activite_a_mettre_a_jour => $bool)
