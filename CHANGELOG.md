@@ -1,3 +1,8 @@
+## 0.0.7 (July 25, 2025)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.6 –> 0.0.7
+- Merge branch 'julien-recalcul-etat-parcours-apres-evenement-metier'
+- Commit : Verification Etats Parents si Enfants tous cochés
+
 ## 0.0.6 (July 23, 2025)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.5 –> 0.0.6
 - Restauration du fonctionnement du livret pour générer une série d'évènements uniques plutôt qu'un évènement groupé.
