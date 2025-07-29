@@ -14,6 +14,8 @@ use Modules\FcmCentral\Models\Marin;
 use Modules\FcmCentral\Models\MarinParcours;
 use Modules\FcmCentral\Models\Parcours;
 
+use Modules\FcmCommun\Services\OutilsMarinParcoursService;
+
 class MajPpaMarinfcm implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
@@ -32,9 +34,6 @@ class MajPpaMarinfcm implements ShouldQueue
     public function handle(): void
     {
         // Lorsque je fixe (serialise) un parcours, un job doit etre enregistré pour se lancer à la date selectionnée à 00h01.
-        // je vais passer par les event pour la maj des parcours de tous les marins.
-        // Je fais un event MAJ_PARCOURS_SERIALISE_MARIN par marin mis a jour
-        // Les parametres sont : rh_uuid, ancien parcours, nouveau parcours, uuid_user_fixateur
         // 
         // Je récupère les données du ppa à appliquer
         $parcours=ParcoursSerialise::where('uuid','=', $this->parcoursserialise_uuid)->get();
@@ -45,19 +44,43 @@ class MajPpaMarinfcm implements ShouldQueue
         foreach($listfcmmarins as $fcmmarin){
             // Je récupère le parcours actuel du marin
             $parcoursmarin=$fcmmarin->parcoursmarin;
-            // Je le découpe en tableaux pour comparer avec le nouveau parcours.
-            $activites=[];
-            $sf=[];
-            $comp=[];
-            $fonc=[];
+            //en utilisant le service outils, je récupère sous forme de tableau par type d'element [uuid =>etat_valid,valideur,commentaire,date_validation,commentaire_proposition,date_proposition]]
+            $outils= New OutilsMarinParcoursService($parcoursmarin);
+            
             // Je prends le nouveau parcours, et j'ajoute les champs avec des valeurs si elles existent
             // je recrée le parcours marin en ajoutant les champs supplémentaires déjà rempli s'il y a correspondance uuid entre l'existant et le nouveau.
+            $newparcours=$parcours->parcours;
+            $old_list_fonction=$outils->fonctions_du_parcours();
+            $old_list_competence=$outils->competences_du_parcours();
+            $old_list_savoirfaire=$outils->savoirfaires_du_parcours();
+            $old_list_activite=$outils->activites_du_parcours();
+            foreach($newparcours['fonction'] as $fonction){
+                if (isset($old_list_fonction[$fonction['uuid']])){
+                    $data['commentaire'] = $old_list_fonction['commentaire'];
+                    $data['etat_valid'] = $old_list_fonction['etat_valid'];
+                    $data['valideur'] = $old_list_fonction['valideur'];
+                    $data['date_validation'] = $old_list_fonction['date_validation'];
+                    $data['commentaire_proposition'] = $old_list_fonction['commentaire_proposition'];
+                    $data['date_proposition'] = $old_list_fonction['date_proposition'];
+                }
+                else{
+                    $data['commentaire']= null;
+                    $data['etat_valid']= false;
+                    $data['valideur']= null;
+                    $data['date_validation']= null;
+                    $data['commentaire_proposition']= null;
+                    $data['date_proposition']= null;
+                }
+                $newparcours['fonction'][$fonction['uuid']]=$data;
+            
+            }
 
             // Je fais l'event
             // $event = new UserGeneratedEvent(
             //     UserGeneratedEventTypes::MAJ_PARCOURS_SERIALISE_MARIN,
             //     auth()->user()->uuid,
             //     [
+                // rh_uuid, ancien parcours, nouveau parcours,
             //         "parcours" =>  $data,
             //     ]
             // );
