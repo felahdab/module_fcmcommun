@@ -498,14 +498,45 @@ class LivretFcm extends Component
             break;
     }
  
-    // ✅ UN SEUL ÉVÉNEMENT AVEC TOUS LES ÉLÉMENTS
+    //  UN SEUL ÉVÉNEMENT AVEC TOUS LES ÉLÉMENTS
     $key = $data["key"];
     $items_a_mettre_a_jour = $data["selectedItems"][$key] ?? [];
     //ddd($items_a_mettre_a_jour["activites"], $data['eventType'], $this->comment);
     $marin = $this->fcmMarin->marin;
+
+    // TRAITER D'ABORD LES SAVOIR-FAIRES (priorité)
+    foreach($items_a_mettre_a_jour["savoirfaires"] as $savoirfaire_uuid => $bool) {
+    if (!$bool) continue; // Ignorer si non sélectionné
+    
+    //  ÉVÉNEMENT SAVOIR-FAIRE
+    $event = new $this->eventClass(
+        event_type: $data['eventType'],
+        user_uuid: auth()->user()->uuid,
+        object_class: ObjectClasses::MARIN,
+        object_uuid: $marin->uuid,
+        detail: [
+            "type_element" => "savoirfaire", 
+            "uuid_element" => $savoirfaire_uuid, 
+            "date" => Carbon::now(), 
+            "commentaire" => $this->comment,
+            
+        ]
+    );
+    event($event);
+}
+
+    //  TRAITER LES ACTIVITÉS INDIVIDUELLES (seulement celles hors savoir-faires validés)
+    $activites_deja_traitees = $this->getActivitesTraiteesParSavoirfaires($items_a_mettre_a_jour["savoirfaires"]);
  
-    foreach($items_a_mettre_a_jour["activites"] as $activite_a_mettre_a_jour => $bool)
-        {
+    foreach($items_a_mettre_a_jour["activites"] as $activite_uuid => $bool) {
+    if (!$bool) continue; // Ignorer si non sélectionné
+    
+    //  VÉRIFIER SI L'ACTIVITÉ N'EST PAS DÉJÀ TRAITÉE PAR UN SAVOIR-FAIRE
+    if (in_array($activite_uuid, $activites_deja_traitees)) {
+        continue; // Ignorer car déjà traitée par le savoir-faire parent
+    }
+
+   
             $event = new $this->eventClass(
                 event_type: $data['eventType'],
                 user_uuid: auth()->user()->uuid,
@@ -513,7 +544,7 @@ class LivretFcm extends Component
                 object_uuid: $marin->uuid,
                 detail: [
                     "type_element" => "activite", 
-                    "uuid_element" => $activite_a_mettre_a_jour, 
+                    "uuid_element" => $activite_uuid, 
                     "date" => Carbon::now(), 
                     "commentaire" => $this->comment, 
                 ]
@@ -627,4 +658,39 @@ class LivretFcm extends Component
         // Mettre à jour le taux global dans le parcours
         $this->parcours[$parcoursIndex]['taux_global'] = round($tauxGlobal, 2);
     }
+
+
+
+
+        // ✅ MÉTHODE HELPER POUR IDENTIFIER LES ACTIVITÉS DÉJÀ TRAITÉES
+        private function getActivitesTraiteesParSavoirfaires($savoirfaires_selectionnes): array
+        {
+            $activites_traitees = [];
+            $parcours = $this->fcmMarin->marin->complements_fcm->donnees_du_parcours->parcoursmarin;
+            
+            foreach ($savoirfaires_selectionnes as $savoirfaire_uuid => $bool) {
+                if (!$bool) continue;
+                
+                // Parcourir la structure pour trouver les activités de ce savoir-faire
+                foreach ($parcours['fonctions'] as $fonction) {
+                    if (!isset($fonction['competences'])) continue;
+                    
+                    foreach ($fonction['competences'] as $competence) {
+                        if (!isset($competence['savoirfaires'])) continue;
+                        
+                        foreach ($competence['savoirfaires'] as $savoirfaire) {
+                            if ($savoirfaire['uuid'] === $savoirfaire_uuid && isset($savoirfaire['activites'])) {
+                                foreach ($savoirfaire['activites'] as $activite) {
+                                    $activites_traitees[] = $activite['uuid'];
+                                }
+                                break 3; // Sortir de tous les loops
+                            }
+                        }
+                    }
+                }
+            }
+            
+            return $activites_traitees;
+        }
+
 }
