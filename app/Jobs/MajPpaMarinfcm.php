@@ -9,7 +9,7 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 
 use Modules\FcmCentral\Models\ParcoursSerialise;
-use Modules\FcmCommun\Helpers\DataParcoursMarinHelper;
+use Modules\FcmCommun\Helpers\DataParcoursMarinHelper; // a l'air de ne faire que les activites et pas les autres elements
 use Modules\FcmCentral\Models\Marin;
 use Modules\FcmCentral\Models\MarinParcours;
 use Modules\FcmCentral\Models\Parcours;
@@ -45,72 +45,29 @@ class MajPpaMarinfcm implements ShouldQueue
             // Je récupère le parcours actuel du marin
             $parcoursmarin=$fcmmarin->parcoursmarin;
             //en utilisant le service outils, je récupère sous forme de tableau par type d'element [uuid =>etat_valid,valideur,commentaire,date_validation,commentaire_proposition,date_proposition]]
-            $outils= New OutilsMarinParcoursService($parcoursmarin);
-            
-            // Je prends le nouveau parcours, et j'ajoute les champs avec des valeurs si elles existent
-            // je recrée le parcours marin en ajoutant les champs supplémentaires déjà rempli s'il y a correspondance uuid entre l'existant et le nouveau.
+            $outils= New OutilsMarinParcoursService($parcoursmarin);            
+            // Je prends le nouveau parcours serialisé, et j'ajoute les champs avec des valeurs si elles existent
             $newparcours=$parcours->parcours;
-            $old_list_fonction=$outils->fonctions_du_parcours();
-            $old_list_competence=$outils->competences_du_parcours();
-            $old_list_savoirfaire=$outils->savoirfaires_du_parcours();
-            $old_list_activite=$outils->activites_du_parcours();
-            foreach($newparcours['fonction'] as $fonction){
-                if (isset($old_list_fonction[$fonction['uuid']])){
-                    $data['commentaire'] = $old_list_fonction['commentaire'];
-                    $data['etat_valid'] = $old_list_fonction['etat_valid'];
-                    $data['valideur'] = $old_list_fonction['valideur'];
-                    $data['date_validation'] = $old_list_fonction['date_validation'];
-                    $data['commentaire_proposition'] = $old_list_fonction['commentaire_proposition'];
-                    $data['date_proposition'] = $old_list_fonction['date_proposition'];
-                }
-                else{
-                    $data['commentaire']= null;
-                    $data['etat_valid']= false;
-                    $data['valideur']= null;
-                    $data['date_validation']= null;
-                    $data['commentaire_proposition']= null;
-                    $data['date_proposition']= null;
-                }
-                $newparcours['fonction'][$fonction['uuid']]=$data;
-            
-            }
+            // tableau des valeurs utiles pour la maj
+            $tableauxValeurs = [
+                'niveau1' => $outils->fonctions_valid_du_parcours(), // fonction
+                'niveau2' => $outils->competences_valid_du_parcours(), // competence
+                'niveau3' => $outils->savoirfaires_du_parcours(), // savoirfaire
+                'niveau4' => $outils->activites_du_parcours(), // activite;
+            ];
+            $newparcours = DataParcoursMarinHelper::rajoutChampSupplementaireAvecValeurs($newparcours, $tableauxValeurs, 1);
 
-            // Je fais l'event
+            // event à créer
             // $event = new UserGeneratedEvent(
             //     UserGeneratedEventTypes::MAJ_PARCOURS_SERIALISE_MARIN,
-            //     auth()->user()->uuid,
+            //     auth()->user()->uuid, // pas sur que je l'ai vu que c'est un job lancé par un cron.
             //     [
-                // rh_uuid, ancien parcours, nouveau parcours,
+                // rh_uuid, ancien parcours $parcoursmarin, nouveau parcours $newparcours,
             //         "parcours" =>  $data,
             //     ]
             // );
             // event($event);    
+        }
     }
-
-    //     rajoutChampSupplementaire(array $data, array $addFields = null, string $mode='init'): array
-    // {
-    //     // Mode 'init', injection des champs stantards et supplementaires
-    //     if ($mode==='init'){
-    //         // Champs a injecter fixe
-    //         $data['commentaire']                = null;
-    //         $data['etat_valid']                 = false;
-    //         $data['valideur']                   = null;
-    //         $data['date_validation']            = null;
-    //         $data['commentaire_proposition']    = null;
-    //         $data['date_proposition']           = null;
-
-        //
-        // je récupère les données du ppa à appliquer (uuid et parcours complet)
-        
-        // je cherche tous les marins qui ont ce parours_uuid.
-
-        // Pour chaque marin je crée à partir ancien parcours
-        //tableau activité [uuid, lib, etat, comment, valideur, date]
-        //tableau sf [uuid, lib, etat, comment, valideur, date]
-        //tableau comp [uuid, lib, etat, comment, valideur, date]
-        //tableau fonc [uuid, lib, etat, comment, valideur, date]
-
-        //je recrée le parcours marin en ajoutant les champs supplémentaires déjà rempli s'il y a correspondance uuid entre l'existant et le nouveau.
-        
-    }
+    
 }

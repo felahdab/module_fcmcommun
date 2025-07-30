@@ -71,7 +71,40 @@ class DataParcoursMarinHelper
 
     }
 
-   
+    // Cette fonction va permettre de mettre à jour les champs supplémentaires du parcours d'un marin en comparaison de la version précédente.
+        // $parcours : le parcours de parcours serialisé (pas le parcours avec les champs déjà ajoutés comme dans parcours marin)
+        // $tableauxValeurs : ensemble des tableaux de comparaison pour saisir les données s'il y en a
+        //  exemple : $tableauxValeurs = [
+        //     'niveau1' => $outils->fonctions_valid_du_parcours(), // fonction
+        //     'niveau2' => $outils->competences_valid_du_parcours(), // competence
+        //     'niveau3' => $outils->savoirfaires_valid_du_parcours(), // savoirfaire
+        //     'niveau4' => $outils->activites_valid_du_parcours(), // activite];
+        // $niveau : permet de selectionner dans tableauxValeurs la ligne à consulter
+    public static function rajoutChampSupplementaireAvecValeurs(array $parcours, array $tableauxValeurs, $niveau=1): array {
+        $tablcompar = $tableauxValeurs['niveau' . $niveau] ?? [];
+        foreach ($parcours as &$element) {
+            // Ajouter les champs avec la valeur nulle par défaut
+            $element['commentaire']                = null;
+            $element['etat_valid']                 = false;
+            $element['valideur']                   = null;
+            $element['date_validation']            = null;
+            $element['commentaire_proposition']    = null;
+            $element['date_proposition']           = null;
+            if (isset($tablcompar[$element['uuid']])) {
+                $valeurs = $tablcompar[$element['uuid']];
+                $element['commentaire']                = $valeurs['commentaire'];
+                $element['etat_valid']                 = $valeurs['etat_valid'];
+                $element['valideur']                   = $valeurs['valideur'];
+                $element['date_validation']            = $valeurs['date_validation'];
+                $element['commentaire_proposition']    = $valeurs['commentaire_proposition'];
+                $element['date_proposition']           = $valeurs['date_proposition'];
+            }
+            if (is_array($element)) {
+                self::rajoutChampSupplementaireAvecValeurs($element, $tableauxValeurs, $niveau + 1);
+            }
+        }
+        return $parcours;
+    }
 
 
 }
