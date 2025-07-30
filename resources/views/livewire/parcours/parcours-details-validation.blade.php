@@ -113,6 +113,8 @@
     function parcoursManager() {
         return {
             sections: {},
+           
+            selectedItems:{},
             
             toggleSection(sectionId) {
                 this.sections[sectionId] = !this.sections[sectionId];
@@ -126,7 +128,65 @@
             saveToStorage() {
                 localStorage.setItem('parcours_sections_state', JSON.stringify(this.sections));
             },
-            
+
+            toggleCheck(sectionId) {
+                const [type, uuid] = sectionId.split('_');
+                if (!this.selectedItems[type]) {
+                    this.selectedItems[type] = {};
+                }
+
+                // Cas savoirfaire : gestion enfants
+                if (type === 'savoirfaires') {
+                    const enfants = this.savoirfaireChildren && this.savoirfaireChildren[uuid] ? this.savoirfaireChildren[uuid] : [];
+                    const isChecked = !!this.selectedItems[type][uuid];
+                    /** 
+                     * LE double !! convertit la valeur en booléen (true or false)
+                    * si this.selectedItems[type][uuid] vaut true alors isChecked sera true
+                    * si this.selectedItems[type][uuid] faut false or undefinde alors isChecked sera false
+                    */
+
+
+                    if (isChecked) {
+                        // Décocher le savoirfaire => décocher tous ses enfants cochés
+                        delete this.selectedItems[type][uuid];
+                        enfants.forEach(childUuid => {
+                            if (this.selectedItems['activites'] && this.selectedItems['activites'][childUuid]) {
+                                delete this.selectedItems['activites'][childUuid];
+                            }
+                        });
+                        // Nettoyage si plus rien
+                        if (this.selectedItems['activites'] && Object.keys(this.selectedItems['activites']).length === 0) {
+                            delete this.selectedItems['activites'];
+                        }
+                        if (Object.keys(this.selectedItems[type]).length === 0) {
+                            delete this.selectedItems[type];
+                        }
+                    } else {
+                        // Cocher le savoirfaire => cocher tous ses enfants non cochés
+                        this.selectedItems[type][uuid] = true;
+                        if (!this.selectedItems['activites']) this.selectedItems['activites'] = {};
+                        enfants.forEach(childUuid => {
+                            this.selectedItems['activites'][childUuid] = true;
+                        });
+                    }
+                } else {
+                    // Cas normal (activité, etc)
+                    if (this.selectedItems[type][uuid]) {
+                        delete this.selectedItems[type][uuid];
+                        if (Object.keys(this.selectedItems[type]).length === 0) {
+                            delete this.selectedItems[type];
+                        }
+                    } else {
+                        this.selectedItems[type][uuid] = true;
+                    }
+                }
+
+                console.log ('type : ',type, ' uuid', uuid);
+                            console.log('selectedItems :',this.selectedItems);
+            },
+
+
+          
             loadFromStorage() {
                 const saved = localStorage.getItem('parcours_sections_state');
                 if (saved) {

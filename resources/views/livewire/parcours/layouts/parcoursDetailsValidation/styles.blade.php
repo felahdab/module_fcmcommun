@@ -24,5 +24,9 @@
     .ml-1{margin-left:10px;}
     .ml-2{margin-left:20px;}
 
+    .text-success{
+        color:lawngreen;
+    }
+
 </style>
 
