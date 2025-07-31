@@ -40,6 +40,11 @@ class LivretFcm extends Component
     public $selectedRestoreEvent=null;
     public $restore = [];
 
+    // Parcours JSON  pour AlpinJS
+    public $savoirFaireChildren = [];
+    public $competenceChildren = [];
+    public $fonctionChildren = [];
+
 
 
     public function mount($fcmMarinId, $tablePrefix, $parcoursMarin, $eventClass)
@@ -263,10 +268,10 @@ class LivretFcm extends Component
 
     protected function initializeSelectedItems()
     {
-        $generator = new HierarchyMapGeneratorService();
-        $this->selectedItems['map'] = $generator->generate($this->parcours[0]['parcours']);
-        $this->selectedItems['init'] = [];
-        $this->selectedItems['gestion'] = [];
+        //$generator = new HierarchyMapGeneratorService();
+        //$this->selectedItems['map'] = $generator->generate($this->parcours[0]['parcours']);
+        //$this->selectedItems['init'] = [];
+        //$this->selectedItems['gestion'] = [];
         
         $this->populateInitialItems();
     }
@@ -276,18 +281,32 @@ class LivretFcm extends Component
         foreach ($this->parcours as $parcoursItem) {
             foreach ($parcoursItem['parcours']['fonctions'] as $fonction) {
                 $this->processInitialElement('fonctions', $fonction);
-                
+
+                // Initialisation pour les enfants de la fonction
                 if (isset($fonction['competences'])) {
                     foreach ($fonction['competences'] as $competence) {
                         $this->processInitialElement('competences', $competence);
-                        
+
+                        // Mapping des enfants pour la fonction
+                        if (empty($competence['etat_valid']) || $competence['etat_valid'] == false) {
+                        $this->fonctionChildren[$fonction['uuid']][] = $competence['uuid'];
+                        }
                         if (isset($competence['savoirfaires'])) {
                             foreach ($competence['savoirfaires'] as $savoirfaire) {
                                 $this->processInitialElement('savoirfaires', $savoirfaire);
-                                
+
+                                // Mapping des enfants pour la compétence
+                                if (empty($savoirfaire['etat_valid']) || $savoirfaire['etat_valid'] == false) {
+                                $this->competenceChildren[$competence['uuid']][] = $savoirfaire['uuid'];
+                                }
                                 if (isset($savoirfaire['activites'])) {
                                     foreach ($savoirfaire['activites'] as $activite) {
                                         $this->processInitialElement('activites', $activite);
+
+                                        // Mapping des enfants pour le savoir-faire (uniquement non validés)
+                                        if (empty($activite['etat_valid']) || $activite['etat_valid'] == false) {
+                                            $this->savoirFaireChildren[$savoirfaire['uuid']][] = $activite['uuid'];
+                                        }
                                     }
                                 }
                             }
@@ -297,6 +316,7 @@ class LivretFcm extends Component
             }
         }
     }
+
 
     protected function processInitialElement(string $type, array $element)
     {

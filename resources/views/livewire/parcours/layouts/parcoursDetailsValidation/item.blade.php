@@ -57,15 +57,24 @@ x-data="{
                 />  --}}
 
                 
+                @if (!!$isChecked)
+                <x-filament::icon-button
+                size="lg"
+                color="success"
+                icon="heroicon-c-shield-check"
+                tooltip="Validation le {{$dateValidation }} par {{$valideur}}"
+                class="tree-checkbox"
+            />
+                @else
 
                         {{-- Bouton validation Alpine --}}
         <button
         type="button"
         class="tree-checkbox"
         {{-- :class="checked ? 'text-gray-400' : 'text-gray-600'" --}}
-        :class="selectedItems['{{$type}}'] && selectedItems['{{$type}}']['{{$uuid}}'] ? 'text-success' : 'text-gray-600' "
+        :class="selectedItems['sauve']['{{$type}}'] && selectedItems['sauve']['{{$type}}']['{{$uuid}}'] ? 'text-success' : 'text-gray-600' "
         @click="toggleCheck('{{$sectionId}}')"
-        :title="selectedItems['{{$type}}'] && selectedItems['{{$type}}']['{{$uuid}}'] ? 'Validé' : 'À valider'"
+        :title="selectedItems['sauve']['{{$type}}'] && selectedItems['sauve']['{{$type}}']['{{$uuid}}'] ? 'Validé' : 'À valider'"
         
     >
         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
@@ -74,16 +83,16 @@ x-data="{
                   d="M5 13l4 4L19 7"/>
         </svg>
     </button>
-
+            @endif
             
 
         
                         
             {{-- Si pas checke --}}
-            @if (!$isChecked)
+            {{-- @if (!$isChecked) --}}
 
                 {{-- Boucle Etat bouton --}}
-                @if (isset($selectedItems['gestion'][$type][$uuid]) && $selectedItems['gestion'][$type][$uuid])
+                {{-- @if (isset($selectedItems['gestion'][$type][$uuid]) && $selectedItems['gestion'][$type][$uuid])
 
                     <x-filament::icon-button
                         size="lg"
@@ -109,10 +118,10 @@ x-data="{
                         
                     />
 
-                @endif
+                @endif  --}}
                 {{-- Fin boucle etat --}}
 
-                @if(($type === 'activites')||($type === 'savoirfaires'))
+                {{-- @if(($type === 'activites')||($type === 'savoirfaires'))
                     @if (!$isProposChecked)
                        
                             <x-filament::icon-button
@@ -155,7 +164,7 @@ x-data="{
            
 
             @endif
-            @endif
+            @endif --}}
             {{-- Fin Si pas checke --}}
             <strong  class="ml1">{{ $label }} </strong>
      
