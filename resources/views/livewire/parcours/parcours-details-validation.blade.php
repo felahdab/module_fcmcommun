@@ -4,7 +4,7 @@
 
 <div x-data="parcoursManager()" x-init="initSections()">
     @if (!empty($parcours))
-        <form>
+        {{-- <form> --}}
 
             @foreach ($parcours as $parcoursItem)
         
@@ -62,14 +62,20 @@
                 </ul>
                 
             @endforeach
+            <!-- Pour debbugage -->
+            <pre x-text="JSON.stringify(JSON.parse(selectedItemsSauveJson || '{}'), null, 2)"></pre>
 
+            <!-- Champ input pour le stocker les data AlpineJs dans livewire -->
+            <input type="hidden" x-model="selectedItemsSauveJson" wire:model="selectedItemsSauve">
+           
             <!-- Bouton Submit -->
             <div class="mt-6">
-                <x-filament::button wire:click="$dispatch('open-modal', { id: 'sauve' })" >
+                <x-filament::button 
+                wire:click="$dispatch('open-modal', { id: 'sauve' })" >
                Sauvegarder
             </x-filament::button>
             </div>
-        </form>
+        {{-- </form> --}}
     @else
         <p>Aucun parcours Sérialisé trouvé pour ce marin</p>
     @endif

@@ -9,11 +9,16 @@ icon="heroicon-o-information-circle"
         <h2 class="text-lg font-bold">Ajouter un commentaire</h2>
     </x-slot>
     <x-slot name="description">
+        <pre x-text="JSON.stringify(JSON.parse(selectedItemsSauveJson || '{}'), null, 2)"></pre>
+
     <textarea wire:model="comment" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 "></textarea>
 </x-slot>
     <x-slot name="footer">
         <x-filament::button color="gray" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" wire:click="$dispatch('close-modal',{id:'sauve'})">Annuler</x-filament::button>
-        <x-filament::button color="success" class="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700" wire:click="save('valid')">Valider</x-filament::button>
+        <x-filament::button color="success" 
+        class="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700" 
+        @click.prevent="selectedItemsSauveJson = JSON.stringify(selectedItems.sauve)"
+        wire:click="save('valid')">Valider</x-filament::button>
     </x-slot>
 </x-filament::modal>
 

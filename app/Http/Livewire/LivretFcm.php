@@ -40,10 +40,11 @@ class LivretFcm extends Component
     public $selectedRestoreEvent=null;
     public $restore = [];
 
-    // Parcours JSON  pour AlpinJS
+    // Parcours JSON  pour AlpineJS
     public $savoirFaireChildren = [];
     public $competenceChildren = [];
     public $fonctionChildren = [];
+    public $selectedItemsSauve = '';
 
 
 
@@ -421,6 +422,9 @@ class LivretFcm extends Component
      public function save(string $type)
 {
     $record = $this->fcmMarin;
+    logger($this->selectedItemsSauve);
+    dd($this->selectedItemsSauve);
+    
  
     if (!$record) {
         Notification::make()
@@ -433,9 +437,13 @@ class LivretFcm extends Component
  
     switch ($type) {
         case "valid":
+
+            $this->selectedItems = json_decode($this->selectedItemsSauve, true);
+
             $data = [
                 'commentaire' => $this->comment,
-                'selectedItems' => $this->selectedItems,
+                //'selectedItems' => $this->selectedItems,
+                'selectedItems' => $this->selectedItems['sauve'],
                 'key' => 'sauve',
                 'marinUuid' => $record->marin->uuid,
                 'eventName' => 'valid',
@@ -517,6 +525,8 @@ class LivretFcm extends Component
             $modal = "sauve";
             break;
     }
+
+  
  
     //  UN SEUL ÉVÉNEMENT AVEC TOUS LES ÉLÉMENTS
     $key = $data["key"];
