@@ -4,37 +4,13 @@ namespace Modules\FcmCommun\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-//use Modules\FcmCommun\Traits\HasTablePrefix;
-
-
-
 
 class MarinParcours extends Model
 {
-    //use HasTablePrefix;
-    //use HasUuids;
-
-    /*
-     The attributes that are mass assignable.
-    // Function dans le cas Si on met des champs avec le prefixe 'fcmcentral_'  exemple : fcmcentral_marin_id
-
-    protected $fillable = [];
-    public function __construct(array $attributes = [])
-    {
-        parent::_construct($attributes);
-        // Init de fillable dans le constructeur
-        $this->fillable = [
-            $this->prefix.'marin_id',
-            $this->prefix.'parcours_id',
-            'taux_global',
-            'taux_stage',
-            'taux_activite',
-            'parcours',
-            'mentor_id',
-        ];
-    }
-
-    */
+    /**
+     * Les attributs ci-dessous sont communs aux modèles MarinParcours des modules FcmCentral et FcmUnité
+     * qui étendent cette classe.
+     */
 
     protected $fillable = [
         'marin_id',
@@ -49,10 +25,4 @@ class MarinParcours extends Model
     protected $casts = [
         'parcoursmarin' => 'array',
     ];
-
-  
-
-
-   
-   
 }
