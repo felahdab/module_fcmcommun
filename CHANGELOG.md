@@ -1,3 +1,22 @@
+## 0.0.10 (August 25, 2025)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.9 –> 0.0.10
+- Adaptation du livret de FCM
+- WIP sur nouvelle version plus légère et rapide du livret de FCM
+- Ajustement OutilsMarinParcoursService pour ne travailler que sur les données sérialisées du parcours, sans référence aux classes du module FcmCentral.
+- Nettoyage MarinParcours
+- Merge remote-tracking branch 'origin/job_maj_ppa_marinfcm_sza' into fldb-nouveau-livret
+- Livret FCM ALpineJS v3
+- Livret FCM AlpineJs V2
+- Debut Modification Parcours bouton AlpineJS
+- wip suite
+- Merge remote-tracking branch 'origin/julien-pdf' into job_maj_ppa_marinfcm_sza
+- Livret FCM : Event SavoirFaire
+- wip job serialisation
+- complement outils marin parcours
+- debut service outils marin parcours
+- PDF Livret v1
+- sauv idees
+
 ## 0.0.9 (July 25, 2025)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.8 –> 0.0.9
 - Retrait des classes de génération des events devenues obsolètes
