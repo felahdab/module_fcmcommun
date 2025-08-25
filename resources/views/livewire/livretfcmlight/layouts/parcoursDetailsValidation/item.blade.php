@@ -29,7 +29,7 @@
         initial_proposed : {{ $isProposChecked ? 'true' : 'false'}},
 
         isSelected() {
-            return selectedItems['sauve']['{{$type}}'] && selectedItems['sauve']['{{$type}}']['{{$uuid}}'];
+            return selectedItems['{{$type}}'] && selectedItems['{{$type}}']['{{$uuid}}'];
         }
     }">
 
@@ -66,8 +66,8 @@
                     type="button"
                     class="tree-checkbox"
                     x-on:click="toggleCheck('{{$sectionId}}')"
-                    x-bind:class="selectedItems['sauve']['{{$type}}'] && selectedItems['sauve']['{{$type}}']['{{$uuid}}'] ? 'text-success' : 'text-gray-600' "
-                    x-bind:title="selectedItems['sauve']['{{$type}}'] && selectedItems['sauve']['{{$type}}']['{{$uuid}}'] ? 'Validé' : 'À valider'">
+                    x-bind:class="selectedItems['{{$type}}'] && selectedItems['{{$type}}']['{{$uuid}}'] ? 'text-success' : 'text-gray-600' "
+                    x-bind:title="selectedItems['{{$type}}'] && selectedItems['{{$type}}']['{{$uuid}}'] ? 'Validé' : 'À valider'">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -99,7 +99,16 @@
                 color="{{ $isChecked ? 'success':'gray' }}"
                 icon="heroicon-c-information-circle"
                 tooltip="Voir les infos "
-                wire:click="infosModal('{{$type}}', '{{$uuid}}', '{{ $dateValidation ?? '' }}', '{{ $valideur ?? 'Inconnu' }}', '{{ $commentaire ?? '' }}','{{ $libelleCourt }}','{{ $libelleLong }}','{{$duree}}')"
+                x-on:click="infos = {'type'  : '{{$type}}', 
+                            'uuid'           : '{{$uuid}}', 
+                            'libelleCourt'   : '{{ $libelleCourt }}', 
+                            'libelleLong'    : '{{ $libelleLong }}' ,
+                            'duree'          : '{{$duree}}',
+                            'dateValidation' : '{{ $dateValidation ?? '' }}',
+                            'valideur'       : '{{ $valideur ?? 'Inconnu' }}',
+                            'commentaire'    : '{{ $commentaire ?? '' }}'
+                        };
+                        $dispatch('open-modal', { id: 'infosModal'});"
             />
             {{--  Le bouton pour désactiver l'élément --}}
             @can('fcmcentral::valider_element_parcours')

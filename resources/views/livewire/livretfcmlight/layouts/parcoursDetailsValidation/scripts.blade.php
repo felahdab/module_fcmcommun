@@ -7,6 +7,7 @@
 
             a_devalider : {},
             a_proposer : {},
+            infos : {},
 
             commentaire : '',
             message_du_modal : '',
@@ -14,7 +15,27 @@
             savoirFaireChildren: window.savoirfaireChildren || {},
            
             selectedItems:{
-                sauve: {},
+            },
+
+            hasSelectedItems() 
+            {
+                if (this.selectedItems['activite'])
+                {
+                    if (Object.keys(this.selectedItems['activite']).length > 0)
+                    {
+                        return true;
+                    }
+                }
+
+                if (this.selectedItems['savoirfaire'])
+                {
+                    if (Object.keys(this.selectedItems['savoirfaire']).length > 0)
+                    {
+                        return true;
+                    }
+                }
+
+                return false;
             },
             
             selectedItemsSauveJson: '',
@@ -35,18 +56,18 @@
             toggleCheck(sectionId) {
                 const [type, uuid] = sectionId.split('_');
 
-                if ( ! this.selectedItems.sauve[type]) {
-                    this.selectedItems.sauve[type] = {};
+                if ( ! this.selectedItems[type]) {
+                    this.selectedItems[type] = {};
                 }
 
-                if (this.selectedItems.sauve[type][uuid]) {
-                    delete this.selectedItems.sauve[type][uuid];
+                if (this.selectedItems[type][uuid]) {
+                    delete this.selectedItems[type][uuid];
                 } else {
-                    this.selectedItems.sauve[type][uuid] = true;
+                    this.selectedItems[type][uuid] = true;
                 }
 
                 console.log ('type : ',type, ' uuid', uuid);
-                console.log('selectedItems :',this.selectedItems.sauve);
+                console.log('selectedItems :',this.selectedItems);
            },
           
             loadFromStorage() {
