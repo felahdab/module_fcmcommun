@@ -88,6 +88,8 @@ class LivretFcmLight extends Component
         event($event);
 
         $this->marin->refresh();
+
+        $this->js('window.location.reload()');
     }
 
     public function valider(array $elements_a_valider, string $commentaire)
@@ -135,6 +137,15 @@ class LivretFcmLight extends Component
         }
 
         $this->marin->refresh();
+
+// Vider le cache
+//unset($this->marin);  
+//$this->reset();     
+// Rafraîchir le composant Livewire
+//$this->dispatch('$refresh');
+// Recharger la page 
+$this->js('window.location.reload()');
+
     }
 
     public function proposer(array $element_a_proposer, string $commentaire)

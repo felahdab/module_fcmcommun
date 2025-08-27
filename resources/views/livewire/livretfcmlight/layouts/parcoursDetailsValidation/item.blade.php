@@ -31,7 +31,9 @@
         isSelected() {
             return selectedItems['{{$type}}'] && selectedItems['{{$type}}']['{{$uuid}}'];
         }
-    }">
+    }"
+    
+>
 
     <div class="flex items-center space-x-2">
        
@@ -46,7 +48,7 @@
 
         @if(($type === 'savoirfaire')||($type === 'activite'))
             {{--  Ce qui s'affiche quand l'élément n'est pas encore validé --}}
-            <div x-show="! checked">
+            <div x-show="!checked">
                 {{--  Le bouton pour proposer l'élément à la validation --}}
                 @if($isCurrentUser)
                     <div x-show="! checked && ! initial_proposed">
