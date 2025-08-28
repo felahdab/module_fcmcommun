@@ -11,7 +11,7 @@ class OutilsMarinParcoursService
     public $competence= null;
     public $savoirfaire= null;
 
-    public function activites_du_parcours_respectant_une_condition(array $ppa = [], Closure $predicat)
+    public function activites_du_parcours_respectant_une_condition( Closure $predicat, array $ppa = [])
     {
         $result=[];
         foreach($ppa["fonctions"] as $fonction)
@@ -34,11 +34,11 @@ class OutilsMarinParcoursService
         return $result;
     }
 
-    public function liste_des_activites_du_parcours_respectant_une_condition(array $ppa = [], Closure $predicat)
+    public function liste_des_activites_du_parcours_respectant_une_condition(Closure $predicat , array $ppa = [] )
     {
         $result = [];
 
-        $activites = $this->activites_du_parcours_respectant_une_condition($ppa, $predicat);
+        $activites = $this->activites_du_parcours_respectant_une_condition($predicat,$ppa) ;
         foreach($activites as $activite)
         {
             $result[] = $activite['uuid'];
@@ -50,16 +50,16 @@ class OutilsMarinParcoursService
 
     public function liste_activites_valid_du_parcours(array $ppa = [], string $fonction = null, string $competence = null, string $savoirfaire = null)
     {
-        return $this->liste_des_activites_du_parcours_respectant_une_condition($ppa, function ($activite){
+        return $this->liste_des_activites_du_parcours_respectant_une_condition(function ($activite){
             return $activite["etat_valid"];
-        });
+        },$ppa);
     }
 
     public function activites_valid_du_parcours(array $ppa = [], string $fonction = null, string $competence = null, string $savoirfaire = null)
     {
-        return $this->activites_du_parcours_respectant_une_condition($ppa, function ($activite){
+        return $this->activites_du_parcours_respectant_une_condition( function ($activite){
             return $activite["etat_valid"];
-        });
+        },$ppa);
 
         $result=[];
         foreach ($this->savoirfaires_du_parcours($ppa, $fonction, $competence) as $sf){

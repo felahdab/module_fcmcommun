@@ -55,13 +55,51 @@ class LivretFcmLight extends Component
     public function render()
     {
         $isCurrentUser = $this->marin->isCurrentUser();
+
+        // Générer le mapping savoir-faire/enfants
+        $savoirFaireChildren = $this->generateSavoirFaireChildrenMapping();
+    
         
         return view('fcmcommun::livewire.livretfcmlight.livretfcmlight', [
             'marin' => $this->marin,
             'parcours' => $this->marin->complements_fcm->donnees_du_parcours->parcoursmarin,
             'isCurrentUser' => $isCurrentUser,
+            'savoirFaireChildren' => $savoirFaireChildren, 
         ]);
     }
+
+    private function generateSavoirFaireChildrenMapping(): array
+    {
+        $mapping = [];
+        
+        // Vérifier si le marin a un parcours
+        if (!$this->marin->complements_fcm || 
+            !$this->marin->complements_fcm->donnees_du_parcours ||
+            !$this->marin->complements_fcm->donnees_du_parcours->parcoursmarin) {
+            return $mapping;
+        }
+        
+        $parcours = $this->marin->complements_fcm->donnees_du_parcours->parcoursmarin;
+        
+        foreach ($parcours['fonctions'] ?? [] as $fonction) {
+            foreach ($fonction['competences'] ?? [] as $competence) {
+                foreach ($competence['savoirfaires'] ?? [] as $savoirfaire) {
+                    $savoirfaireUuid = $savoirfaire['uuid'];
+                    $activiteUuids = [];
+                    
+                    foreach ($savoirfaire['activites'] ?? [] as $activite) {
+                        $activiteUuids[] = $activite['uuid'];
+                    }
+                    
+                    $mapping[$savoirfaireUuid] = $activiteUuids;
+                }
+            }
+        }
+        
+        return $mapping;
+    }
+    
+
 
     public function devalider(array $element_a_devalider)
     {
