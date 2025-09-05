@@ -13,6 +13,25 @@
     'default' =>'',
    };
 
+      // Codes couleur par type
+      $colorClasses = match($type) {
+    'fonction' => 'fcm-fonction',
+    'competence' => 'fcm-competence',
+    'savoirfaire' => 'fcm-savoirfaire',
+    'activite' => 'fcm-activite',
+    default => ''
+};
+
+$textColorClasses = match($type) {
+    'fonction' => 'fcm-fonction-text',
+    'competence' => 'fcm-competence-text',
+    'savoirfaire' => 'fcm-savoirfaire-text',
+    'activite' => 'fcm-activite-text',
+    default => ''
+};
+
+
+
    $isChecked = $etatValid ?? false;
 
    $isProposChecked = $dateProposition ?? false;
@@ -22,7 +41,8 @@
    $sectionId = $type.'_'.$uuid;
 @endphp
 
-<div class="flex items-center justify-between mt1 mb1 {{ $indentation }}" 
+<div class="flex items-center justify-between mt1 mb1 {{ $indentation }} {{ $colorClasses }}" 
+
     x-data="{
         initial_checked : {{ $etatValid ? 'true':'false' }},
         checked: {{ $etatValid ? 'true':'false' }},
@@ -70,11 +90,15 @@
                     x-on:click="toggleCheck('{{$sectionId}}')"
                     x-bind:class="selectedItems['{{$type}}'] && selectedItems['{{$type}}']['{{$uuid}}'] ? 'text-success' : 'text-gray-600' "
                     x-bind:title="selectedItems['{{$type}}'] && selectedItems['{{$type}}']['{{$uuid}}'] ? 'Validé' : 'À valider'">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
+                        {{-- <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M5 13l4 4L19 7"/>
+                        </svg> --}}
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
+
                     </button>
                 @endcan
             </div>
@@ -90,7 +114,7 @@
 
         @endif
 
-        <strong  class="ml1">{{ $label }} </strong>
+        <strong  class="ml1 {{ $textColorClasses }}">{{ $label }} </strong>
     </div>
        
     <div class="flex items-center space-x-2">
