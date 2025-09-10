@@ -1,9 +1,3 @@
-@props([
-    'parcoursId', 'type', 'id', 'uuid', 'label', 'libelleLong', 'libelleCourt', 
-    'etatValid', 'dateValidation', 'dateProposition', 'valideur', 
-    'commentaire', 'infos'
-])
-
 @php
    $indentation = match($type){
     'fonction' => 'ml-0',
@@ -13,40 +7,39 @@
     'default' =>'',
    };
 
-      // Codes couleur par type
-      $colorClasses = match($type) {
+   // Codes couleur par type
+   $colorClasses = match($type) {
     'fonction' => 'fcm-fonction',
     'competence' => 'fcm-competence',
     'savoirfaire' => 'fcm-savoirfaire',
     'activite' => 'fcm-activite',
     default => ''
-};
+   };
 
-$textColorClasses = match($type) {
+   $textColorClasses = match($type) {
     'fonction' => 'fcm-fonction-text',
     'competence' => 'fcm-competence-text',
     'savoirfaire' => 'fcm-savoirfaire-text',
     'activite' => 'fcm-activite-text',
     default => ''
-};
-
-
+   };
 
    $isChecked = $etatValid ?? false;
-
-   $isProposChecked = $dateProposition ?? false;
+   $isProposed = !empty($dateProposition); // Correction: vérifier si une date existe
    
    $duree = (($type === 'activite')||($type === 'savoirfaire') ? $infos['coeff'] :'');
    
    $sectionId = $type.'_'.$uuid;
+
+  
 @endphp
 
 <div class="flex items-center justify-between mt1 mb1 {{ $indentation }} {{ $colorClasses }}" 
 
     x-data="{
-        initial_checked : {{ $etatValid ? 'true':'false' }},
-        checked: {{ $etatValid ? 'true':'false' }},
-        initial_proposed : {{ $isProposChecked ? 'true' : 'false'}},
+        initial_checked : {{ $isChecked ? 'true':'false' }},
+        checked: {{ $isChecked ? 'true':'false' }},
+        initial_proposed : {{ $isProposed ? 'true' : 'false'}},
 
         isSelected() {
             return selectedItems['{{$type}}'] && selectedItems['{{$type}}']['{{$uuid}}'];
@@ -70,8 +63,8 @@ $textColorClasses = match($type) {
             {{--  Ce qui s'affiche quand l'élément n'est pas encore validé --}}
             <div x-show="!checked">
                 {{--  Le bouton pour proposer l'élément à la validation --}}
-                @if($isCurrentUser)
-                    <div x-show="! checked && ! initial_proposed">
+                @if($canPropose)
+                    <div x-show="!checked && !initial_proposed">
                         <x-filament::icon-button 
                             size="lg"
                             icon="heroicon-o-chat-bubble-left-right"
@@ -90,26 +83,20 @@ $textColorClasses = match($type) {
                     x-on:click="toggleCheck('{{$sectionId}}')"
                     x-bind:class="selectedItems['{{$type}}'] && selectedItems['{{$type}}']['{{$uuid}}'] ? 'text-success' : 'text-gray-600' "
                     x-bind:title="selectedItems['{{$type}}'] && selectedItems['{{$type}}']['{{$uuid}}'] ? 'Validé' : 'À valider'">
-                        {{-- <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M5 13l4 4L19 7"/>
-                        </svg> --}}
-                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+                        <svg xmlns=http://www.w3.org/2000/svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
-
                     </button>
                 @endcan
             </div>
 
-            {{--  L'indicateur de proposition --}}
-            <div x-show="! checked && initial_proposed">
+            {{--  L'indicateur de proposition (en attente de validation) --}}
+            <div x-show="!checked && initial_proposed">
                 <x-filament::icon-button
                     size="lg"
-                    color='success'
-                    icon="heroicon-s-chat-bubble-left-right"
-                    tooltip="Proposition de validation faite le {{ $dateProposition }} avec le commentaire: {{ $commentaire }}"/>
+                    color='warning'
+                    icon="heroicon-s-clock"
+                    tooltip="En attente de validation depuis le {{ $dateProposition }}. Commentaire: {{ $commentaire }}"/>
             </div>
 
         @endif

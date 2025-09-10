@@ -1,3 +1,7 @@
+@php
+// Vérifier si l'utilisateur peut proposer (utilise FcmAccessControl)
+$canPropose = \Modules\FcmCentral\Traits\FcmAccessControl::canAccessMarinLivret();
+@endphp
 <x-filament::card>
     <div x-data x-show="false">
     Chargement...
