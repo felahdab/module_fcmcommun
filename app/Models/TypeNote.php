@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 
 
+
 class TypeNote extends Model
 {
 
@@ -16,10 +17,8 @@ class TypeNote extends Model
         'libelle_court', 
     ];
 
-    public function notes()
-    {
-        return $this->hasMany(Note::class);
-    }
+    
+
 
 
     

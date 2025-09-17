@@ -1,104 +1,359 @@
 <?php
+// filepath: Modules/FcmCommun/Http/Livewire/LivretFcmLight.php
 
 namespace Modules\FcmCommun\Http\Livewire;
 
 use Carbon\Carbon;
-
 use Illuminate\Support\Facades\Log;
-
 use Livewire\Component;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Computed;
-
-use Filament\Notifications\Notification;
-
-use Modules\FcmCommun\Traits\LoadsModelsDynamically;
-use Modules\FcmCommun\Services\EventTriggerService;
-use Modules\FcmCommun\Services\HierarchyMapGeneratorService;
-use Modules\FcmCommun\Services\ParcoursValidationService;
 use Modules\FcmCommun\DataObjects\Enums\ObjectClasses;
 use Modules\FcmCommun\DataObjects\Enums\UserGeneratedEventTypes;
 use Modules\FcmCommun\Services\OutilsMarinParcoursService;
-
 use Modules\FcmCentral\Models\Marin;
 use Modules\FcmCentral\Events\UserGeneratedEvent;
+use Modules\FcmCentral\Traits\FcmAccessControl;
 
 class LivretFcmLight extends Component
 {
-    use LoadsModelsDynamically;
+    use FcmAccessControl;
 
     #[Locked]
     public $marinId;
 
     private OutilsMarinParcoursService $service;
 
+    public string $search = '';
+    public string $statutFilter = 'tous'; // tous, valides, proposes, non_valides
+
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'statutFilter' => ['except' => 'tous'],
+    ];
+
     public function mount(Marin $marin)
     {
-        logger()->info("Mount");
-
         $this->marinId = $marin->id;
-        logger()->info($this->marinId);
+    }
 
+    public function boot()
+    {
+        $this->service = new OutilsMarinParcoursService();
     }
 
     #[Computed]
     public function marin()
     {
-        return Marin::find($this->marinId);
+        return Marin::select(['id', 'uuid', 'nom', 'prenom'])
+            ->with(['complementsFcm:id,rh_marin_id'])
+            ->find($this->marinId);
     }
 
-    public function boot()
+    #[Computed]
+    public function parcours()
     {
-        $this->service = new OutilsMarinParcoursService;
-    }
- 
-    public function render()
-    {
-        $isCurrentUser = $this->marin->isCurrentUser();
-
-        // Générer le mapping savoir-faire/enfants
-        $savoirFaireChildren = $this->generateSavoirFaireChildrenMapping();
-    
-        
-        return view('fcmcommun::livewire.livretfcmlight.livretfcmlight', [
-            'marin' => $this->marin,
-            'parcours' => $this->marin->complements_fcm->donnees_du_parcours->parcoursmarin,
-            'isCurrentUser' => $isCurrentUser,
-            'savoirFaireChildren' => $savoirFaireChildren, 
-        ]);
-    }
-
-    private function generateSavoirFaireChildrenMapping(): array
-    {
-        $mapping = [];
-        
-        // Vérifier si le marin a un parcours
-        if (!$this->marin->complements_fcm || 
-            !$this->marin->complements_fcm->donnees_du_parcours ||
-            !$this->marin->complements_fcm->donnees_du_parcours->parcoursmarin) {
-            return $mapping;
+        if (!$this->marin->complements_fcm?->donnees_du_parcours?->parcoursmarin) {
+            return null;
         }
-        
-        $parcours = $this->marin->complements_fcm->donnees_du_parcours->parcoursmarin;
-        
-        foreach ($parcours['fonctions'] ?? [] as $fonction) {
+       
+        return $this->marin->complements_fcm->donnees_du_parcours->parcoursmarin;
+    }
+
+    #[Computed]
+    public function canPropose()
+    {
+        return $this->canAccessMarinLivret();
+    }
+
+    #[Computed]
+    public function savoirFaireChildren()
+    {
+        if (!$this->parcours) {
+            return [];
+        }
+
+        $mapping = [];
+       
+        foreach ($this->parcours['fonctions'] ?? [] as $fonction) {
             foreach ($fonction['competences'] ?? [] as $competence) {
                 foreach ($competence['savoirfaires'] ?? [] as $savoirfaire) {
-                    $savoirfaireUuid = $savoirfaire['uuid'];
-                    $activiteUuids = [];
-                    
-                    foreach ($savoirfaire['activites'] ?? [] as $activite) {
-                        $activiteUuids[] = $activite['uuid'];
-                    }
-                    
-                    $mapping[$savoirfaireUuid] = $activiteUuids;
+                    $mapping[$savoirfaire['uuid']] = array_column(
+                        $savoirfaire['activites'] ?? [],
+                        'uuid'
+                    );
                 }
             }
         }
-        
+
         return $mapping;
     }
-    
+
+    #[Computed]
+    public function isCurrentUser()
+    {
+        return $this->marin->isCurrentUser();
+    }
+
+    #[Computed]
+    public function parcoursFiltre()
+    {
+        if (!$this->parcours) {
+            return null;
+        }
+
+        return $this->appliquerFiltres($this->parcours);
+    }
+
+    #[Computed]
+    public function statistiques()
+    {
+        if (!$this->parcours) {
+            return [
+                'total' => 0,
+                'valides' => 0,
+                'proposes' => 0,
+                'non_valides' => 0
+            ];
+        }
+
+        return $this->calculerStatistiques();
+    }
+
+    public function filtrerParStatut(string $statut)
+    {
+        $this->statutFilter = $statut;
+        Log::info("=== FILTRE PAR STATUT: {$statut} ===");
+    }
+
+    // ✅ LOGIQUE DE FILTRAGE ENTIÈREMENT REFAITE
+    private function appliquerFiltres(array $parcours): array
+    {
+        $parcoursFiltre = $parcours;
+
+        if (isset($parcoursFiltre['fonctions'])) {
+            $fonctionsFiltrees = [];
+           
+            foreach ($parcoursFiltre['fonctions'] as $fonction) {
+                $fonctionFiltre = $this->filtrerFonction($fonction);
+                if ($fonctionFiltre !== null) {
+                    $fonctionsFiltrees[] = $fonctionFiltre;
+                }
+            }
+           
+            $parcoursFiltre['fonctions'] = $fonctionsFiltrees;
+        }
+
+        return $parcoursFiltre;
+    }
+
+    private function filtrerFonction(array $fonction): ?array
+    {
+        $fonctionFiltre = $fonction;
+        $competencesFiltrees = [];
+
+        if (isset($fonction['competences'])) {
+            foreach ($fonction['competences'] as $competence) {
+                $competenceFiltre = $this->filtrerCompetence($competence);
+                if ($competenceFiltre !== null) {
+                    $competencesFiltrees[] = $competenceFiltre;
+                }
+            }
+        }
+
+        // ✅ Si aucune compétence n'a passé les filtres, ne pas afficher la fonction
+        if (empty($competencesFiltrees)) {
+            return null;
+        }
+
+        $fonctionFiltre['competences'] = $competencesFiltrees;
+        return $fonctionFiltre;
+    }
+
+    private function filtrerCompetence(array $competence): ?array
+    {
+        $competenceFiltre = $competence;
+        $savoirfairesFiltres = [];
+
+        if (isset($competence['savoirfaires'])) {
+            foreach ($competence['savoirfaires'] as $savoirfaire) {
+                $savoirfaireFiltre = $this->filtrerSavoirFaire($savoirfaire);
+                if ($savoirfaireFiltre !== null) {
+                    $savoirfairesFiltres[] = $savoirfaireFiltre;
+                }
+            }
+        }
+
+        // ✅ Si aucun savoir-faire n'a passé les filtres, ne pas afficher la compétence
+        if (empty($savoirfairesFiltres)) {
+            return null;
+        }
+
+        $competenceFiltre['savoirfaires'] = $savoirfairesFiltres;
+        return $competenceFiltre;
+    }
+
+    private function filtrerSavoirFaire(array $savoirfaire): ?array
+    {
+        // ✅ VÉRIFIER D'ABORD LE SAVOIR-FAIRE LUI-MÊME
+        $savoirfaireCorrespond = $this->elementCorrespondAuxFiltres($savoirfaire, 'savoirfaire');
+       
+        // ✅ FILTRER LES ACTIVITÉS
+        $activitesFiltrees = [];
+        if (isset($savoirfaire['activites'])) {
+            foreach ($savoirfaire['activites'] as $activite) {
+                if ($this->elementCorrespondAuxFiltres($activite, 'activite')) {
+                    $activitesFiltrees[] = $activite;
+                }
+            }
+        }
+
+        // ✅ LOGIQUE : garder le savoir-faire si LUI ou ses ACTIVITÉS correspondent
+        if (!$savoirfaireCorrespond && empty($activitesFiltrees)) {
+            return null;
+        }
+
+        $savoirfaireFiltre = $savoirfaire;
+        $savoirfaireFiltre['activites'] = $activitesFiltrees;
+
+        return $savoirfaireFiltre;
+    }
+
+    // ✅ VÉRIFICATION UNIQUEMENT POUR SAVOIRFAIRES ET ACTIVITÉS
+    private function elementCorrespondAuxFiltres(array $element, string $type): bool
+    {
+        // ✅ Recherche SEULEMENT dans savoir-faires et activités
+        if (!empty($this->search)) {
+            if (!in_array($type, ['savoirfaire', 'activite'])) {
+                return true; // Ne pas filtrer les fonctions/compétences par recherche
+            }
+           
+            if (!$this->correspondRecherche($element)) {
+                return false;
+            }
+        }
+
+        // ✅ Statut SEULEMENT pour savoir-faires et activités
+        if (in_array($type, ['savoirfaire', 'activite']) && $this->statutFilter !== 'tous') {
+            return $this->verifierStatut($element);
+        }
+
+        return true;
+    }
+
+    private function correspondRecherche(array $element): bool
+    {
+        $recherche = strtolower(trim($this->search));
+        $texteElement = strtolower(
+            ($element['libelle_court'] ?? '') . ' ' 
+            .($element['libelle_long'] ?? '') . ' ' 
+            //.($element['description'] ?? '')
+        );
+       
+        return str_contains($texteElement, $recherche);
+    }
+
+    // ✅ VÉRIFICATION DE STATUT AVEC LOGS DÉTAILLÉS
+    private function verifierStatut(array $element): bool
+    {
+        $etatValid = ($element['etat_valid'] ?? 0);
+        $dateProposition = $element['date_proposition'] ?? null;
+       
+        // ✅ Debug complet
+        $libelle = $element['libelle_court'] ?? 'Element';
+        Log::info("=== VÉRIF STATUT ===");
+        Log::info("Element: {$libelle}");
+        Log::info("etat_valid: " . json_encode($etatValid));
+        Log::info("date_proposition: " . json_encode($dateProposition));
+        Log::info("Filtre demandé: {$this->statutFilter}");
+
+        // Valeur
+        $estValide = ($etatValid === 1 || $etatValid === '1' || $etatValid === true);
+        $estPropose = !empty($dateProposition);
+        $nonValide = $estPropose && !$estValide;
+
+        $resultat = false;
+        switch ($this->statutFilter) {
+            case 'valides':
+                $resultat = $estValide;
+                Log::info("Test validé (etat_valid == 1): " . ($resultat ? 'OUI' : 'NON'));
+                break;
+               
+            case 'proposes':
+                $resultat = $estPropose;
+                Log::info("Test proposé (etat_valid != 1) && (!empty date_proposition): " . ($resultat ? 'OUI' : 'NON'));
+                break;
+               
+            case 'non_valides':
+                $resultat = $nonValide;
+                Log::info("Test non validé (etat_valid != 1) && (empty date_proposition): " . ($resultat ? 'OUI' : 'NON'));
+                break;
+               
+            default:
+                $resultat = true;
+        }
+       
+        Log::info("RÉSULTAT FINAL: " . ($resultat ? 'GARDÉ' : 'EXCLU'));
+        Log::info("===================");
+       
+        return $resultat;
+    }
+
+    private function calculerStatistiques(): array
+    {
+        $total = 0;
+        $valides = 0;
+        $proposes = 0;
+
+        foreach ($this->parcours['fonctions'] ?? [] as $fonction) {
+            foreach ($fonction['competences'] ?? [] as $competence) {
+                foreach ($competence['savoirfaires'] ?? [] as $savoirfaire) {
+                    $total++;
+                   
+                    $etatValid = ($savoirfaire['etat_valid'] ?? 0) == 1;
+                    $dateProposition = !empty($savoirfaire['date_proposition']);
+                   
+                    if ($etatValid) {
+                        $valides++;
+                    }
+                    if ($dateProposition) {
+                        $proposes++;
+                    }
+
+                    foreach ($savoirfaire['activites'] ?? [] as $activite) {
+                        $total++;
+                       
+                        $etatValidActivite = ($activite['etat_valid'] ?? 0) == 1;
+                        $datePropositionActivite = !empty($activite['date_proposition']);
+                       
+                        if ($etatValidActivite) {
+                            $valides++;
+                        }
+                        if ($datePropositionActivite) {
+                            $proposes++;
+                        }
+                    }
+                }
+            }
+        }
+
+        return [
+            'total' => $total,
+            'valides' => $valides,
+            'proposes' => $proposes,
+            'non_valides' => $total - $valides
+        ];
+    }
+
+
+
+
+
+
+
+    // ========================================
+    // FONCTIONS
+    // ========================================
 
 
     public function devalider(array $element_a_devalider)
@@ -211,205 +466,61 @@ $this->js('window.location.reload()');
         event($event);
 
         $this->marin->refresh();
+
+        $this->js('window.location.reload()');
     }
 
 
+    // ========================================
+    // HELPER
+    // ========================================
 
-    
-
-    public function save(string $type)
-    {
-        $record = $this->fcmMarin;
-        logger($this->selectedItemsSauve);
-    
-        if (!$record) {
-            Notification::make()
-                ->title('Erreur')
-                ->body('Impossible de trouver le marin ou ses parcours.')
-                ->danger()
-                ->send();
-            return;
-        }
-    
-        switch ($type) {
-            case "valid":
-
-                $this->selectedItems = json_decode($this->selectedItemsSauve, true);
-
-                $data = [
-                    'commentaire' => $this->comment,
-                    //'selectedItems' => $this->selectedItems,
-                    'selectedItems' => $this->selectedItems['sauve'],
-                    'key' => 'sauve',
-                    'marinUuid' => $record->marin->uuid,
-                    'eventName' => 'valid',
-                    'eventType' => UserGeneratedEventTypes::VALID_ELMT_MARIN_PARCOURS,
-                    'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                ];
-                $modal = 'sauve';
-                break;
-            case "annul":
-                $data = [
-                    'commentaire' => $this->comment,
-                    'selectedItems' => $this->selectedItems,
-                    'key' => 'annul',
-                    'marinUuid' => $record->marin->uuid,
-                    'eventName' => 'annul',
-                    'eventType' => UserGeneratedEventTypes::ANNUL_ELMT_MARIN_PARCOURS,
-                    'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                ];
-                $modal = 'annul';
-                break;
-            case "propos":
-                $data = [
-                    'commentaire' => $this->comment,
-                    'selectedItems' => $this->selectedItems,
-                    'key' => 'propos',
-                    'marinUuid' => $record->marin->uuid,
-                    'eventName' => 'propos',
-                    'eventType' => UserGeneratedEventTypes::PROPOS_ELMT_MARIN_PARCOURS,
-                    'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                ];
-                $modal = 'propos';
-                break; 
-            case "annulPropos":
-                $data = [
-                    'commentaire' => 'Annulation de la Proposition',
-                    'selectedItems' => $this->selectedItems,
-                    'key' => 'aValiderPropos',
-                    'marinUuid' => $record->marin->uuid,
-                    'eventName' => 'annulPropos',
-                    'eventType' => UserGeneratedEventTypes::ANNUL_PROPOS_ELMT_MARIN_PARCOURS,
-                    'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                ];
-                $modal = 'aValiderModal';
-                break;   
-            case "validPropos":
-                $data = [
-                    'commentaire' => 'Validation de la Proposition',
-                    'selectedItems' => $this->selectedItems,
-                    'key' => 'aValiderPropos',
-                    'marinUuid' => $record->marin->uuid,
-                    'eventName' => 'validPropos',
-                    'eventType' => UserGeneratedEventTypes::VALID_ELMT_MARIN_PARCOURS,
-                    'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                ];
-                $modal = 'aValiderModal';
-                break;    
-            case "restore":
-                $data = [
-                    'commentaire' => $this->selectedItems['commentaire'],
-                    'selectedItems' => $this->selectedItems,
-                    'marinUuid' => $record->marin->uuid,
-                    'eventName' => 'restore',
-                    'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                ];
-                $modal = 'restoreModal';
-                break;   
-            case "reboot":
-                $data = [
-                    'commentaire' => 'Reboot Data',
-                    'selectedItems' => $this->selectedItems,
-                    'marinUuid' => $record->marin->uuid,
-                    'eventName' => 'reboot',
-                    'objectUuid' => $record->parcoursSerialises[0]->uuid,
-                ];
-                $modal = 'rebootModal';
-                break;                                     
-            default:
-                $data = [];
-                $modal = "sauve";
-                break;
+    private function escapeForTooltip($text): string
+{
+    if (empty($text)) {
+        return '';
     }
-
-  
- 
-    //  UN SEUL ÉVÉNEMENT AVEC TOUS LES ÉLÉMENTS
-    $key = $data["key"];
-    $items_a_mettre_a_jour = $data["selectedItems"][$key] ?? [];
-    //ddd($items_a_mettre_a_jour["activites"], $data['eventType'], $this->comment);
-    $marin = $this->fcmMarin->marin;
-
-    // TRAITER D'ABORD LES SAVOIR-FAIRES (priorité)
-    foreach($items_a_mettre_a_jour["savoirfaires"] as $savoirfaire_uuid => $bool) {
-    if (!$bool) continue; // Ignorer si non sélectionné
-    
-    //  ÉVÉNEMENT SAVOIR-FAIRE
-    $event = new $this->eventClass(
-        event_type: $data['eventType'],
-        user_uuid: auth()->user()->uuid,
-        object_class: ObjectClasses::MARIN,
-        object_uuid: $marin->uuid,
-        detail: [
-            "type_element" => "savoirfaire", 
-            "uuid_element" => $savoirfaire_uuid, 
-            "date" => Carbon::now(), 
-            "commentaire" => $this->comment,
-            
-        ]
+   
+    // Échapper les caractères spéciaux pour éviter les bugs JavaScript/HTML
+    return htmlspecialchars(
+        str_replace(["\r\n", "\n", "\r", "'", '"'], [' ', ' ', ' ', "&#39;", "&#34;"], $text),
+        ENT_QUOTES,
+        'UTF-8'
     );
-    event($event);
 }
 
-    //  TRAITER LES ACTIVITÉS INDIVIDUELLES (seulement celles hors savoir-faires validés)
-    $activites_deja_traitees = $this->getActivitesTraiteesParSavoirfaires($items_a_mettre_a_jour["savoirfaires"]);
- 
-    foreach($items_a_mettre_a_jour["activites"] as $activite_uuid => $bool) {
-    if (!$bool) continue; // Ignorer si non sélectionné
-    
-    //  VÉRIFIER SI L'ACTIVITÉ N'EST PAS DÉJÀ TRAITÉE PAR UN SAVOIR-FAIRE
-    if (in_array($activite_uuid, $activites_deja_traitees)) {
-        continue; // Ignorer car déjà traitée par le savoir-faire parent
+private function escapeForJs($text): string
+{
+    if (empty($text)) {
+        return '';
     }
+   
+    return addslashes(htmlspecialchars($text, ENT_QUOTES, 'UTF-8'));
+}
+
+
+
+
+
+    // ========================================
+    // RENDU OPTIMISÉ
+    // ========================================
+
+    public function render()
+    {
+        return view('fcmcommun::livewire.livretfcmlight.livretfcmlight', [
+            'marin' => $this->marin,
+            'parcours' => $this->parcoursFiltre,
+            'isCurrentUser' => $this->isCurrentUser,
+            'savoirFaireChildren' => $this->savoirFaireChildren,
+            'canPropose' => $this->canPropose,
+            'statistiques' => $this->statistiques,
+        ]);
+    }
+
+
+
+    
 
    
-            $event = new $this->eventClass(
-                event_type: $data['eventType'],
-                user_uuid: auth()->user()->uuid,
-                object_class: ObjectClasses::MARIN,
-                object_uuid: $marin->uuid,
-                detail: [
-                    "type_element" => "activite", 
-                    "uuid_element" => $activite_uuid, 
-                    "date" => Carbon::now(), 
-                    "commentaire" => $this->comment, 
-                ]
-            );
-            event($event);
-
-        }
-
-}
-
-        // ✅ MÉTHODE HELPER POUR IDENTIFIER LES ACTIVITÉS DÉJÀ TRAITÉES
-        private function getActivitesTraiteesParSavoirfaires($savoirfaires_selectionnes): array
-        {
-            $activites_traitees = [];
-            $parcours = $this->fcmMarin->marin->complements_fcm->donnees_du_parcours->parcoursmarin;
-            
-            foreach ($savoirfaires_selectionnes as $savoirfaire_uuid => $bool) {
-                if (!$bool) continue;
-                
-                // Parcourir la structure pour trouver les activités de ce savoir-faire
-                foreach ($parcours['fonctions'] as $fonction) {
-                    if (!isset($fonction['competences'])) continue;
-                    
-                    foreach ($fonction['competences'] as $competence) {
-                        if (!isset($competence['savoirfaires'])) continue;
-                        
-                        foreach ($competence['savoirfaires'] as $savoirfaire) {
-                            if ($savoirfaire['uuid'] === $savoirfaire_uuid && isset($savoirfaire['activites'])) {
-                                foreach ($savoirfaire['activites'] as $activite) {
-                                    $activites_traitees[] = $activite['uuid'];
-                                }
-                                break 3; // Sortir de tous les loops
-                            }
-                        }
-                    }
-                }
-            }
-            
-            return $activites_traitees;
-        }
-
 }

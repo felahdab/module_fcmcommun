@@ -31,6 +31,9 @@
    
    $sectionId = $type.'_'.$uuid;
 
+   // Utiliser libelle_long pour le tooltip s'il existe, sinon libelle_court
+   $tooltipText = !empty($libelleLong) ? $libelleLong : $label;
+
   
 @endphp
 
@@ -101,7 +104,7 @@
 
         @endif
 
-        <strong  class="ml1 {{ $textColorClasses }}">{{ $label }} </strong>
+        <strong  class="ml1 {{ $textColorClasses }}" title="{{ $tooltipText }}">{{ $label }} </strong>
     </div>
        
     <div class="flex items-center space-x-2">
