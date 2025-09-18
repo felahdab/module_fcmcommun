@@ -7,7 +7,6 @@
     'default' =>'',
    };
 
-   // Codes couleur par type
    $colorClasses = match($type) {
     'fonction' => 'fcm-fonction',
     'competence' => 'fcm-competence',
@@ -25,124 +24,123 @@
    };
 
    $isChecked = $etatValid ?? false;
-   $isProposed = !empty($dateProposition); // Correction: vérifier si une date existe
-   
+   $isProposed = !empty($dateProposition);
    $duree = (($type === 'activite')||($type === 'savoirfaire') ? $infos['coeff'] :'');
-   
    $sectionId = $type.'_'.$uuid;
-
-   // Utiliser libelle_long pour le tooltip s'il existe, sinon libelle_court
    $tooltipText = !empty($libelleLong) ? $libelleLong : $label;
-
-  
 @endphp
 
-<div class="flex items-center justify-between mt1 mb1 {{ $indentation }} {{ $colorClasses }}" 
-
+{{-- ✅ CLÉ UNIQUE QUI CHANGE SELON L'ÉTAT --}}
+<div class="flex items-center justify-between mt1 mb1 {{ $indentation }} {{ $colorClasses }}"
+    wire:key="item-{{ $uuid }}-{{ $isChecked ? 'checked' : 'unchecked' }}-{{ $isProposed ? 'proposed' : 'normal' }}"
     x-data="{
-        initial_checked : {{ $isChecked ? 'true':'false' }},
-        checked: {{ $isChecked ? 'true':'false' }},
-        initial_proposed : {{ $isProposed ? 'true' : 'false'}},
-
         isSelected() {
             return selectedItems['{{$type}}'] && selectedItems['{{$type}}']['{{$uuid}}'];
         }
-    }"
-    
->
+    }">
 
     <div class="flex items-center space-x-2">
        
-        <div x-show="initial_checked">
+        {{-- ✅ ICÔNE DE VALIDATION (condition PHP directe) --}}
+        @if($isChecked)
             <x-filament::icon-button
-            size="lg"
-            color='success'
-            icon="heroicon-c-shield-check"
-            tooltip="Validation le {{$dateValidation }} par {{$valideur}}"
-            class="tree-checkbox"/>
-        </div>
+                size="lg"
+                color='success'
+                icon="heroicon-c-shield-check"
+                tooltip="Validé le {{ $dateValidation }} par {{ $valideur }}"
+                class="tree-checkbox"/>
+        @endif
 
         @if(($type === 'savoirfaire')||($type === 'activite'))
-            {{--  Ce qui s'affiche quand l'élément n'est pas encore validé --}}
-            <div x-show="!checked">
-                {{--  Le bouton pour proposer l'élément à la validation --}}
-                @if($canPropose)
-                    <div x-show="!checked && !initial_proposed">
-                        <x-filament::icon-button 
-                            size="lg"
-                            icon="heroicon-o-chat-bubble-left-right"
-                            x-on:click="a_proposer = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' }; 
-                                message_du_modal = '{{ $label }}';
-                                $dispatch('open-modal', { id: 'propos' })"
-                            tooltip="Proposer à la validation"/>
-                    </div>
-                @endif
+           
+            {{-- ✅ BOUTON PROPOSER (si pas validé et pas proposé) --}}
+            @if(!$isChecked && !$isProposed && $canPropose)
+                <x-filament::icon-button
+                    size="lg"
+                    icon="heroicon-o-chat-bubble-left-right"
+                    x-on:click="a_proposer = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' };
+                        message_du_modal = '{{ $label }}';
+                        $dispatch('open-modal', { id: 'propos' })"
+                    tooltip="Proposer à la validation"/>
+            @endif
 
-                {{--  Le bouton pour sélectionner l'élément en vue de la validation. --}}
+            {{-- ✅ BOUTON SÉLECTIONNER (si pas validé et pas proposé) --}}
+            @if(!$isChecked && !$isProposed)
                 @can('fcmcentral::valider_element_parcours')
                     <button
-                    type="button"
-                    class="tree-checkbox"
-                    x-on:click="toggleCheck('{{$sectionId}}')"
-                    x-bind:class="selectedItems['{{$type}}'] && selectedItems['{{$type}}']['{{$uuid}}'] ? 'text-success' : 'text-gray-600' "
-                    x-bind:title="selectedItems['{{$type}}'] && selectedItems['{{$type}}']['{{$uuid}}'] ? 'Validé' : 'À valider'">
-                        <svg xmlns=http://www.w3.org/2000/svg fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
+                        type="button"
+                        class="tree-checkbox"
+                        x-on:click="toggleCheck('{{$sectionId}}')"
+                        x-bind:class="isSelected() ? 'text-success' : 'text-gray-600'"
+                        x-bind:title="isSelected() ? 'Sélectionné pour validation' : 'Cliquer pour sélectionner'">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
                     </button>
                 @endcan
-            </div>
+            @endif
 
-            {{--  L'indicateur de proposition (en attente de validation) --}}
-            <div x-show="!checked && initial_proposed">
+            {{-- ✅ INDICATEUR EN ATTENTE (si proposé mais pas validé) --}}
+            @if(!$isChecked && $isProposed)
+            @can('fcmcentral::valider_element_parcours')
+            <x-filament::icon-button
+            size="lg"
+            color='info'
+            icon="heroicon-s-clock"
+            x-on:click="toggleCheck('{{$sectionId}}')"
+            tooltip="En attente depuis le {{ $dateProposition }}. Commentaire: {{ $commentaire }}"/>
+                    @else
                 <x-filament::icon-button
                     size="lg"
                     color='warning'
                     icon="heroicon-s-clock"
-                    tooltip="En attente de validation depuis le {{ $dateProposition }}. Commentaire: {{ $commentaire }}"/>
-            </div>
+                    tooltip="En attente depuis le {{ $dateProposition }}. Commentaire: {{ $commentaire }}"/>
+                    @endcan
+                    @endif
 
         @endif
 
-        <strong  class="ml1 {{ $textColorClasses }}" title="{{ $tooltipText }}">{{ $label }} </strong>
+        <strong class="ml1 {{ $textColorClasses }}" title="{{ $tooltipText }}">{{ $label }}</strong>
     </div>
        
     <div class="flex items-center space-x-2">
-
         @if(($type === 'activite')||($type === 'savoirfaire'))
+            {{-- BOUTON INFOS --}}
             <x-filament::icon-button
                 size="lg"
                 color="{{ $isChecked ? 'success':'gray' }}"
                 icon="heroicon-c-information-circle"
-                tooltip="Voir les infos "
-                x-on:click="infos = {'type'  : '{{$type}}', 
-                            'uuid'           : '{{$uuid}}', 
-                            'libelleCourt'   : '{{ $libelleCourt }}', 
-                            'libelleLong'    : '{{ $libelleLong }}' ,
-                            'duree'          : '{{$duree}}',
-                            'dateValidation' : '{{ $dateValidation ?? '' }}',
-                            'valideur'       : '{{ $valideur ?? 'Inconnu' }}',
-                            'commentaire'    : '{{ $commentaire ?? '' }}'
+                tooltip="Voir les infos"
+                x-on:click="infos = {
+                            'type': '{{$type}}',
+                            'uuid': '{{$uuid}}',
+                            'libelleCourt': '{{ $libelleCourt }}',
+                            'libelleLong': '{{ $libelleLong }}',
+                            'duree': '{{$duree}}',
+                            'dateValidation': '{{ $dateValidation ?? '' }}',
+                            'valideur': '{{ $valideur ?? 'Inconnu' }}',
+                            'commentaire': '{{ $commentaire ?? '' }}'
                         };
                         $dispatch('open-modal', { id: 'infosModal'});"
             />
-            {{--  Le bouton pour désactiver l'élément --}}
-            @can('fcmcentral::valider_element_parcours')
-                <x-filament::icon-button
-                    size="lg"
-                    color="danger"
-                    icon="heroicon-s-x-circle"
-                    tooltip="Dévalider "
-                    x-show='initial_checked || initial_proposed'
-                    x-on:click="a_devalider = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' }; 
-                                message_du_modal = '{{ $label }}';
-                                $dispatch('open-modal', { id: 'annul' });"
-                />
-            @endcan
+           
+            {{-- BOUTON DÉVALIDER (si validé ou proposé) --}}
+            @if($isChecked || $isProposed)
+                @can('fcmcentral::valider_element_parcours')
+                    <x-filament::icon-button
+                        size="lg"
+                        color="danger"
+                        icon="heroicon-s-x-circle"
+                        tooltip="Dévalider"
+                        x-on:click="a_devalider = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' };
+                                    message_du_modal = '{{ $label }}';
+                                    $dispatch('open-modal', { id: 'annul' });"
+                    />
+                @endcan
+            @endif
         @endif
 
         @if(($type === 'fonction')||($type === 'competence'))
-            {{--  Le bouton pour développer l'élément --}}
             <x-filament::icon-button
                 size="lg"
                 color="black"
@@ -150,7 +148,6 @@
                 x-show="! isOpen('{{ $sectionId }}')"
                 x-on:click="toggleSection('{{ $sectionId }}')"
             />
-            {{--  Le bouton pour refermer l'élément --}}
             <x-filament::icon-button
                 size="lg"
                 color="black"

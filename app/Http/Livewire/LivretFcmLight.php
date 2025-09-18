@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Log;
 use Livewire\Component;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\On;
 use Modules\FcmCommun\DataObjects\Enums\ObjectClasses;
 use Modules\FcmCommun\DataObjects\Enums\UserGeneratedEventTypes;
 use Modules\FcmCommun\Services\OutilsMarinParcoursService;
@@ -65,6 +66,13 @@ class LivretFcmLight extends Component
     {
         return $this->canAccessMarinLivret();
     }
+
+    #[Computed]
+    public function canValidateElements()
+    {
+        return $this->canValidateElements();
+    }
+  
 
     #[Computed]
     public function savoirFaireChildren()
@@ -268,9 +276,10 @@ class LivretFcmLight extends Component
         Log::info("Filtre demandé: {$this->statutFilter}");
 
         // Valeur
-        $estValide = ($etatValid === 1 || $etatValid === '1' || $etatValid === true);
+        //$estValide = ($etatValid === 1 || $etatValid === '1' || $etatValid === true);
+        $estValide = ($etatValid === true);
         $estPropose = !empty($dateProposition);
-        $nonValide = $estPropose && !$estValide;
+        $nonValide = ($etatValid == null);
 
         $resultat = false;
         switch ($this->statutFilter) {
@@ -285,7 +294,7 @@ class LivretFcmLight extends Component
                 break;
                
             case 'non_valides':
-                $resultat = $nonValide;
+                $resultat = $nonValide && !$estPropose ;
                 Log::info("Test non validé (etat_valid != 1) && (empty date_proposition): " . ($resultat ? 'OUI' : 'NON'));
                 break;
                
@@ -382,7 +391,19 @@ class LivretFcmLight extends Component
 
         $this->marin->refresh();
 
-        $this->js('window.location.reload()');
+        //$this->js('window.location.reload()');
+
+        // Réinitialiser les propriétés computées pour forcer le recalcul
+    unset($this->parcours);
+    unset($this->parcoursFiltre);
+    unset($this->statistiques);
+   
+    // Déclencher un événement pour vider les sélections
+    $this->dispatch('clear-selections');
+   
+    // Forcer un refresh du composant
+    $this->dispatch('$refresh');
+
     }
 
     public function valider(array $elements_a_valider, string $commentaire)
@@ -431,13 +452,20 @@ class LivretFcmLight extends Component
 
         $this->marin->refresh();
 
-// Vider le cache
-//unset($this->marin);  
-//$this->reset();     
-// Rafraîchir le composant Livewire
-//$this->dispatch('$refresh');
-// Recharger la page 
-$this->js('window.location.reload()');
+        // Vider le cache
+        //unset($this->marin);  
+        //$this->reset();     
+        // Rafraîchir le composant Livewire
+        //$this->dispatch('$refresh');
+        // Recharger la page 
+        //$this->js('window.location.reload()');
+
+        unset($this->parcours);
+        unset($this->parcoursFiltre);
+        unset($this->statistiques);
+        $this->dispatch('clear-selections');
+        $this->dispatch('$refresh');
+
 
     }
 
@@ -467,7 +495,14 @@ $this->js('window.location.reload()');
 
         $this->marin->refresh();
 
-        $this->js('window.location.reload()');
+       // $this->js('window.location.reload()');
+
+       unset($this->parcours);
+       unset($this->parcoursFiltre);
+       unset($this->statistiques);
+       $this->dispatch('clear-selections');
+       $this->dispatch('$refresh');
+   
     }
 
 
@@ -475,6 +510,7 @@ $this->js('window.location.reload()');
     // HELPER
     // ========================================
 
+    // Pour les commenataires speciaux dans libelle_long
     private function escapeForTooltip($text): string
 {
     if (empty($text)) {
@@ -489,6 +525,7 @@ $this->js('window.location.reload()');
     );
 }
 
+
 private function escapeForJs($text): string
 {
     if (empty($text)) {
@@ -497,6 +534,33 @@ private function escapeForJs($text): string
    
     return addslashes(htmlspecialchars($text, ENT_QUOTES, 'UTF-8'));
 }
+
+// Methode pour rafraichir du Livewire
+
+public function refreshElements()
+{
+    // Forcer le rechargement des données
+    $this->dispatch('elements-refreshed');
+}
+
+#[On('sync-elements')]
+public function syncElements()
+{
+    // Recharger les données du parcours
+    $this->refreshElements();
+}
+
+// Après chaque action (validation, proposition, etc.)
+public function afterElementAction()
+{
+    // Petite pause pour laisser la DB se mettre à jour
+    usleep(200000); // 200ms
+    
+    // Dispatch pour forcer le rafraîchissement
+    $this->dispatch('elements-refreshed');
+}
+
+
 
 
 

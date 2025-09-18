@@ -71,7 +71,7 @@
                 
                 <x-filament::button
                     size="sm"
-                    color="{{ $statutFilter === 'non_valides' ? 'gray' : 'gray' }}"
+                    color="{{ $statutFilter === 'non_valides' ? 'info' : 'gray' }}"
                     wire:click="filtrerParStatut('non_valides')"
                 >
                     <x-filament::icon icon="heroicon-o-x-circle" class="w-4 h-4 mr-1" />
