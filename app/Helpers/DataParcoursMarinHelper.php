@@ -60,7 +60,7 @@ class DataParcoursMarinHelper
 
 
         // Boucle et traite
-        foreach(['fonctions','competences','savoirfaires','activites'] as $relation){
+        foreach(['annees','savoirfaires','objectifs'] as $relation){
             if (isset($data[$relation]) && is_array($data[$relation])){
                 foreach ($data[$relation] as $index => $child) {
                     $data[$relation][$index] = self::rajoutChampSupplementaire($child);

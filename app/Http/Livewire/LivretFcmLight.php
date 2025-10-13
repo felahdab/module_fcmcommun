@@ -1,5 +1,4 @@
 <?php
-// filepath: Modules/FcmCommun/Http/Livewire/LivretFcmLight.php
 
 namespace Modules\FcmCommun\Http\Livewire;
 
@@ -12,6 +11,7 @@ use Livewire\Attributes\On;
 use Modules\FcmCommun\DataObjects\Enums\ObjectClasses;
 use Modules\FcmCommun\DataObjects\Enums\UserGeneratedEventTypes;
 use Modules\FcmCommun\Services\OutilsMarinParcoursService;
+use Modules\FcmCommun\Services\OutilsFcmLightService;
 use Modules\FcmCentral\Models\Marin;
 use Modules\FcmCentral\Events\UserGeneratedEvent;
 use Modules\FcmCentral\Traits\FcmAccessControl;
@@ -25,13 +25,27 @@ class LivretFcmLight extends Component
 
     private OutilsMarinParcoursService $service;
 
+    // ========================================
+    // PROPRIÉTÉS DE FILTRAGE
+    // ========================================
+   
     public string $search = '';
-    public string $statutFilter = 'tous'; // tous, valides, proposes, non_valides
+    public string $statutFilter = 'tous';
+    public string $anneeFilter = 'toutes';
+    public string $competenceFilter = 'toutes';
+    public string $savoirfaireTypeFilter = 'tous';
 
     protected $queryString = [
         'search' => ['except' => ''],
         'statutFilter' => ['except' => 'tous'],
+        'anneeFilter' => ['except' => 'toutes'],
+        'competenceFilter' => ['except' => 'toutes'],
+        'savoirfaireTypeFilter' => ['except' => 'tous'],
     ];
+
+    // ========================================
+    // LIFECYCLE METHODS
+    // ========================================
 
     public function mount(Marin $marin)
     {
@@ -42,6 +56,10 @@ class LivretFcmLight extends Component
     {
         $this->service = new OutilsMarinParcoursService();
     }
+
+    // ========================================
+    // COMPUTED PROPERTIES - DONNÉES DE BASE
+    // ========================================
 
     #[Computed]
     public function marin()
@@ -62,6 +80,102 @@ class LivretFcmLight extends Component
     }
 
     #[Computed]
+    public function parcoursFiltre()
+    {
+        if (!$this->parcours) {
+            return null;
+        }
+
+        return $this->appliquerFiltres($this->parcours);
+    }
+
+    // ========================================
+    // COMPUTED PROPERTIES - DONNÉES POUR FILTRES
+    // ========================================
+
+    #[Computed]
+    public function anneesDisponibles()
+    {
+        if (!$this->parcours) return [];
+
+        $annees = [];
+        foreach ($this->parcours['annees'] ?? [] as $annee) {
+            $anneeId = $annee['id'] ?? $annee['uuid'] ?? null;
+           
+            if ($anneeId && !isset($annees[$anneeId])) {
+                $anneeInfos = OutilsFcmLightService::getAnneeInfos((int)$anneeId);
+                $annees[$anneeId] = $anneeInfos;
+            }
+        }
+
+        uasort($annees, fn($a, $b) => $a['ordre'] <=> $b['ordre']);
+        return $annees;
+    }
+
+    #[Computed]
+    public function competencesDisponibles()
+    {
+        if (!$this->parcours) return [];
+
+        $competences = [];
+        foreach ($this->parcours['annees'] ?? [] as $annee) {
+            foreach ($annee['savoirfaires'] ?? [] as $savoirfaire) {
+                $competenceId = $this->getCompetenceId($savoirfaire);
+               
+                if ($competenceId && !isset($competences[$competenceId])) {
+                    $competenceInfos = OutilsFcmLightService::getCompetenceInfos($competenceId);
+                    $competences[$competenceId] = $competenceInfos;
+                }
+            }
+        }
+
+        uasort($competences, fn($a, $b) => $a['code'] <=> $b['code']);
+        return $competences;
+    }
+
+    #[Computed]
+    public function savoirfaireTypesDisponibles()
+    {
+        if (!$this->parcours) return [];
+
+        $typesUtilises = [];
+       
+        foreach ($this->parcours['annees'] ?? [] as $annee) {
+            foreach ($annee['savoirfaires'] ?? [] as $savoirfaire) {
+                $typeId = $this->getSavoirfaireTypeId($savoirfaire);
+               
+                if ($typeId && !isset($typesUtilises[$typeId])) {
+                    $typeInfos = OutilsFcmLightService::getSavoirfaireTypeInfos($typeId);
+                    $typesUtilises[$typeId] = $typeInfos;
+                }
+            }
+        }
+
+        uasort($typesUtilises, fn($a, $b) => $a['ordre'] <=> $b['ordre']);
+        return $typesUtilises;
+    }
+
+    // ✅ COMPUTED PROPERTIES SIMPLIFIÉES
+    
+    #[Computed]
+    public function tousLesSavoirfaireTypes()
+    {
+        return OutilsFcmLightService::getSavoirfaireTypeLibellesCourt();
+    }
+
+    #[Computed]
+    public function toutesLesCompetences()
+    {
+        return OutilsFcmLightService::getCompetences()->pluck('libelle_court', 'id')->toArray();
+    }
+
+    #[Computed]
+    public function toutesLesAnnees()
+    {
+        return OutilsFcmLightService::getAnneeLibellesCourt();
+    }
+
+    #[Computed]
     public function canPropose()
     {
         return $this->canAccessMarinLivret();
@@ -72,8 +186,8 @@ class LivretFcmLight extends Component
     {
         return $this->canValidateElements();
     }
-  
 
+    // ✅ SIMPLIFIÉ - Utilise directement les objectifs du parcours sérialisé
     #[Computed]
     public function savoirFaireChildren()
     {
@@ -83,13 +197,21 @@ class LivretFcmLight extends Component
 
         $mapping = [];
        
-        foreach ($this->parcours['fonctions'] ?? [] as $fonction) {
-            foreach ($fonction['competences'] ?? [] as $competence) {
-                foreach ($competence['savoirfaires'] ?? [] as $savoirfaire) {
-                    $mapping[$savoirfaire['uuid']] = array_column(
-                        $savoirfaire['activites'] ?? [],
-                        'uuid'
-                    );
+        foreach ($this->parcours['annees'] ?? [] as $annee) {
+            foreach ($annee['savoirfaires'] ?? [] as $savoirfaire) {
+                $pivotId = $savoirfaire['pivot']['id'] ?? null;
+               
+                if ($pivotId) {
+                    $uniqueUuid = 'pivot_' . $pivotId;
+                    $objectifs = $savoirfaire['objectifs'] ?? []; // ✅ Directement depuis les données
+                   
+                    // ✅ Créer les UUID des objectifs
+                    $objectifUuids = [];
+                    foreach ($objectifs as $objectif) {
+                        $objectifUuids[] = 'obj_' . $pivotId . '_' . $objectif['id'];
+                    }
+                   
+                    $mapping[$uniqueUuid] = $objectifUuids;
                 }
             }
         }
@@ -101,16 +223,6 @@ class LivretFcmLight extends Component
     public function isCurrentUser()
     {
         return $this->marin->isCurrentUser();
-    }
-
-    #[Computed]
-    public function parcoursFiltre()
-    {
-        if (!$this->parcours) {
-            return null;
-        }
-
-        return $this->appliquerFiltres($this->parcours);
     }
 
     #[Computed]
@@ -128,63 +240,182 @@ class LivretFcmLight extends Component
         return $this->calculerStatistiques();
     }
 
+    #[Computed]
+    public function hasActiveFilters()
+    {
+        return !empty($this->search) ||
+               $this->statutFilter !== 'tous' ||
+               $this->anneeFilter !== 'toutes' ||
+               $this->competenceFilter !== 'toutes' ||
+               $this->savoirfaireTypeFilter !== 'tous';
+    }
+
+    // ========================================
+    // MÉTHODES HELPER POUR EXTRACTION DES IDs
+    // ========================================
+
+    private function getCompetenceId(array $savoirfaire): ?int
+    {
+        $competenceId = $savoirfaire['competence_id'] ??
+                       $savoirfaire['pivot']['competence_id'] ??
+                       null;
+       
+        return $competenceId ? (int)$competenceId : null;
+    }
+
+    private function getSavoirfaireTypeId(array $savoirfaire): ?int
+    {
+        $typeId = $savoirfaire['savoirfaire_type_id'] ??
+                 $savoirfaire['pivot']['savoirfaire_type_id'] ??
+                 null;
+       
+        return $typeId ? (int)$typeId : null;
+    }
+
+    // ========================================
+    // MÉTHODES HELPER POUR AFFICHAGE
+    // ========================================
+
+    public function getCompetenceCode(array $savoirfaire): string
+    {
+        $competenceId = $this->getCompetenceId($savoirfaire);
+        if (!$competenceId) return 'COMP';
+       
+        $competenceInfos = OutilsFcmLightService::getCompetenceInfos($competenceId);
+        return $competenceInfos['code'];
+    }
+
+    public function getCompetenceColor(array $savoirfaire): string
+    {
+        $competenceId = $this->getCompetenceId($savoirfaire);
+        if (!$competenceId) return '#6b7280';
+       
+        $competenceInfos = OutilsFcmLightService::getCompetenceInfos($competenceId);
+        return $competenceInfos['color'];
+    }
+
+    public function getSavoirfaireTypeCode(array $savoirfaire): string
+    {
+        $typeId = $this->getSavoirfaireTypeId($savoirfaire);
+        if (!$typeId) return 'SF';
+       
+        $typeInfos = OutilsFcmLightService::getSavoirfaireTypeInfos($typeId);
+        return $typeInfos['code'];
+    }
+
+    public function getSavoirfaireTypeColor(array $savoirfaire): string
+    {
+        $typeId = $this->getSavoirfaireTypeId($savoirfaire);
+        if (!$typeId) return '#3b82f6';
+       
+        $typeInfos = OutilsFcmLightService::getSavoirfaireTypeInfos($typeId);
+        return $typeInfos['color'];
+    }
+
+    // ========================================
+    // MÉTHODES DE FILTRAGE
+    // ========================================
+
     public function filtrerParStatut(string $statut)
     {
         $this->statutFilter = $statut;
         Log::info("=== FILTRE PAR STATUT: {$statut} ===");
     }
 
-    // ✅ LOGIQUE DE FILTRAGE ENTIÈREMENT REFAITE
+    public function filtrerParAnnee(string $anneeId)
+    {
+        $this->anneeFilter = $anneeId;
+       
+        if ($anneeId !== 'toutes') {
+            $anneeInfos = OutilsFcmLightService::getAnneeInfos((int)$anneeId);
+            Log::info("=== FILTRE PAR ANNÉE: {$anneeId} ({$anneeInfos['libelle_court']}) ===");
+        } else {
+            Log::info("=== FILTRE PAR ANNÉE: TOUTES ===");
+        }
+    }
+
+    public function filtrerParCompetence(string $competenceId)
+    {
+        $this->competenceFilter = $competenceId;
+       
+        if ($competenceId !== 'toutes') {
+            $competenceInfos = OutilsFcmLightService::getCompetenceInfos((int)$competenceId);
+            Log::info("=== FILTRE PAR COMPÉTENCE: {$competenceId} ({$competenceInfos['code']}) ===");
+        } else {
+            Log::info("=== FILTRE PAR COMPÉTENCE: TOUTES ===");
+        }
+    }
+
+    public function filtrerParSavoirfaireType(string $typeId)
+    {
+        $this->savoirfaireTypeFilter = $typeId;
+       
+        if ($typeId !== 'tous') {
+            $typeInfos = OutilsFcmLightService::getSavoirfaireTypeInfos((int)$typeId);
+            Log::info("=== FILTRE PAR TYPE SF: {$typeId} ({$typeInfos['code']}) ===");
+        } else {
+            Log::info("=== FILTRE PAR TYPE SF: TOUS ===");
+        }
+    }
+
+    public function resetAllFilters()
+    {
+        $this->search = '';
+        $this->statutFilter = 'tous';
+        $this->anneeFilter = 'toutes';
+        $this->competenceFilter = 'toutes';
+        $this->savoirfaireTypeFilter = 'tous';
+    }
+
+    // ========================================
+    // LOGIQUE DE FILTRAGE - MÉTHODES PRIVÉES
+    // ========================================
+
     private function appliquerFiltres(array $parcours): array
     {
         $parcoursFiltre = $parcours;
 
-        if (isset($parcoursFiltre['fonctions'])) {
-            $fonctionsFiltrees = [];
+        if (isset($parcoursFiltre['annees'])) {
+            $anneesFiltrees = [];
            
-            foreach ($parcoursFiltre['fonctions'] as $fonction) {
-                $fonctionFiltre = $this->filtrerFonction($fonction);
-                if ($fonctionFiltre !== null) {
-                    $fonctionsFiltrees[] = $fonctionFiltre;
+            foreach ($parcoursFiltre['annees'] as $annee) {
+                if (!$this->anneeCorrespondAuFiltre($annee)) {
+                    continue;
+                }
+
+                $anneeFiltre = $this->filtrerAnnee($annee);
+                if ($anneeFiltre !== null) {
+                    $anneesFiltrees[] = $anneeFiltre;
                 }
             }
            
-            $parcoursFiltre['fonctions'] = $fonctionsFiltrees;
+            $parcoursFiltre['annees'] = $anneesFiltrees;
         }
 
         return $parcoursFiltre;
     }
 
-    private function filtrerFonction(array $fonction): ?array
+    private function anneeCorrespondAuFiltre(array $annee): bool
     {
-        $fonctionFiltre = $fonction;
-        $competencesFiltrees = [];
-
-        if (isset($fonction['competences'])) {
-            foreach ($fonction['competences'] as $competence) {
-                $competenceFiltre = $this->filtrerCompetence($competence);
-                if ($competenceFiltre !== null) {
-                    $competencesFiltrees[] = $competenceFiltre;
-                }
-            }
+        if ($this->anneeFilter === 'toutes') {
+            return true;
         }
 
-        // ✅ Si aucune compétence n'a passé les filtres, ne pas afficher la fonction
-        if (empty($competencesFiltrees)) {
-            return null;
-        }
-
-        $fonctionFiltre['competences'] = $competencesFiltrees;
-        return $fonctionFiltre;
+        $anneeId = $annee['id'] ?? $annee['uuid'] ?? '';
+        return (string)$anneeId === $this->anneeFilter;
     }
 
-    private function filtrerCompetence(array $competence): ?array
+    private function filtrerAnnee(array $annee): ?array
     {
-        $competenceFiltre = $competence;
+        $anneeFiltre = $annee;
         $savoirfairesFiltres = [];
 
-        if (isset($competence['savoirfaires'])) {
-            foreach ($competence['savoirfaires'] as $savoirfaire) {
+        if (isset($annee['savoirfaires'])) {
+            foreach ($annee['savoirfaires'] as $savoirfaire) {
+                if (!$this->savoirfaireCorrespondAuxFiltresGeneraux($savoirfaire)) {
+                    continue;
+                }
+
                 $savoirfaireFiltre = $this->filtrerSavoirFaire($savoirfaire);
                 if ($savoirfaireFiltre !== null) {
                     $savoirfairesFiltres[] = $savoirfaireFiltre;
@@ -192,48 +423,66 @@ class LivretFcmLight extends Component
             }
         }
 
-        // ✅ Si aucun savoir-faire n'a passé les filtres, ne pas afficher la compétence
         if (empty($savoirfairesFiltres)) {
             return null;
         }
 
-        $competenceFiltre['savoirfaires'] = $savoirfairesFiltres;
-        return $competenceFiltre;
+        $anneeFiltre['savoirfaires'] = $savoirfairesFiltres;
+        return $anneeFiltre;
+    }
+
+    private function savoirfaireCorrespondAuxFiltresGeneraux(array $savoirfaire): bool
+    {
+        // Filtre par compétence
+        if ($this->competenceFilter !== 'toutes') {
+            $competenceId = $this->getCompetenceId($savoirfaire);
+           
+            if ((string)$competenceId !== $this->competenceFilter) {
+                return false;
+            }
+        }
+
+        // Filtre par type de savoir-faire
+        if ($this->savoirfaireTypeFilter !== 'tous') {
+            $typeId = $this->getSavoirfaireTypeId($savoirfaire);
+           
+            if ((string)$typeId !== $this->savoirfaireTypeFilter) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     private function filtrerSavoirFaire(array $savoirfaire): ?array
     {
-        // ✅ VÉRIFIER D'ABORD LE SAVOIR-FAIRE LUI-MÊME
         $savoirfaireCorrespond = $this->elementCorrespondAuxFiltres($savoirfaire, 'savoirfaire');
        
-        // ✅ FILTRER LES ACTIVITÉS
-        $activitesFiltrees = [];
-        if (isset($savoirfaire['activites'])) {
-            foreach ($savoirfaire['activites'] as $activite) {
-                if ($this->elementCorrespondAuxFiltres($activite, 'activite')) {
-                    $activitesFiltrees[] = $activite;
+        $objectifsFiltres = [];
+        if (isset($savoirfaire['objectifs'])) {
+            foreach ($savoirfaire['objectifs'] as $objectif) {
+                if ($this->elementCorrespondAuxFiltres($objectif, 'objectif')) {
+                    $objectifsFiltres[] = $objectif;
                 }
             }
         }
 
-        // ✅ LOGIQUE : garder le savoir-faire si LUI ou ses ACTIVITÉS correspondent
-        if (!$savoirfaireCorrespond && empty($activitesFiltrees)) {
+        if (!$savoirfaireCorrespond && empty($objectifsFiltres)) {
             return null;
         }
 
         $savoirfaireFiltre = $savoirfaire;
-        $savoirfaireFiltre['activites'] = $activitesFiltrees;
+        $savoirfaireFiltre['objectifs'] = $objectifsFiltres;
 
         return $savoirfaireFiltre;
     }
 
-    // ✅ VÉRIFICATION UNIQUEMENT POUR SAVOIRFAIRES ET ACTIVITÉS
     private function elementCorrespondAuxFiltres(array $element, string $type): bool
     {
-        // ✅ Recherche SEULEMENT dans savoir-faires et activités
+        // Recherche textuelle
         if (!empty($this->search)) {
-            if (!in_array($type, ['savoirfaire', 'activite'])) {
-                return true; // Ne pas filtrer les fonctions/compétences par recherche
+            if (!in_array($type, ['savoirfaire', 'objectif'])) {
+                return true;
             }
            
             if (!$this->correspondRecherche($element)) {
@@ -241,8 +490,8 @@ class LivretFcmLight extends Component
             }
         }
 
-        // ✅ Statut SEULEMENT pour savoir-faires et activités
-        if (in_array($type, ['savoirfaire', 'activite']) && $this->statutFilter !== 'tous') {
+        // Filtre par statut
+        if (in_array($type, ['savoirfaire', 'objectif']) && $this->statutFilter !== 'tous') {
             return $this->verifierStatut($element);
         }
 
@@ -253,60 +502,34 @@ class LivretFcmLight extends Component
     {
         $recherche = strtolower(trim($this->search));
         $texteElement = strtolower(
-            ($element['libelle_court'] ?? '') . ' ' 
-            .($element['libelle_long'] ?? '') . ' ' 
-            //.($element['description'] ?? '')
+            ($element['libelle_court'] ?? '') . ' '
+            .($element['libelle_long'] ?? '') . ' '
+            .($element['code'] ?? '') . ' '
         );
        
         return str_contains($texteElement, $recherche);
     }
 
-    // ✅ VÉRIFICATION DE STATUT AVEC LOGS DÉTAILLÉS
     private function verifierStatut(array $element): bool
     {
         $etatValid = ($element['etat_valid'] ?? 0);
         $dateProposition = $element['date_proposition'] ?? null;
        
-        // ✅ Debug complet
-        $libelle = $element['libelle_court'] ?? 'Element';
-        Log::info("=== VÉRIF STATUT ===");
-        Log::info("Element: {$libelle}");
-        Log::info("etat_valid: " . json_encode($etatValid));
-        Log::info("date_proposition: " . json_encode($dateProposition));
-        Log::info("Filtre demandé: {$this->statutFilter}");
-
-        // Valeur
-        //$estValide = ($etatValid === 1 || $etatValid === '1' || $etatValid === true);
         $estValide = ($etatValid === true);
         $estPropose = !empty($dateProposition);
         $nonValide = ($etatValid == null);
 
-        $resultat = false;
-        switch ($this->statutFilter) {
-            case 'valides':
-                $resultat = $estValide;
-                Log::info("Test validé (etat_valid == 1): " . ($resultat ? 'OUI' : 'NON'));
-                break;
-               
-            case 'proposes':
-                $resultat = $estPropose;
-                Log::info("Test proposé (etat_valid != 1) && (!empty date_proposition): " . ($resultat ? 'OUI' : 'NON'));
-                break;
-               
-            case 'non_valides':
-                $resultat = $nonValide && !$estPropose ;
-                Log::info("Test non validé (etat_valid != 1) && (empty date_proposition): " . ($resultat ? 'OUI' : 'NON'));
-                break;
-               
-            default:
-                $resultat = true;
-        }
-       
-        Log::info("RÉSULTAT FINAL: " . ($resultat ? 'GARDÉ' : 'EXCLU'));
-        Log::info("===================");
-       
-        return $resultat;
+        return match($this->statutFilter) {
+            'valides' => $estValide,
+            'proposes' => $estPropose,
+            'non_valides' => $nonValide && !$estPropose,
+            default => true
+        };
     }
+
+    // ========================================
+    // CALCULS ET STATISTIQUES
+    // ========================================
 
     private function calculerStatistiques(): array
     {
@@ -314,33 +537,31 @@ class LivretFcmLight extends Component
         $valides = 0;
         $proposes = 0;
 
-        foreach ($this->parcours['fonctions'] ?? [] as $fonction) {
-            foreach ($fonction['competences'] ?? [] as $competence) {
-                foreach ($competence['savoirfaires'] ?? [] as $savoirfaire) {
+        foreach ($this->parcours['annees'] ?? [] as $annee) {
+            foreach ($annee['savoirfaires'] ?? [] as $savoirfaire) {
+                $total++;
+               
+                $etatValid = ($savoirfaire['etat_valid'] ?? 0) == 1;
+                $dateProposition = !empty($savoirfaire['date_proposition']);
+               
+                if ($etatValid) {
+                    $valides++;
+                }
+                if ($dateProposition) {
+                    $proposes++;
+                }
+
+                foreach ($savoirfaire['objectifs'] ?? [] as $objectif) {
                     $total++;
                    
-                    $etatValid = ($savoirfaire['etat_valid'] ?? 0) == 1;
-                    $dateProposition = !empty($savoirfaire['date_proposition']);
+                    $etatValidObjectif = ($objectif['etat_valid'] ?? 0) == 1;
+                    $datePropositionObjectif = !empty($objectif['date_proposition']);
                    
-                    if ($etatValid) {
+                    if ($etatValidObjectif) {
                         $valides++;
                     }
-                    if ($dateProposition) {
+                    if ($datePropositionObjectif) {
                         $proposes++;
-                    }
-
-                    foreach ($savoirfaire['activites'] ?? [] as $activite) {
-                        $total++;
-                       
-                        $etatValidActivite = ($activite['etat_valid'] ?? 0) == 1;
-                        $datePropositionActivite = !empty($activite['date_proposition']);
-                       
-                        if ($etatValidActivite) {
-                            $valides++;
-                        }
-                        if ($datePropositionActivite) {
-                            $proposes++;
-                        }
                     }
                 }
             }
@@ -354,26 +575,44 @@ class LivretFcmLight extends Component
         ];
     }
 
-
-
-
-
-
-
     // ========================================
-    // FONCTIONS
+    // MÉTHODES UTILITAIRES
     // ========================================
 
+    public function getSavoirfaireTypeInfos(int $typeId): array
+    {
+        return OutilsFcmLightService::getSavoirfaireTypeInfos($typeId);
+    }
+
+    public function escapeForTooltip($text): string
+    {
+        if (empty($text)) {
+            return '';
+        }
+       
+        return htmlspecialchars(
+            str_replace(["\r\n", "\n", "\r", "'", '"'], [' ', ' ', ' ', "&#39;", "&#34;"], $text),
+            ENT_QUOTES,
+            'UTF-8'
+        );
+    }
+
+    public function escapeForJs($text): string
+    {
+        if (empty($text)) {
+            return '';
+        }
+       
+        return addslashes(htmlspecialchars($text, ENT_QUOTES, 'UTF-8'));
+    }
+
+    // ========================================
+    // ACTIONS DE VALIDATION/PROPOSITION
+    // ========================================
 
     public function devalider(array $element_a_devalider)
     {
-        /**
-         * [ 'type' => 'activite',
-         *   'uuid' => '06a569b8-23a7-4c3f-b57a-51ca841894a7' 
-         * ]
-         */
-        logger()->info("Dévalider: ");
-        logger()->info($element_a_devalider);
+        logger()->info("Dévalider: ", $element_a_devalider);
 
         $event = new UserGeneratedEvent(
             event_type: UserGeneratedEventTypes::ANNUL_ELMT_MARIN_PARCOURS,
@@ -381,103 +620,42 @@ class LivretFcmLight extends Component
             object_class: ObjectClasses::MARIN,
             object_uuid: $this->marin->uuid,
             detail: [
-                "type_element" => $element_a_devalider['type'], 
-                "uuid_element" => $element_a_devalider['uuid'], 
-                "date" => Carbon::now(), 
-                
+                "type_element" => $element_a_devalider['type'],
+                "uuid_element" => $element_a_devalider['uuid'],
+                "date" => Carbon::now(),
             ]
         );
         event($event);
 
-        $this->marin->refresh();
-
-        //$this->js('window.location.reload()');
-
-        // Réinitialiser les propriétés computées pour forcer le recalcul
-    unset($this->parcours);
-    unset($this->parcoursFiltre);
-    unset($this->statistiques);
-   
-    // Déclencher un événement pour vider les sélections
-    $this->dispatch('clear-selections');
-   
-    // Forcer un refresh du composant
-    $this->dispatch('$refresh');
-
+        $this->refreshAfterAction();
     }
 
     public function valider(array $elements_a_valider, string $commentaire)
     {
-        logger()->info($elements_a_valider);
+        logger()->info("Valider: ", $elements_a_valider);
 
         if (array_key_exists("savoirfaire", $elements_a_valider)){
             foreach($elements_a_valider["savoirfaire"] as $savoirfaire_uuid => $bool) {
-                if (!$bool) continue; // Ignorer si non sélectionné
-                
-                $event = new UserGeneratedEvent(
-                    event_type: UserGeneratedEventTypes::VALID_ELMT_MARIN_PARCOURS,
-                    user_uuid: auth()->user()->uuid,
-                    object_class: ObjectClasses::MARIN,
-                    object_uuid: $this->marin->uuid,
-                    detail: [
-                        "type_element" => "savoirfaire", 
-                        "uuid_element" => $savoirfaire_uuid, 
-                        "date" => Carbon::now(), 
-                        "commentaire" => $commentaire,
-                    ]
-                );
-                event($event);
+                if (!$bool) continue;
+               
+                $this->createValidationEvent("savoirfaire", $savoirfaire_uuid, $commentaire);
             }
         }
 
-        if (array_key_exists("activite", $elements_a_valider)){
-            foreach($elements_a_valider["activite"] as $activite_uuid => $bool) {
-                if (!$bool) continue; // Ignorer si non sélectionné
-                
-                $event = new UserGeneratedEvent(
-                    event_type: UserGeneratedEventTypes::VALID_ELMT_MARIN_PARCOURS,
-                    user_uuid: auth()->user()->uuid,
-                    object_class: ObjectClasses::MARIN,
-                    object_uuid: $this->marin->uuid,
-                    detail: [
-                        "type_element" => "activite", 
-                        "uuid_element" => $activite_uuid, 
-                        "date" => Carbon::now(), 
-                        "commentaire" => $commentaire,
-                    ]
-                );
-                event($event);
+        if (array_key_exists("objectif", $elements_a_valider)){
+            foreach($elements_a_valider["objectif"] as $objectif_uuid => $bool) {
+                if (!$bool) continue;
+               
+                $this->createValidationEvent("objectif", $objectif_uuid, $commentaire);
             }
         }
 
-        $this->marin->refresh();
-
-        // Vider le cache
-        //unset($this->marin);  
-        //$this->reset();     
-        // Rafraîchir le composant Livewire
-        //$this->dispatch('$refresh');
-        // Recharger la page 
-        //$this->js('window.location.reload()');
-
-        unset($this->parcours);
-        unset($this->parcoursFiltre);
-        unset($this->statistiques);
-        $this->dispatch('clear-selections');
-        $this->dispatch('$refresh');
-
-
+        $this->refreshAfterAction();
     }
 
     public function proposer(array $element_a_proposer, string $commentaire)
     {
-        /**
-         * [ 'type' => 'activite',
-         *   'uuid' => '06a569b8-23a7-4c3f-b57a-51ca841894a7' 
-         * ]
-         */
-        logger()->info("Proposer: ");
-        logger()->info($element_a_proposer);
+        logger()->info("Proposer: ", $element_a_proposer);
 
         $event = new UserGeneratedEvent(
             event_type: UserGeneratedEventTypes::PROPOS_ELMT_MARIN_PARCOURS,
@@ -485,89 +663,73 @@ class LivretFcmLight extends Component
             object_class: ObjectClasses::MARIN,
             object_uuid: $this->marin->uuid,
             detail: [
-                "type_element" => $element_a_proposer['type'], 
-                "uuid_element" => $element_a_proposer['uuid'], 
-                "date" => Carbon::now(), 
+                "type_element" => $element_a_proposer['type'],
+                "uuid_element" => $element_a_proposer['uuid'],
+                "date" => Carbon::now(),
                 "commentaire" => $commentaire
             ]
         );
         event($event);
 
+        $this->refreshAfterAction();
+    }
+
+    // ========================================
+    // MÉTHODES HELPER POUR ACTIONS
+    // ========================================
+
+    private function createValidationEvent(string $type, string $uuid, string $commentaire): void
+    {
+        $event = new UserGeneratedEvent(
+            event_type: UserGeneratedEventTypes::VALID_ELMT_MARIN_PARCOURS,
+            user_uuid: auth()->user()->uuid,
+            object_class: ObjectClasses::MARIN,
+            object_uuid: $this->marin->uuid,
+            detail: [
+                "type_element" => $type,
+                "uuid_element" => $uuid,
+                "date" => Carbon::now(),
+                "commentaire" => $commentaire,
+            ]
+        );
+        event($event);
+    }
+
+    private function refreshAfterAction(): void
+    {
         $this->marin->refresh();
-
-       // $this->js('window.location.reload()');
-
-       unset($this->parcours);
-       unset($this->parcoursFiltre);
-       unset($this->statistiques);
-       $this->dispatch('clear-selections');
-       $this->dispatch('$refresh');
-   
+       
+        unset($this->parcours);
+        unset($this->parcoursFiltre);
+        unset($this->statistiques);
+       
+        $this->dispatch('clear-selections');
+        $this->dispatch('$refresh');
     }
 
-
     // ========================================
-    // HELPER
+    // ÉVÉNEMENTS ET SYNCHRONISATION
     // ========================================
 
-    // Pour les commenataires speciaux dans libelle_long
-    private function escapeForTooltip($text): string
-{
-    if (empty($text)) {
-        return '';
+    public function refreshElements()
+    {
+        $this->dispatch('elements-refreshed');
     }
-   
-    // Échapper les caractères spéciaux pour éviter les bugs JavaScript/HTML
-    return htmlspecialchars(
-        str_replace(["\r\n", "\n", "\r", "'", '"'], [' ', ' ', ' ', "&#39;", "&#34;"], $text),
-        ENT_QUOTES,
-        'UTF-8'
-    );
-}
 
-
-private function escapeForJs($text): string
-{
-    if (empty($text)) {
-        return '';
+    #[On('sync-elements')]
+    public function syncElements()
+    {
+        $this->refreshElements();
     }
-   
-    return addslashes(htmlspecialchars($text, ENT_QUOTES, 'UTF-8'));
-}
 
-// Methode pour rafraichir du Livewire
-
-public function refreshElements()
-{
-    // Forcer le rechargement des données
-    $this->dispatch('elements-refreshed');
-}
-
-#[On('sync-elements')]
-public function syncElements()
-{
-    // Recharger les données du parcours
-    $this->refreshElements();
-}
-
-// Après chaque action (validation, proposition, etc.)
-public function afterElementAction()
-{
-    // Petite pause pour laisser la DB se mettre à jour
-    usleep(200000); // 200ms
-    
-    // Dispatch pour forcer le rafraîchissement
-    $this->dispatch('elements-refreshed');
-}
-
-
-
-
-
-
+    public function afterElementAction()
+    {
+        usleep(200000); // 200ms
+        $this->dispatch('elements-refreshed');
+    }
 
     // ========================================
-    // RENDU OPTIMISÉ
+    // RENDU
     // ========================================
 
     public function render()
@@ -579,12 +741,12 @@ public function afterElementAction()
             'savoirFaireChildren' => $this->savoirFaireChildren,
             'canPropose' => $this->canPropose,
             'statistiques' => $this->statistiques,
+           
+            'anneesDisponibles' => $this->anneesDisponibles,
+            'competencesDisponibles' => $this->competencesDisponibles,
+            'savoirfaireTypesDisponibles' => $this->savoirfaireTypesDisponibles,
+            'tousLesSavoirfaireTypes' => $this->tousLesSavoirfaireTypes,
+            'hasActiveFilters' => $this->hasActiveFilters,
         ]);
     }
-
-
-
-    
-
-   
 }

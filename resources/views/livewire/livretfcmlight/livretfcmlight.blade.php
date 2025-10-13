@@ -1,19 +1,19 @@
 <x-filament::card>
+
     <div x-data="parcoursManager()" x-init="initLivret()" x-cloak>
-        
-        {{-- ✅ BARRE DE RECHERCHE AVEC BOUTON VALIDER --}}
+
+        {{-- ✅ BARRE DE RECHERCHE ET FILTRES --}}
         <div class="mb-6 space-y-4">
-            
+           
             {{-- Barre de recherche avec bouton --}}
             <div class="flex items-center space-x-2">
                 <div class="flex-1">
                     <x-filament::input.wrapper>
                         <x-filament::input
                             type="text"
-                            wire:model="search"
+                            wire:model.live.debounce.500ms="search"
                             placeholder="Rechercher dans le parcours..."
                             class="w-full"
-                            wire:keydown.enter="$refresh"
                         >
                             <x-slot name="prefix">
                                 <x-filament::icon icon="heroicon-o-magnifying-glass" class="w-5 h-5 text-gray-400" />
@@ -21,24 +21,83 @@
                         </x-filament::input>
                     </x-filament::input.wrapper>
                 </div>
-                
-                <x-filament::button
-                    color="primary"
-                    wire:click="$refresh"
-                >
-                    <x-filament::icon icon="heroicon-o-magnifying-glass" class="w-4 h-4 mr-2" />
-                    Rechercher
-                </x-filament::button>
-                
+               
                 @if(!empty($search))
                     <x-filament::button
                         color="gray"
                         wire:click="$set('search', '')"
+                        title="Effacer la recherche"
                     >
                         <x-filament::icon icon="heroicon-o-x-mark" class="w-4 h-4" />
                     </x-filament::button>
                 @endif
             </div>
+
+            {{-- ✅ FILTRES PAR CATÉGORIE --}}
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                
+                {{-- Filtre par Année --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <x-filament::icon icon="heroicon-o-calendar" class="w-4 h-4 inline mr-1" />
+                        Filtrer par année
+                    </label>
+                    <x-filament::input.wrapper>
+                        <x-filament::input.select wire:model.live="anneeFilter">
+                            <option value="toutes">Toutes les années</option>
+                            @foreach($this->anneesDisponibles as $annee)
+                                <option value="{{ $annee['id'] }}">{{ $annee['libelle_court'] }}</option>
+                            @endforeach
+                        </x-filament::input.select>
+                    </x-filament::input.wrapper>
+                </div>
+            
+
+                {{-- Filtre par Compétence --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <x-filament::icon icon="heroicon-o-academic-cap" class="w-4 h-4 inline mr-1" />
+                        Filtrer par compétence
+                    </label>
+                    <x-filament::input.wrapper>
+                        <x-filament::input.select wire:model.live="competenceFilter">
+                            <option value="toutes">Toutes les compétences</option>
+                            @forelse($this->competencesDisponibles as $competenceId => $competence)
+                                <option value="{{ $competenceId }}">
+                                    {{ $competence['code'] }} - {{ $competence['libelle_court'] }}
+                                </option>
+                            @empty
+                                <option disabled>Aucune compétence trouvée</option>
+                            @endforelse
+                        </x-filament::input.select>
+                    </x-filament::input.wrapper>
+                    
+                </div>
+            
+
+                {{-- ✅ Filtre par Type de Formation (CORRIGÉ) --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">
+                        <x-filament::icon icon="heroicon-o-clipboard-document-list" class="w-4 h-4 inline mr-1" />
+                        Filtrer par type de formation
+                    </label>
+                    <x-filament::input.wrapper>
+                        <x-filament::input.select wire:model.live="savoirfaireTypeFilter">
+                            <option value="tous">Tous les types</option>
+                            @forelse($this->savoirfaireTypesDisponibles as $typeId => $typeInfo)
+                                <option value="{{ $typeId }}">
+                                    {{ $typeInfo['code'] }} - {{ $typeInfo['libelle_court'] }}
+                                </option>
+                            @empty
+                                <option disabled>Aucun type trouvé</option>
+                            @endforelse
+                        </x-filament::input.select>
+                    </x-filament::input.wrapper>
+                    
+                   
+                </div>
+            </div>
+            
 
             {{-- ✅ BOUTONS DE FILTRE PAR STATUT --}}
             <div class="flex flex-wrap gap-2">
@@ -48,144 +107,202 @@
                     wire:click="filtrerParStatut('tous')"
                 >
                     <x-filament::icon icon="heroicon-o-document-text" class="w-4 h-4 mr-1" />
-                    Tous ({{ $statistiques['total'] }})
+                    Tous ({{ $this->statistiques['total'] }})
                 </x-filament::button>
-                
+               
                 <x-filament::button
                     size="sm"
                     color="{{ $statutFilter === 'valides' ? 'success' : 'gray' }}"
                     wire:click="filtrerParStatut('valides')"
                 >
                     <x-filament::icon icon="heroicon-o-check-circle" class="w-4 h-4 mr-1" />
-                    Validés ({{ $statistiques['valides'] }})
+                    Validés ({{ $this->statistiques['valides'] }})
                 </x-filament::button>
-                
+               
                 <x-filament::button
                     size="sm"
                     color="{{ $statutFilter === 'proposes' ? 'warning' : 'gray' }}"
                     wire:click="filtrerParStatut('proposes')"
                 >
                     <x-filament::icon icon="heroicon-o-paper-airplane" class="w-4 h-4 mr-1" />
-                    Proposés ({{ $statistiques['proposes'] }})
+                    Proposés ({{ $this->statistiques['proposes'] }})
                 </x-filament::button>
-                
+               
                 <x-filament::button
                     size="sm"
                     color="{{ $statutFilter === 'non_valides' ? 'info' : 'gray' }}"
                     wire:click="filtrerParStatut('non_valides')"
                 >
                     <x-filament::icon icon="heroicon-o-x-circle" class="w-4 h-4 mr-1" />
-                    Non validés ({{ $statistiques['non_valides'] }})
+                    Non validés ({{ $this->statistiques['non_valides'] }})
                 </x-filament::button>
             </div>
 
-            {{-- Indicateur de filtres actifs --}}
-            @if(!empty($search) || $statutFilter !== 'tous')
+            
+
+            {{-- ✅ INDICATEUR DE FILTRES ACTIFS (mis à jour) --}}
+            @if($this->hasActiveFilters)
                 <div class="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <div class="flex items-center space-x-2 text-sm text-blue-800">
-                        <x-filament::icon icon="heroicon-o-funnel" class="w-4 h-4" />
-                        <span>Filtres actifs :</span>
+                    <div class="flex items-center flex-wrap gap-2 text-sm text-blue-800">
+                        <div class="flex items-center">
+                            <x-filament::icon icon="heroicon-o-funnel" class="w-4 h-4 mr-1" />
+                            <span class="font-medium">Filtres actifs :</span>
+                        </div>
+                       
                         @if(!empty($search))
-                            <span class="px-2 py-1 bg-blue-200 rounded text-xs">
-                                Recherche: "{{ $search }}"
+                            <span class="px-2 py-1 bg-blue-200 rounded text-xs font-medium">
+                                🔍 "{{ Str::limit($search, 20) }}"
                             </span>
                         @endif
+                       
                         @if($statutFilter !== 'tous')
-                            <span class="px-2 py-1 bg-blue-200 rounded text-xs">
-                                Statut: {{ $statutFilter }}
+                            <span class="px-2 py-1 bg-blue-200 rounded text-xs font-medium">
+                                📊 {{ ucfirst($statutFilter) }}
+                            </span>
+                        @endif
+                       
+                        @if($anneeFilter !== 'toutes')
+                            @php
+                                $anneeLibelle = collect($this->anneesDisponibles)->firstWhere('id', $anneeFilter)['libelle'] ?? "Année {$anneeFilter}";
+                            @endphp
+                            <span class="px-2 py-1 bg-green-200 rounded text-xs font-medium">
+                                📅 {{ $anneeLibelle }}
+                            </span>
+                        @endif
+                       
+                        @if($competenceFilter !== 'toutes')
+                            <span class="px-2 py-1 bg-yellow-200 rounded text-xs font-medium">
+                                🎯 {{ $this->competencesDisponibles[$competenceFilter]['libelle_court'] }}
+                            </span>
+                        @endif
+                       
+                        @if($savoirfaireTypeFilter !== 'tous')
+                            <span class="px-2 py-1 bg-purple-200 rounded text-xs font-medium">
+                                📚 {{ $this->savoirfaireTypesDisponibles[$savoirfaireTypeFilter]['libelle_court'] }}
                             </span>
                         @endif
                     </div>
+                   
                     <x-filament::button
                         color="gray"
                         size="sm"
-                        wire:click="$set('search', ''); $set('statutFilter', 'tous')"
+                        wire:click="resetAllFilters"
+                        title="Effacer tous les filtres"
                     >
                         <x-filament::icon icon="heroicon-o-x-mark" class="w-4 h-4 mr-1" />
-                        Effacer filtres
+                        Tout effacer
                     </x-filament::button>
                 </div>
             @endif
 
-            {{-- Barre de progression --}}
-            @if($statistiques['total'] > 0)
-                <div class="p-4 bg-blue-50 rounded-lg">
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-sm font-medium text-blue-900">
-                            Progression du parcours
-                        </span>
-                        <span class="text-sm font-bold text-blue-900">
-                            {{ $statistiques['total'] > 0 ? round(($statistiques['valides'] / $statistiques['total']) * 100, 1) : 0 }}%
+            {{-- ✅ BARRE DE PROGRESSION AMÉLIORÉE --}}
+            @if($this->statistiques['total'] > 0)
+                <div class="p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200">
+                    <div class="flex items-center justify-between mb-3">
+                        <div class="flex items-center">
+                            <x-filament::icon icon="heroicon-o-chart-bar" class="w-5 h-5 text-blue-600 mr-2" />
+                            <span class="text-sm font-semibold text-blue-900">
+                                Progression du parcours
+                            </span>
+                        </div>
+                        <span class="text-lg font-bold text-blue-900">
+                            {{ $this->statistiques['total'] > 0 ? round(($this->statistiques['valides'] / $this->statistiques['total']) * 100, 1) : 0 }}%
                         </span>
                     </div>
-                    <div class="w-full bg-blue-200 rounded-full h-2">
-                        <div 
-                            class="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                            style="width: {{ $statistiques['total'] > 0 ? round(($statistiques['valides'] / $statistiques['total']) * 100, 1) : 0 }}%"
+                    
+                    <div class="w-full bg-blue-200 rounded-full h-3 mb-2">
+                        <div
+                            class="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500 ease-out"
+                            style="width: {{ $this->statistiques['total'] > 0 ? round(($this->statistiques['valides'] / $this->statistiques['total']) * 100, 1) : 0 }}%"
                         ></div>
                     </div>
-                    <div class="flex justify-between text-xs text-blue-700 mt-1">
-                        <span>{{ $statistiques['valides'] }}/{{ $statistiques['total'] }} validés</span>
-                        <span>{{ $statistiques['proposes'] }} proposés</span>
+                    
+                    <div class="grid grid-cols-3 gap-4 text-xs text-blue-700">
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                            <span><strong>{{ $this->statistiques['valides'] }}</strong> validés</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 bg-orange-400 rounded-full mr-1"></div>
+                            <span><strong>{{ $this->statistiques['proposes'] }}</strong> proposés</span>
+                        </div>
+                        <div class="flex items-center">
+                            <div class="w-2 h-2 bg-gray-400 rounded-full mr-1"></div>
+                            <span><strong>{{ $this->statistiques['non_valides'] }}</strong> restants</span>
+                        </div>
                     </div>
                 </div>
             @endif
         </div>
 
-        {{-- CONTENU PRINCIPAL --}}
+        {{-- ✅ CONTENU PRINCIPAL --}}
         @if($parcours)
-            <div class="flex items-center justify-between mt-1 mb-1">
-                <h3 class="text-2xl font-bold mt-1 mb-1">{{ $parcours['libelle_long'] }}</h3>
+            <div class="flex items-center justify-between mt-1 mb-4">
+                <div>
+                    <h3 class="text-2xl font-bold text-gray-900 mb-1">{{ $parcours['libelle_long'] }}</h3>
+                    <p class="text-sm text-gray-600">Code: {{ $parcours['code'] ?? 'N/A' }}</p>
+                </div>
+                
+                @if($this->statistiques['total'] > 0)
+                    <div class="text-right">
+                        <div class="text-2xl font-bold text-blue-600">
+                            {{ $this->statistiques['valides'] }}/{{ $this->statistiques['total'] }}
+                        </div>
+                        <div class="text-sm text-gray-600">éléments validés</div>
+                    </div>
+                @endif
             </div>
                
-            @if(!empty($parcours['fonctions']))
-                <ul>
-                    @foreach ($parcours['fonctions'] as $fonction)
-                        @include('fcmcommun::livewire.livretfcmlight.layouts.parcoursDetailsValidation.fonction', [
+            @if(!empty($parcours['annees']))
+                <ul class="space-y-2">
+                    @foreach ($parcours['annees'] as $annee)
+                        {{-- ✅ CORRECTION: 'annee' au lieu de 'fonction' --}}
+                        @include('fcmcommun::livewire.livretfcmlight.layouts.parcoursDetailsValidation.annee', [
                             'parcoursId' => $parcours['uuid'],
-                            'fonction' => $fonction,
+                            'annee' => $annee,
                         ])
                     @endforeach
                 </ul>
             @else
-                <div class="text-center py-12 text-gray-500">
-                    <x-filament::icon icon="heroicon-o-magnifying-glass" class="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                    <p class="text-lg font-medium mb-2">Aucun résultat trouvé</p>
-                    <p class="text-sm mb-4">
+                <div class="text-center py-16 text-gray-500">
+                    <x-filament::icon icon="heroicon-o-magnifying-glass" class="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                    <p class="text-xl font-medium mb-2">Aucun résultat trouvé</p>
+                    <p class="text-sm mb-6 max-w-md mx-auto">
                         @if(!empty($search))
-                            Aucun élément ne correspond à votre recherche "{{ $search }}"
-                        @elseif($statutFilter !== 'tous')
-                            Aucun élément ne correspond au filtre "{{ $statutFilter }}"
+                            Aucun élément ne correspond à votre recherche <strong>"{{ $search }}"</strong>
+                        @elseif($this->hasActiveFilters)
+                            Aucun élément ne correspond aux filtres sélectionnés
                         @else
-                            Aucun élément trouvé
+                            Ce parcours ne contient aucune année définie
                         @endif
                     </p>
-                    <x-filament::button 
-                        color="gray" 
-                        size="sm" 
-                        wire:click="$set('search', ''); $set('statutFilter', 'tous')"
+                    <x-filament::button
+                        color="gray"
+                        size="sm"
+                        wire:click="resetAllFilters"
                     >
                         <x-filament::icon icon="heroicon-o-arrow-path" class="w-4 h-4 mr-2" />
-                        Tout afficher
+                        Réinitialiser les filtres
                     </x-filament::button>
                 </div>
             @endif
         @else
-            <div class="text-center py-12 text-gray-500">
-                <x-filament::icon icon="heroicon-o-document-text" class="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                <p class="text-lg font-medium mb-2">Aucun parcours disponible</p>
-                <p class="text-sm">Ce marin n'a pas encore de parcours défini</p>
+            <div class="text-center py-16 text-gray-500">
+                <x-filament::icon icon="heroicon-o-document-text" class="w-16 h-16 mx-auto mb-4 text-gray-300" />
+                <p class="text-xl font-medium mb-2">Aucun parcours disponible</p>
+                <p class="text-sm">Ce marin n'a pas encore de parcours défini ou vous n'avez pas les droits pour le consulter</p>
             </div>
         @endif
            
-        {{-- BOUTON DE VALIDATION FLOTTANT --}}
+        {{-- ✅ BOUTON DE VALIDATION FLOTTANT --}}
         <div class="mt-6">
             @can('fcmcentral::valider_element_parcours')
                 <div
                     x-data="{ hasSelectedItems: false }"
                     x-init="$watch('selectedItems', () => {
-                        hasSelectedItems = Object.keys(selectedItems.activite || {}).length > 0 ||
-                                          Object.keys(selectedItems.savoirfaire || {}).length > 0;
+                        hasSelectedItems = Object.keys(selectedItems.objectif || {}).length > 0 ||
+                                          Object.keys(selectedItems.savoirfaire || {}).length > 0 ||
+                                          Object.keys(selectedItems.annee || {}).length > 0;
                     })"
                     x-show="hasSelectedItems"
                     style="position: fixed; top: 10rem; left: 1rem; z-index: 1000;"
@@ -195,21 +312,23 @@
                     x-transition:leave="transition ease-in duration-200"
                     x-transition:leave-start="opacity-100 transform scale-100"
                     x-transition:leave-end="opacity-0 transform scale-90"
-                > 
+                >
                     <x-filament::button
                         color="success"
                         size="lg"
-                        class="relative shadow-lg"
-                        x-on:click="$dispatch('open-modal', { id: 'sauve' })"
+                        class="relative shadow-xl border-2 border-green-400"
+                        
+                         x-on:click="$dispatch('open-modal', { id: 'sauve' })" 
                     >
                         <div class="flex items-center space-x-2">
                             <x-filament::icon
                                 icon="heroicon-o-check-circle"
-                                class="w-5 h-5"
+                                class="w-6 h-6"
                             />
-                            <span class="text-sm leading-tight">
-                                Valider<br> les éléments cochés
-                            </span>
+                            <div class="text-left">
+                                <div class="text-sm font-semibold leading-tight">Valider</div>
+                                <div class="text-xs leading-tight">les éléments cochés</div>
+                            </div>
                         </div>
                     </x-filament::button>
                 </div>

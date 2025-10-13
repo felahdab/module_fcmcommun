@@ -7,20 +7,25 @@ namespace Modules\FcmCommun\DataObjects;
 use Spatie\LaravelData\Data;
 use Illuminate\Support\Collection;
 
-use Modules\FcmCommun\DataObjects\ActiviteDto;
+use Modules\FcmCommun\DataObjects\ObjectifDto;
 
-class SavoirFaireDto extends Data
+class SavoirfaireDto extends Data
 {
-    public string $id;
+    public int $id;
+    public string $savoirfaire_id;
+    public string $code;
     public string $libelle_long;
     public string $libelle_court;
-    public string $url;
-    public string $code_sicomp;
-    public string $niveau;
-    public array $state = [ "checked" => false, "opened" => false];
+    public ?string $competence_code;
+    public int $ordre;
+    public ?int $heures;
+    public ?int $jours;
+    public ?string $intitule;
+    public ?string $savoirfaire_type;
+    public ?string $color;
+    public array $state = ["checked" => false, "opened" => false];
 
-
-    /** @var Collection<int, ActiviteDto> */
-    public Collection $activites;
-    
+     /** @var Collection<int, ObjectifDto> */
+     public Collection $objectifs;
 }
+
