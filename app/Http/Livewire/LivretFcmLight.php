@@ -15,10 +15,14 @@ use Modules\FcmCommun\Services\OutilsFcmLightService;
 use Modules\FcmCentral\Models\Marin;
 use Modules\FcmCentral\Events\UserGeneratedEvent;
 use Modules\FcmCentral\Traits\FcmAccessControl;
+use Modules\FcmCentral\Traits\FilamentPermissionTrait;
 
 class LivretFcmLight extends Component
 {
     use FcmAccessControl;
+    use FilamentPermissionTrait;
+
+
 
     #[Locked]
     public $marinId;
