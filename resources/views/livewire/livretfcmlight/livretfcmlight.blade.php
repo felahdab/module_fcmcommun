@@ -35,23 +35,23 @@
 
             {{-- ✅ FILTRES PAR CATÉGORIE --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                
-                {{-- Filtre par Année --}}
+               
+                {{-- Filtre par Affectation --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">
-                        <x-filament::icon icon="heroicon-o-calendar" class="w-4 h-4 inline mr-1" />
-                        Filtrer par année
+                        <x-filament::icon icon="heroicon-o-briefcase" class="w-4 h-4 inline mr-1" />
+                        Filtrer par affectation
                     </label>
                     <x-filament::input.wrapper>
-                        <x-filament::input.select wire:model.live="anneeFilter">
-                            <option value="toutes">Toutes les années</option>
-                            @foreach($this->anneesDisponibles as $annee)
-                                <option value="{{ $annee['id'] }}">{{ $annee['libelle_court'] }}</option>
+                        <x-filament::input.select wire:model.live="affectationFilter">
+                            <option value="toutes">Toutes les affectations</option>
+                            @foreach($this->affectationsDisponibles as $affectation)
+                                <option value="{{ $affectation['id'] }}">{{ $affectation['libelle_court'] }}</option>
                             @endforeach
                         </x-filament::input.select>
                     </x-filament::input.wrapper>
                 </div>
-            
+           
 
                 {{-- Filtre par Compétence --}}
                 <div>
@@ -71,11 +71,10 @@
                             @endforelse
                         </x-filament::input.select>
                     </x-filament::input.wrapper>
-                    
                 </div>
-            
+           
 
-                {{-- ✅ Filtre par Type de Formation (CORRIGÉ) --}}
+                {{-- ✅ Filtre par Type de Formation --}}
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">
                         <x-filament::icon icon="heroicon-o-clipboard-document-list" class="w-4 h-4 inline mr-1" />
@@ -84,20 +83,18 @@
                     <x-filament::input.wrapper>
                         <x-filament::input.select wire:model.live="savoirfaireTypeFilter">
                             <option value="tous">Tous les types</option>
-                            @forelse($this->savoirfaireTypesDisponibles as $typeId => $typeInfo)
-                                <option value="{{ $typeId }}">
-                                    {{ $typeInfo['code'] }} - {{ $typeInfo['libelle_court'] }}
+                            @forelse($this->savoirfaireTypesDisponibles as $typeCode => $typeInfo)
+                                <option value="{{ $typeCode }}">
+                                    {{ $typeInfo['code'] }} - {{ $typeInfo['libelle'] }}
                                 </option>
                             @empty
                                 <option disabled>Aucun type trouvé</option>
                             @endforelse
                         </x-filament::input.select>
                     </x-filament::input.wrapper>
-                    
-                   
                 </div>
             </div>
-            
+           
 
             {{-- ✅ BOUTONS DE FILTRE PAR STATUT --}}
             <div class="flex flex-wrap gap-2">
@@ -138,9 +135,7 @@
                 </x-filament::button>
             </div>
 
-            
-
-            {{-- ✅ INDICATEUR DE FILTRES ACTIFS (mis à jour) --}}
+            {{-- ✅ INDICATEUR DE FILTRES ACTIFS --}}
             @if($this->hasActiveFilters)
                 <div class="flex items-center justify-between p-3 bg-blue-50 border border-blue-200 rounded-lg">
                     <div class="flex items-center flex-wrap gap-2 text-sm text-blue-800">
@@ -161,12 +156,12 @@
                             </span>
                         @endif
                        
-                        @if($anneeFilter !== 'toutes')
+                        @if($affectationFilter !== 'toutes')
                             @php
-                                $anneeLibelle = collect($this->anneesDisponibles)->firstWhere('id', $anneeFilter)['libelle'] ?? "Année {$anneeFilter}";
+                                $affectationLibelle = collect($this->affectationsDisponibles)->firstWhere('id', $affectationFilter)['libelle_court'] ?? "Affectation {$affectationFilter}";
                             @endphp
                             <span class="px-2 py-1 bg-green-200 rounded text-xs font-medium">
-                                📅 {{ $anneeLibelle }}
+                                💼 {{ $affectationLibelle }}
                             </span>
                         @endif
                        
@@ -178,7 +173,7 @@
                        
                         @if($savoirfaireTypeFilter !== 'tous')
                             <span class="px-2 py-1 bg-purple-200 rounded text-xs font-medium">
-                                📚 {{ $this->savoirfaireTypesDisponibles[$savoirfaireTypeFilter]['libelle_court'] }}
+                                📚 {{ $this->savoirfaireTypesDisponibles[$savoirfaireTypeFilter]['libelle'] }}
                             </span>
                         @endif
                     </div>
@@ -196,7 +191,7 @@
             @endif
 
             {{-- ✅ BARRE DE PROGRESSION AMÉLIORÉE --}}
-            @if($this->statistiques['total'] > 0)
+            {{-- @if($this->statistiques['total'] > 0)
                 <div class="p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-lg border border-blue-200">
                     <div class="flex items-center justify-between mb-3">
                         <div class="flex items-center">
@@ -209,14 +204,14 @@
                             {{ $this->statistiques['total'] > 0 ? round(($this->statistiques['valides'] / $this->statistiques['total']) * 100, 1) : 0 }}%
                         </span>
                     </div>
-                    
+                   
                     <div class="w-full bg-blue-200 rounded-full h-3 mb-2">
                         <div
                             class="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500 ease-out"
                             style="width: {{ $this->statistiques['total'] > 0 ? round(($this->statistiques['valides'] / $this->statistiques['total']) * 100, 1) : 0 }}%"
                         ></div>
                     </div>
-                    
+                   
                     <div class="grid grid-cols-3 gap-4 text-xs text-blue-700">
                         <div class="flex items-center">
                             <div class="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
@@ -232,7 +227,50 @@
                         </div>
                     </div>
                 </div>
-            @endif
+            @endif --}}
+
+
+            @php
+            $stats = $this->getStatistiquesGenerales();
+        @endphp
+        
+        <div class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
+            {{-- Affectations --}}
+            <x-filament::section>
+                <x-slot name="heading">Affectations</x-slot>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-primary-600">
+                        {{ $stats['affectations_validees'] }} / {{ $stats['affectations_total'] }}
+                    </div>
+                    <div class="text-sm text-gray-600">Affectations validées</div>
+                </div>
+            </x-filament::section>
+        
+            {{-- Heures --}}
+            <x-filament::section>
+                <x-slot name="heading">Progression Générale (Heures)</x-slot>
+                <div class="text-center">
+                    <div class="text-3xl font-bold text-success-600">
+                        {{ $stats['heures_validees'] }}h / {{ $stats['heures_total'] }}h
+                    </div>
+                    <div class="text-sm text-gray-600">{{ $stats['taux_heures'] }}% complété</div>
+                </div>
+            </x-filament::section>
+        
+            {{-- Autre stat si besoin --}}
+            <x-filament::section>
+                <x-slot name="heading">État global</x-slot>
+                <div class="text-center">
+                    <x-filament::badge
+                        size="lg"
+                        color="{{ $stats['taux_heures'] == 100 ? 'success' : ($stats['taux_heures'] > 50 ? 'warning' : 'danger') }}">
+                        {{ $stats['taux_heures'] }}% validé
+                    </x-filament::badge>
+                </div>
+            </x-filament::section>
+        </div>
+        
+
         </div>
 
         {{-- ✅ CONTENU PRINCIPAL --}}
@@ -242,7 +280,7 @@
                     <h3 class="text-2xl font-bold text-gray-900 mb-1">{{ $parcours['libelle_long'] }}</h3>
                     <p class="text-sm text-gray-600">Code: {{ $parcours['code'] ?? 'N/A' }}</p>
                 </div>
-                
+               
                 @if($this->statistiques['total'] > 0)
                     <div class="text-right">
                         <div class="text-2xl font-bold text-blue-600">
@@ -253,13 +291,13 @@
                 @endif
             </div>
                
-            @if(!empty($parcours['annees']))
+            @if(!empty($parcours['affectations']))
                 <ul class="space-y-2">
-                    @foreach ($parcours['annees'] as $annee)
-                        {{-- ✅ CORRECTION: 'annee' au lieu de 'fonction' --}}
-                        @include('fcmcommun::livewire.livretfcmlight.layouts.parcoursDetailsValidation.annee', [
+                    @foreach ($parcours['affectations'] as $affectation)
+                        @include('fcmcommun::livewire.livretfcmlight.layouts.parcoursDetailsValidation.affectation', [
                             'parcoursId' => $parcours['uuid'],
-                            'annee' => $annee,
+                            'affectation' => $affectation,
+                            
                         ])
                     @endforeach
                 </ul>
@@ -273,7 +311,7 @@
                         @elseif($this->hasActiveFilters)
                             Aucun élément ne correspond aux filtres sélectionnés
                         @else
-                            Ce parcours ne contient aucune année définie
+                            Ce parcours ne contient aucune affectation définie
                         @endif
                     </p>
                     <x-filament::button
@@ -296,13 +334,14 @@
            
         {{-- ✅ BOUTON DE VALIDATION FLOTTANT --}}
         <div class="mt-6">
-            @can('fcmcentral::valider_element_parcours')
+            @can('fcmcentral::livret.valider')
                 <div
                     x-data="{ hasSelectedItems: false }"
                     x-init="$watch('selectedItems', () => {
                         hasSelectedItems = Object.keys(selectedItems.objectif || {}).length > 0 ||
                                           Object.keys(selectedItems.savoirfaire || {}).length > 0 ||
-                                          Object.keys(selectedItems.annee || {}).length > 0;
+                                          Object.keys(selectedItems.competence || {}).length > 0 ||
+                                          Object.keys(selectedItems.affectation || {}).length > 0;
                     })"
                     x-show="hasSelectedItems"
                     style="position: fixed; top: 10rem; left: 1rem; z-index: 1000;"
@@ -317,8 +356,7 @@
                         color="success"
                         size="lg"
                         class="relative shadow-xl border-2 border-green-400"
-                        
-                         x-on:click="$dispatch('open-modal', { id: 'sauve' })" 
+                        x-on:click="$dispatch('open-modal', { id: 'sauve' })"
                     >
                         <div class="flex items-center space-x-2">
                             <x-filament::icon

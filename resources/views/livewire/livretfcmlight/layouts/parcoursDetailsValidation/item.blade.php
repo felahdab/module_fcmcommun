@@ -1,76 +1,82 @@
 @php
-   $indentation = match($type){
-    'annee' => 'ml-0',
-    'savoirfaire' => 'ml-8',
-    'objectif' => 'ml-12',
-    'default' =>'',
-   };
+    // --- Normalisation des infos ---
+    if (empty($infos) || !is_array($infos)) {
+        $infos = [];
+    }
 
-   // ✅ UNIFORMISER LES VARIABLES couleurLigne (pas couleurligne)
-   $couleurActuelle = $couleurLigne ?? $couleurligne ?? 'gray';
+    // Uniformiser les clés selon le type
+    if ($type === 'affectation') {
+        $infos['competences'] = $infos['competences'] ?? [];
+    }
+    if ($type === 'competence') {
+        $infos['competenceSavoirfaires'] = $infos['competenceSavoirfaires'] ?? [];
+    }
+    if ($type === 'savoirfaire') {
+        $infos['objectifs_list'] = $infos['objectifs_list'] ?? [];
+    }
 
-   // ✅ Classes couleur selon couleurLigne uniformisée
-   $colorClasses = match($type) {
-    'annee' => 'fcm-item-' . $couleurActuelle,
-    'savoirfaire' => 'fcm-item-' . $couleurActuelle,
-    'objectif' => 'fcm-item-' . $couleurActuelle,
-    default => ''
-   };
+    // Variables communes
+    $indentation = match($type){
+        'affectation' => 'ml-0',
+        'competence' => 'ml-4',
+        'savoirfaire' => 'ml-8',
+        'objectif' => 'ml-12',
+        default => '',
+    };
+    $couleurActuelle = $couleurLigne ?? 'gray';
+    $colorClasses = 'fcm-item-' . $couleurActuelle;
+    $textColorClasses = 'fcm-text-' . $couleurActuelle;
 
-   $textColorClasses = match($type) {
-    'annee' => 'fcm-text-' . $couleurActuelle,
-    'savoirfaire' => 'fcm-text-' . $couleurActuelle,
-    'objectif' => 'fcm-text-' . $couleurActuelle,
-    default => ''
-   };
+    $isChecked = $etatValid ?? false;
+    $isProposed = !empty($dateProposition);
+    $sectionId = $type.'_'.$uuid;
+    $tooltipText = !empty($libelleLong) ? $libelleLong : $label;
 
-   $isChecked = $etatValid ?? false;
-   $isProposed = !empty($dateProposition);
-   $duree = (($type === 'objectif') ? $infos['coeff'] :'');
-   $sectionId = $type.'_'.$uuid;
-   $tooltipText = !empty($libelleLong) ? $libelleLong : $label;
+    // ✅ CODE BADGE POUR TOUS LES TYPES
+    $codeElement = $code ?? match($type) {
+        'affectation' => "AFF{$id}",
+        'competence' => "C{$id}",
+        'objectif' => "OBJ{$id}",
+        default => $infos['code'] ?? ''
+    };
 
-   $codeElement ='';
-   if ($type === 'objectif') {
-    $codeElement= $code ?? $infos['code'] ?? '';
-   }
+    // Spécifique aux savoir-faire
+    if ($type === 'savoirfaire') {
+        $competenceCode = $infos['competence_code'] ?? 'COMP';
+        $competenceColor = $infos['competence_color'] ?? 'gray';
+        $savoirfaireTypeCode = $infos['savoirfaire_type_code'] ?? 'C';
+        $savoirfaireTypeColor = $infos['savoirfaire_type_color'] ?? 'info';
+        $isCompagnonnage = $savoirfaireTypeCode === 'C';
 
-   // ✅ DONNÉES SPÉCIFIQUES AUX SAVOIR-FAIRE
-   if ($type === 'savoirfaire') {
-       $competenceCode = $infos['competence_code'] ?? 'COMP';
-       $competenceColor = $infos['competence_color'] ?? 'gray';
-       $savoirfaireTypeCode = $infos['savoirfaire_type_code'] ?? 'C';
-       $savoirfaireTypeColor = $infos['savoirfaire_type_color'] ?? 'info';
-       $isCompagnonnage = $savoirfaireTypeCode === 'C';
+        $objectifs = $infos['objectifs_list'] ?? [];
+        $totalObjectifs = count($objectifs);
+        $objectifsValides = collect($objectifs)->where('etat_valid', true)->count();
+        $pourcentage = $totalObjectifs > 0 ? round(($objectifsValides / $totalObjectifs) * 100) : 0;
 
-       // ✅ RÉCUPÉRER LES VRAIS OBJECTIFS DEPUIS LES INFOS PASSÉES
-       $objectifs = $infos['objectifs_list'] ?? []; // ✅ Nouvelle clé pour la liste
-       $totalObjectifs = count($objectifs);
-       $objectifsValides = collect($objectifs)->where('etat_valid', true)->count();
-       $pourcentage = $totalObjectifs > 0 ? round(($objectifsValides / $totalObjectifs) * 100) : 0;
+        $libelleLongTronque = strlen($libelleLong ?? '') > 50 ? substr($libelleLong, 0, 47) . '...' : ($libelleLong ?? '');
+        $hasObjectifs = $isCompagnonnage && $totalObjectifs > 0;
+    } else {
+        $hasObjectifs = false;
+    }
 
-       // Libellé court tronqué
-       $libelleLongTronque = strlen($libelleLong ?? '') > 50 ? substr($libelleLong, 0, 47) . '...' : ($libelleLong ?? '');
-
-       // ✅ Vérifier s'il y a des objectifs
-       $hasObjectifs = $isCompagnonnage && $totalObjectifs > 0;
-   } else {
-       $hasObjectifs = false;
-   }
+    // Déterminer si on doit afficher le chevron
+    $showChevron = (
+        ($type === 'affectation' && !empty($infos['competences'])) ||
+        ($type === 'competence' && !empty($infos['competenceSavoirfaires'])) ||
+        ($type === 'savoirfaire' && $hasObjectifs)
+    );
 @endphp
 
-{{-- ✅ CLÉ UNIQUE QUI CHANGE SELON L'ÉTAT --}}
 <div class="flex items-center justify-between mt1 mb1 {{ $indentation }} {{ $colorClasses }}"
-    wire:key="item-{{ $uuid }}-{{ $isChecked ? 'checked' : 'unchecked' }}-{{ $isProposed ? 'proposed' : 'normal' }}"
-    x-data="{
-        isSelected() {
-            return selectedItems['{{$type}}'] && selectedItems['{{$type}}']['{{$uuid}}'];
-        }
-    }">
+     wire:key="item-{{ $uuid }}-{{ $isChecked ? 'checked' : 'unchecked' }}-{{ $isProposed ? 'proposed' : 'normal' }}"
+     x-data="{
+         isSelected() {
+             return selectedItems['{{$type}}'] && selectedItems['{{$type}}']['{{$uuid}}'];
+         }
+     }">
 
     <div class="flex items-center space-x-2">
-
-        {{-- ✅ ICÔNE DE VALIDATION --}}
+        {{-- Icône validation --}}
         @if($isChecked)
             <x-filament::icon-button
                 size="lg"
@@ -80,24 +86,22 @@
                 class="tree-checkbox"/>
         @endif
 
+        {{-- Boutons proposer / sélectionner / attente (savoirfaire + objectif uniquement) --}}
         @if(($type === 'savoirfaire')||($type === 'objectif'))
-
-            {{-- ✅ BOUTON PROPOSER - UNIQUEMENT POUR LES UTILISATEURS (PAS LES ADMINS) --}}
-            @if(!$isChecked && !$isProposed && ($canPropose ?? true))
-                @cannot('fcmcentral::valider_element_parcours')
-                    <x-filament::icon-button
+            @if(!$isChecked && !$isProposed  )
+                @can('fcmcentral::livret.proposer')
+                   3<x-filament::icon-button
                         size="lg"
                         icon="heroicon-o-chat-bubble-left-right"
                         x-on:click="a_proposer = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' };
                             message_du_modal = '{{ $label }}';
                             $dispatch('open-modal', { id: 'propos' })"
                         tooltip="Proposer à la validation"/>
-                @endcannot
+                @endcan
             @endif
 
-            {{-- ✅ BOUTON SÉLECTIONNER - UNIQUEMENT POUR LES ADMINS --}}
-            @if(!$isChecked && !$isProposed)
-                @can('fcmcentral::valider_element_parcours')
+            @if(!$isChecked && !$isProposed )
+                @can('fcmcentral::livret.valider')
                     <button
                         type="button"
                         class="tree-checkbox"
@@ -111,9 +115,8 @@
                 @endcan
             @endif
 
-            {{-- ✅ INDICATEUR EN ATTENTE --}}
-            @if(!$isChecked && $isProposed)
-                @can('fcmcentral::valider_element_parcours')
+            @if(!$isChecked && $isProposed )
+                @can('fcmcentral::livret.valider')
                     <x-filament::icon-button
                         size="lg"
                         color='info'
@@ -130,87 +133,70 @@
             @endif
         @endif
 
-        {{-- ✅ AFFICHAGE SPÉCIAL POUR SAVOIR-FAIRE AVEC BADGES FILAMENT --}}
+        {{-- Libellé selon type --}}
         @if($type === 'savoirfaire')
-            {{-- ✅ Badge compétence Filament --}}
-            {{-- <x-filament::badge
-                size="sm"
-                color="{{ $competenceColor }}"
-                style="margin: 0px 4px 0px 4px;">
-                {{ $competenceCode }}
-            </x-filament::badge> --}}
-
-            {{-- ✅ Badge code savoir-faire --}}
-            <x-filament::badge
-                size="sm"
-                {{-- color="{{ $couleurActuelle }}" --}}
-                color="{{ $competenceColor }}"
-                style="margin: 0px 4px 0px 4px;">
-                {{ $infos['code'] ?? 'SF-' . $uuid }}
-               
+            <x-filament::badge size="sm" color="{{ $couleurLigne }}" style="margin: 0px 4px 0px 4px;">
+                {{ $codeElement }}
             </x-filament::badge>
-
-            {{-- ✅ Badge type savoir-faire Filament --}}
-            <x-filament::badge
-                size="sm"
-                color="{{ $savoirfaireTypeColor }}"
-                style="margin: 0px 4px 0px 4px;">
+            <x-filament::badge size="sm" color="{{ $savoirfaireTypeColor }}" style="margin: 0px 4px 0px 4px;">
                 {{ $savoirfaireTypeCode }}
             </x-filament::badge>
+            <strong class="ml1 {{ $textColorClasses }}" title="{{ $tooltipText }}">{{ $libelleLongTronque }}</strong>
 
-            {{-- Libellé tronqué --}}
-            <strong class="ml1 {{ $textColorClasses }}" title="{{ $tooltipText }}">
-                {{ $libelleLongTronque }}
-            </strong>
-
-            {{-- ✅ Pourcentage d'objectifs validés CORRIGÉ --}}
-            @if ( $isCompagnonnage)
-            <div class="flex items-center ml-2 space-x-2">
-                @if($totalObjectifs > 0)
-                    {{-- ✅ Barre de progression avec couleur de l'année --}}
-                    <div class="w-20 bg-gray-200 rounded-full h-3 border border-gray-300">
-                        <div class="h-3 rounded-full progress-fill-{{ $couleurActuelle }} transition-all duration-300"
-                             style="width: {{ $pourcentage }}%"></div>
-                    </div>
-                   
-                    {{-- ✅ Badge avec le pourcentage --}}
-                    <x-filament::badge
-                        size="xs"
-                        color="{{ $pourcentage == 100 ? 'success' : ($pourcentage > 50 ? 'warning' : 'danger') }}">
-                        {{ $pourcentage }}%
-                    </x-filament::badge>
-                   
-                    {{-- ✅ Détail (validés/total) --}}
-                    <span class="text-xs text-gray-500 font-medium">
-                        ({{ $objectifsValides }}/{{ $totalObjectifs }})
-                    </span>
-                @else
-                    {{-- ✅ Cas où il n'y a pas d'objectifs --}}
-                    <x-filament::badge
-                        size="xs"
-                        color="gray">
-                        Aucun objectif
-                    </x-filament::badge>
-                @endif
-            </div>
+            @if ($isCompagnonnage)
+                <div class="flex items-center ml-2 space-x-2">
+                    @if($totalObjectifs > 0)
+                        <div class="w-20 bg-gray-200 rounded-full h-3 border border-gray-300">
+                            <div class="h-3 rounded-full progress-fill-{{ $couleurActuelle }} transition-all duration-300"
+                                 style="width: {{ $pourcentage }}%"></div>
+                        </div>
+                        <x-filament::badge
+                            size="xs"
+                            color="{{ $pourcentage == 100 ? 'success' : ($pourcentage > 50 ? 'warning' : 'danger') }}">
+                            {{ $pourcentage }}%
+                        </x-filament::badge>
+                        <span class="text-xs text-gray-500 font-medium">({{ $objectifsValides }}/{{ $totalObjectifs }})</span>
+                    @else
+                        <x-filament::badge size="xs" color="gray">Aucun objectif</x-filament::badge>
+                    @endif
+                </div>
             @endif
-
-        @elseif($type === 'annee')
-            {{-- ✅ Badge année avec couleur SANS border doublée --}}
+        @else
+            {{-- ✅ BADGE CODE POUR AFFECTATION / COMPETENCE / OBJECTIF --}}
+            <x-filament::badge size="sm" color="{{ $couleurActuelle }}" style="margin: 0px 4px 0px 4px;">
+                {{ $codeElement }}
+            </x-filament::badge>
             <strong class="ml1 {{ $textColorClasses }}" title="{{ $tooltipText }}">
-                {{ $label }}
+                {{ $label }} 
             </strong>
 
-        @else
-            {{-- Affichage normal pour les objectifs --}}
-            <strong class="ml1 {{ $textColorClasses }}" title="{{ $tooltipText }}"> {{  $codeElement }} {{ $label }}</strong>
         @endif
-
     </div>
 
+
+
+     {{-- ✅ A DROITE AFFICHAGE --}}
     <div class="flex items-center space-x-2">
+
+
+            {{-- ✅ AFFICHAGE HEURES POUR AFFECTATION --}}
+            @if($type === 'affectation')
+                <div class="flex items-center ml-2 space-x-2">
+                    <x-filament::badge size="xs" color="gray">
+                        {{ $heuresValidees ?? 0 }}h / {{ $heuresTotal ?? 0 }}h
+                    </x-filament::badge>
+                    @if(($tauxHeures ?? 0) > 0)
+                        <x-filament::badge
+                            size="xs"
+                            color="{{ $tauxHeures == 100 ? 'success' : ($tauxHeures > 50 ? 'warning' : 'danger') }}">
+                            {{ $tauxHeures }}%
+                        </x-filament::badge>
+                    @endif
+                </div>
+            @endif
+
+        {{-- Boutons infos / dévalider --}}
         @if(($type === 'objectif')||($type === 'savoirfaire'))
-            {{-- BOUTON INFOS --}}
             <x-filament::icon-button
                 size="lg"
                 color="{{ $isChecked ? 'success':'gray' }}"
@@ -221,7 +207,6 @@
                             'uuid': '{{$uuid}}',
                             'libelleCourt': '{{ $libelleCourt }}',
                             'libelleLong': '{{ $libelleLong }}',
-                            'duree': '{{$duree}}',
                             'dateValidation': '{{ $dateValidation ?? '' }}',
                             'valideur': '{{ $valideur ?? 'Inconnu' }}',
                             'commentaire': '{{ $commentaire ?? '' }}'
@@ -229,10 +214,9 @@
                         $dispatch('open-modal', { id: 'infosModal'});"
             />
 
-            {{-- ✅ BOUTON DÉVALIDER - UNIQUEMENT POUR LES ADMINS --}}
-            @if($isChecked || $isProposed)
-                @can('fcmcentral::valider_element_parcours')
-                    <x-filament::icon-button
+            @if($isChecked || $isProposed )
+                @can('fcmcentral::livret.annuler')
+                   4 <x-filament::icon-button
                         size="lg"
                         color="danger"
                         icon="heroicon-s-x-circle"
@@ -245,18 +229,15 @@
             @endif
         @endif
 
-        {{-- ✅ CHEVRON POUR ANNÉES ET SAVOIR-FAIRE AVEC CONTENU --}}
-        @if(
-            ($type === 'annee' && !empty($infos['savoirfaires'] ?? [])) ||
-            ($type === 'savoirfaire' && $hasObjectifs)
-        )
+        {{-- Chevron --}}
+        @if($showChevron)
             <x-filament::icon-button
                 size="lg"
                 color="gray"
                 icon='heroicon-o-chevron-right'
                 x-show="! isOpen('{{ $sectionId }}')"
                 x-on:click="toggleSection('{{ $sectionId }}')"
-                tooltip="{{ $type === 'annee' ? 'Voir les savoir-faire' : 'Voir les objectifs' }} ({{ $type === 'annee' ? count($infos['savoirfaires'] ?? []) : $totalObjectifs }})"
+                tooltip="Voir les éléments"
             />
             <x-filament::icon-button
                 size="lg"
@@ -264,9 +245,8 @@
                 icon='heroicon-o-chevron-down'
                 x-show="isOpen('{{ $sectionId }}')"
                 x-on:click="toggleSection('{{ $sectionId }}')"
-                tooltip="{{ $type === 'annee' ? 'Masquer les savoir-faire' : 'Masquer les objectifs' }}"
+                tooltip="Masquer les éléments"
             />
         @endif
-       
     </div>
 </div>

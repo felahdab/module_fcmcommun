@@ -24,6 +24,6 @@
             'coeff'       => $objectif['coeff'] ?? '',
             'code'        => $objectif['code'] ?? '',
         ],
-        'canPropose'      => true,
+        
     ])
 </li>

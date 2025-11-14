@@ -4,190 +4,163 @@
 namespace Modules\FcmCommun\Services;
 
 use Illuminate\Support\Facades\Log;
-use Carbon\Carbon;
 
-class ReCalculEtatParcoursService
+class CalculHeuresParcoursService
 {
     /**
-     * Point d'entrée principal pour recalculer tous les états de validation
+     * Point d'entrée principal pour mettre à jour toutes les heures dans le JSON
      */
-    public static function recalculerEtats(array &$parcoursMarin): void
+    public static function mettreAJourHeures(array &$parcoursMarin): bool
     {
-        $service = new self();
-        $service->recalculerTousLesEtats($parcoursMarin);
+        return (new self())->mettreAJourHeuresDansJson($parcoursMarin);
     }
 
     /**
-     * ✅ Recalcule tous les états en remontant la hiérarchie (STRUCTURE UNIQUE)
+     * ✅ Mise à jour des heures totales par affectation
      */
-    public function recalculerTousLesEtats(array &$parcoursMarin): void
+    public function mettreAJourHeuresDansJson(array &$parcoursMarin): bool
     {
-        foreach ($parcoursMarin['annees'] as &$annee) {
-            if (isset($annee['savoirfaires'])) {
-                foreach ($annee['savoirfaires'] as &$savoirFaire) {
-                    // ✅ 1. RECALCULER LE SAVOIR-FAIRE basé sur ses OBJECTIFS
-                    $this->recalculerSavoirfaireAvecObjectifs($savoirFaire);
+        try {
+            if (!$this->validerStructure($parcoursMarin)) {
+                return false;
+            }
+
+            foreach ($parcoursMarin['affectations'] as &$affectation) {
+                $heuresValidees = 0;
+                $heuresNonValidees = 0;
+                $heuresTotal = 0;
+
+                foreach ($affectation['competences'] ?? [] as $competence) {
+                    foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
+                        $heures = $this->getHeures($csf);
+                        $heuresTotal += $heures;
+
+                        if ($csf['etat_valid'] ?? false) {
+                            $heuresValidees += $heures;
+                        } else {
+                            $heuresNonValidees += $heures;
+                        }
+                    }
                 }
 
-                // ✅ 2. RECALCULER L'ANNÉE basée sur ses SAVOIR-FAIRES
-                $this->validerSiTousEnfantsSontCoches($annee, 'savoirfaires');
+                // ✅ Mise à jour dans l'affectation
+                $affectation['heures_total'] = round($heuresTotal, 2);
+                $affectation['heures_validees'] = round($heuresValidees, 2);
+                $affectation['heures_non_validees'] = round($heuresNonValidees, 2);
+                $affectation['taux_heures'] = $heuresTotal > 0
+                    ? round(($heuresValidees / $heuresTotal) * 100, 2)
+                    : 0;
+
+                Log::info('Heures calculées pour affectation', [
+                    'uuid' => $affectation['uuid'] ?? 'inconnu',
+                    'total' => $heuresTotal,
+                    'validees' => $heuresValidees,
+                    'taux' => $affectation['taux_heures']
+                ]);
             }
+            unset($affectation);
+
+            // ✅ Calcul global du parcours
+            $parcoursMarin['heures_total'] = $this->calculerHeuresTotal($parcoursMarin);
+            $parcoursMarin['heures_validees'] = $this->calculerHeuresValidees($parcoursMarin);
+            $parcoursMarin['heures_non_validees'] = $parcoursMarin['heures_total'] - $parcoursMarin['heures_validees'];
+            $parcoursMarin['taux_heures'] = $parcoursMarin['heures_total'] > 0
+                ? round(($parcoursMarin['heures_validees'] / $parcoursMarin['heures_total']) * 100, 2)
+                : 0;
+
+            return true;
+
+        } catch (\Exception $e) {
+            Log::error('Erreur calcul heures parcours', ['erreur' => $e->getMessage()]);
+            return false;
         }
     }
 
     /**
-     * ✅ Recalculer un savoir-faire basé sur ses objectifs
+     * ✅ Calcule le total des heures du parcours
      */
-    private function recalculerSavoirfaireAvecObjectifs(array &$savoirFaire): void
+    public function calculerHeuresTotal(array $parcoursMarin): float
     {
-        $objectifs = $this->getObjectifsPourRecalcul($savoirFaire);
+        $total = 0;
 
-        if (empty($objectifs)) {
-            // Pas d'objectifs, garder l'état actuel
-            Log::info('Savoir-faire sans objectifs, état conservé', [
-                'uuid' => $savoirFaire['uuid'] ?? 'inconnu',
-                'type' => $this->getSavoirfaireTypeCode($savoirFaire)
-            ]);
-            return;
-        }
-
-        // ✅ Vérifier si tous les objectifs sont validés
-        $tousValides = true;
-        $datePlusRecente = null;
-        $valideurPlusRecent = null;
-
-        foreach ($objectifs as $objectif) {
-            $etatValid = $objectif['etat_valid'] ?? false;
-            
-            if (!$etatValid) {
-                $tousValides = false;
-                break;
-            }
-
-            // Récupérer la date la plus récente
-            if (isset($objectif['date_validation'])) {
-                $dateObjectif = Carbon::parse($objectif['date_validation']);
-                if ($datePlusRecente === null || $dateObjectif->gt($datePlusRecente)) {
-                    $datePlusRecente = $dateObjectif;
-                    $valideurPlusRecent = $objectif['valideur'] ?? 'Auto-calculé';
-                }
-            }
-        }
-
-        // ✅ Mettre à jour le savoir-faire
-        $savoirFaire['etat_valid'] = $tousValides;
-
-        if ($tousValides && $datePlusRecente) {
-            $savoirFaire['date_validation'] = $datePlusRecente->toDateTimeString();
-            $savoirFaire['valideur'] = $valideurPlusRecent;
-        }
-
-        Log::info('Savoir-faire recalculé', [
-            'uuid' => $savoirFaire['uuid'] ?? 'inconnu',
-            'type' => $this->getSavoirfaireTypeCode($savoirFaire),
-            'etat_valid' => $savoirFaire['etat_valid'],
-            'nb_objectifs' => count($objectifs),
-            'tous_valides' => $tousValides
-        ]);
-    }
-
-    /**
-     * ✅ Récupère le code du type de savoir-faire
-     */
-    private function getSavoirfaireTypeCode(array $savoirfaire): ?string
-    {
-        return $savoirfaire['savoirfaire_type']['code'] ?? 
-               $savoirfaire['savoirfaireType']['code'] ?? 
-               $savoirfaire['type_code'] ?? 
-               'inconnu';
-    }
-
-    /**
-     * ✅ Récupère les objectifs pour le recalcul
-     */
-    private function getObjectifsPourRecalcul(array $savoirFaire): array
-    {
-        // ✅ Objectifs directement dans le savoir-faire
-        if (isset($savoirFaire['objectifs']) && is_array($savoirFaire['objectifs'])) {
-            return $savoirFaire['objectifs'];
-        }
-
-        // ✅ Objectifs via pivot ID
-        $pivotId = $savoirFaire['pivot']['id'] ?? null;
-        if ($pivotId) {
-            try {
-                $anneeSavoirfaire = \Modules\FcmCentral\Models\AnneeSavoirfaire::with('objectifs')
-                    ->find($pivotId);
-                
-                if ($anneeSavoirfaire && $anneeSavoirfaire->objectifs) {
-                    return $anneeSavoirfaire->objectifs->map(function ($objectif) {
-                        return [
-                            'id' => $objectif->id,
-                            'uuid' => $objectif->id,
-                            'etat_valid' => false, // ✅ À adapter selon ta logique de suivi des validations
-                            'date_validation' => null,
-                            'valideur' => null,
-                        ];
-                    })->toArray();
-                }
-            } catch (\Exception $e) {
-                Log::warning("Erreur récupération objectifs pour recalcul pivot {$pivotId}: " . $e->getMessage());
-            }
-        }
-
-        return [];
-    }
-
-    /**
-     * ✅ VALIDATION ENFANTS-PARENTS : Si tous les enfants sont cochés → parent devient valide
-     */
-    protected function validerSiTousEnfantsSontCoches(array &$parent, string $typeEnfants): void
-    {
-        $enfants = $parent[$typeEnfants] ?? [];
-        
-        // Si pas d'enfants, garder l'état actuel
-        if (empty($enfants)) {
-            return;
-        }
-
-        // VÉRIFICATION SI TOUS LES ENFANTS SONT COCHÉS
-        $tousCoches = true;
-        $datePlusRecente = null;
-        $valideurPlusRecent = null;
-
-        foreach ($enfants as $enfant) {
-            // Si un enfant n'est pas coché → parent non valide
-            if (!($enfant['etat_valid'] ?? false)) {
-                $tousCoches = false;
-                break;
-            }
-
-            // Récupérer la date la plus récente
-            if (isset($enfant['date_validation'])) {
-                $dateEnfant = Carbon::parse($enfant['date_validation']);
-                if ($datePlusRecente === null || $dateEnfant->gt($datePlusRecente)) {
-                    $datePlusRecente = $dateEnfant;
-                    $valideurPlusRecent = $enfant['valideur'] ?? 'Auto-calculé';
+        foreach ($parcoursMarin['affectations'] ?? [] as $affectation) {
+            foreach ($affectation['competences'] ?? [] as $competence) {
+                foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
+                    $total += $this->getHeures($csf);
                 }
             }
         }
 
-        // MAJ PARENT
-        $parent['etat_valid'] = $tousCoches;
+        return round($total, 2);
+    }
 
-        // Si tous cochés → ajouter les métadonnées de validation
-        if ($tousCoches && $datePlusRecente) {
-            $parent['date_validation'] = $datePlusRecente->toDateTimeString();
-            $parent['valideur'] = $valideurPlusRecent;
+    /**
+     * ✅ Calcule les heures validées du parcours
+     */
+    public function calculerHeuresValidees(array $parcoursMarin): float
+    {
+        $validees = 0;
+
+        foreach ($parcoursMarin['affectations'] ?? [] as $affectation) {
+            foreach ($affectation['competences'] ?? [] as $competence) {
+                foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
+                    if ($csf['etat_valid'] ?? false) {
+                        $validees += $this->getHeures($csf);
+                    }
+                }
+            }
         }
 
-        // LOG
-        Log::info('Élément recalculé', [
-            'type' => $typeEnfants,
-            'uuid' => $parent['uuid'] ?? 'inconnu',
-            'etat_valid' => $parent['etat_valid'],
-            'nb_enfants' => count($enfants),
-            'tous_coches' => $tousCoches
-        ]);
+        return round($validees, 2);
+    }
+
+    /**
+     * ✅ Récupère les heures d'un competenceSavoirfaire (pivot)
+     */
+    private function getHeures(array $csf): float
+    {
+        // Priorité : heures directement dans le CSF
+        if (isset($csf['heures']) && is_numeric($csf['heures'])) {
+            return (float) $csf['heures'];
+        }
+
+        // Si pas d'heures : essayer de calculer depuis jours (1 jour = 7h)
+        if (isset($csf['jours']) && is_numeric($csf['jours'])) {
+            return (float) $csf['jours'] * 7;
+        }
+
+        // Par défaut : 0
+        return 0;
+    }
+
+    /**
+     * ✅ Valide la structure JSON (affectations > competences > competenceSavoirfaires)
+     */
+    private function validerStructure(array $parcoursMarin): bool
+    {
+        if (!isset($parcoursMarin['affectations']) || !is_array($parcoursMarin['affectations'])) {
+            Log::error('Structure JSON invalide: affectations manquantes');
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * ✅ Calcule tous les indicateurs heures en une fois
+     */
+    public function calculerTousIndicateursHeures(array $parcoursMarin): array
+    {
+        $heuresTotal = $this->calculerHeuresTotal($parcoursMarin);
+        $heuresValidees = $this->calculerHeuresValidees($parcoursMarin);
+
+        return [
+            'heures_total' => $heuresTotal,
+            'heures_validees' => $heuresValidees,
+            'heures_non_validees' => $heuresTotal - $heuresValidees,
+            'taux_heures' => $heuresTotal > 0
+                ? round(($heuresValidees / $heuresTotal) * 100, 2)
+                : 0,
+        ];
     }
 }

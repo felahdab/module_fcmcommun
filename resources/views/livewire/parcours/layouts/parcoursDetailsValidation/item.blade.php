@@ -181,7 +181,7 @@ x-data="{
            
 
             
-            @if(($type === 'activites')||($type === 'savoirfaires'))
+            @if(($type === 'objectifs')||($type === 'savoirfaires'))
             <x-filament::icon-button
                 size="lg"
                 color="{{ $isChecked ?'success':'gray' }}"
@@ -192,7 +192,7 @@ x-data="{
             />
             @endif
 
-            @if(($type === 'fonctions')||($type === 'competences'))
+            @if(($type === 'affectations')||($type === 'competences'))
             {{-- <x-filament::icon-button
                 size="lg"
                  color="{{ $isOpen ?'warning':'info' }}"

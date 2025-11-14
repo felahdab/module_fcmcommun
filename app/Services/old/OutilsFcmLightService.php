@@ -1,10 +1,11 @@
 <?php
+// filepath: Modules/FcmCommun/Services/OutilsFcmLightService.php
 
 namespace Modules\FcmCommun\Services;
 
 use Modules\FcmCentral\Models\SavoirfaireType;
 use Modules\FcmCentral\Models\Competence;
-use Modules\FcmCentral\Models\Annee;
+use Modules\FcmCentral\Models\Affectation;
 use Illuminate\Support\Collection;
 
 class OutilsFcmLightService
@@ -20,9 +21,9 @@ class OutilsFcmLightService
     private static ?Collection $competences = null;
 
     /**
-     * Cache des années pour éviter les requêtes répétées
+     * Cache des affectations pour éviter les requêtes répétées
      */
-    private static ?Collection $annees = null;
+    private static ?Collection $affectations = null;
 
     // ========================================
     // SAVOIR-FAIRE TYPES
@@ -49,7 +50,7 @@ class OutilsFcmLightService
     }
 
     /**
-     * Récupère les informations d'un type pour l'affichage (recherche)
+     * Récupère les informations d'un type pour l'affichage
      */
     public static function getSavoirfaireTypeInfos(int $typeId): array
     {
@@ -109,7 +110,7 @@ class OutilsFcmLightService
     }
 
     /**
-     * Récupère les informations d'une compétence pour l'affichage (recherche)
+     * Récupère les informations d'une compétence pour l'affichage
      */
     public static function getCompetenceInfos(int $competenceId): array
     {
@@ -135,63 +136,63 @@ class OutilsFcmLightService
     }
 
     // ========================================
-    // ANNÉES
+    // AFFECTATIONS
     // ========================================
 
     /**
-     * Récupère toutes les années depuis la base
+     * Récupère toutes les affectations depuis la base
      */
-    public static function getAnnees(): Collection
+    public static function getAffectations(): Collection
     {
-        if (self::$annees === null) {
-            self::$annees = Annee::orderBy('ordre')->get();
+        if (self::$affectations === null) {
+            self::$affectations = Affectation::orderBy('ordre')->get();
         }
        
-        return self::$annees;
+        return self::$affectations;
     }
 
     /**
-     * Récupère une année complète par son ID
+     * Récupère une affectation complète par son ID
      */
-    public static function getAnneeById(int $anneeId): ?Annee
+    public static function getAffectationById(int $affectationId): ?Affectation
     {
-        return self::getAnnees()->firstWhere('id', $anneeId);
+        return self::getAffectations()->firstWhere('id', $affectationId);
     }
 
     /**
-     * Récupère les informations d'une année pour l'affichage (recherche)
+     * Récupère les informations d'une affectation pour l'affichage
      */
-    public static function getAnneeInfos(int $anneeId): array
+    public static function getAffectationInfos(int $affectationId): array
     {
-        $annee = self::getAnneeById($anneeId);
+        $affectation = self::getAffectationById($affectationId);
        
-        if (!$annee) {
+        if (!$affectation) {
             return [
-                'id' => $anneeId,
+                'id' => $affectationId,
                 'code' => 'INCONNU',
                 'color' => 'gray',
-                'libelle_court' => 'Année inconnue',
-                'libelle_long' => 'Année inconnue',
+                'libelle_court' => 'Affectation inconnue',
+                'libelle_long' => 'Affectation inconnue',
                 'ordre' => 999
             ];
         }
 
         return [
-            'id' => $annee->id,
-            'code' => $annee->code ?? "A{$annee->id}",
-            'color' => $annee->color,
-            'libelle_court' => $annee->libelle_court,
-            'libelle_long' => $annee->libelle_long ?? $annee->libelle_court,
-            'ordre' => $annee->ordre
+            'id' => $affectation->id,
+            'code' => $affectation->code ?? "AFF{$affectation->id}",
+            'color' => $affectation->color,
+            'libelle_court' => $affectation->libelle_court,
+            'libelle_long' => $affectation->libelle_long ?? $affectation->libelle_court,
+            'ordre' => $affectation->ordre
         ];
     }
 
     /**
-     * Récupère tous les libellés courts des années indexés par ID
+     * Récupère tous les libellés courts des affectations indexés par ID
      */
-    public static function getAnneeLibellesCourt(): array
+    public static function getAffectationLibellesCourt(): array
     {
-        return self::getAnnees()->pluck('libelle_court', 'id')->toArray();
+        return self::getAffectations()->pluck('libelle_court', 'id')->toArray();
     }
 
     // ========================================
@@ -205,6 +206,6 @@ class OutilsFcmLightService
     {
         self::$savoirfaireTypes = null;
         self::$competences = null;
-        self::$annees = null;
+        self::$affectations = null;
     }
 }

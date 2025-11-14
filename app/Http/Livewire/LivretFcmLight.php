@@ -1,4 +1,5 @@
 <?php
+// filepath: Modules/FcmCommun/Http/Livewire/LivretFcmLight.php
 
 namespace Modules\FcmCommun\Http\Livewire;
 
@@ -10,24 +11,22 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Modules\FcmCommun\DataObjects\Enums\ObjectClasses;
 use Modules\FcmCommun\DataObjects\Enums\UserGeneratedEventTypes;
-use Modules\FcmCommun\Services\OutilsMarinParcoursService;
-use Modules\FcmCommun\Services\OutilsFcmLightService;
+//use Modules\FcmCommun\Services\OutilsMarinParcoursService;
+//use Modules\FcmCommun\Services\OutilsFcmLightService;
 use Modules\FcmCentral\Models\Marin;
 use Modules\FcmCentral\Events\UserGeneratedEvent;
-use Modules\FcmCentral\Traits\FcmAccessControl;
+use Modules\FcmCentral\Traits\FcmPermissionTrait;
 use Modules\FcmCentral\Traits\FilamentPermissionTrait;
 
 class LivretFcmLight extends Component
 {
-    use FcmAccessControl;
+    use FcmPermissionTrait;
     use FilamentPermissionTrait;
-
-
 
     #[Locked]
     public $marinId;
 
-    private OutilsMarinParcoursService $service;
+   // private OutilsMarinParcoursService $service;
 
     // ========================================
     // PROPRIÉTÉS DE FILTRAGE
@@ -35,20 +34,22 @@ class LivretFcmLight extends Component
    
     public string $search = '';
     public string $statutFilter = 'tous';
-    public string $anneeFilter = 'toutes';
+    public string $affectationFilter = 'toutes';
     public string $competenceFilter = 'toutes';
     public string $savoirfaireTypeFilter = 'tous';
 
     protected $queryString = [
         'search' => ['except' => ''],
         'statutFilter' => ['except' => 'tous'],
-        'anneeFilter' => ['except' => 'toutes'],
+        'affectationFilter' => ['except' => 'toutes'],
         'competenceFilter' => ['except' => 'toutes'],
         'savoirfaireTypeFilter' => ['except' => 'tous'],
     ];
 
+    
+
     // ========================================
-    // LIFECYCLE METHODS
+    // INIT
     // ========================================
 
     public function mount(Marin $marin)
@@ -58,11 +59,35 @@ class LivretFcmLight extends Component
 
     public function boot()
     {
-        $this->service = new OutilsMarinParcoursService();
+       // $this->service = new OutilsMarinParcoursService();
     }
 
+
     // ========================================
-    // COMPUTED PROPERTIES - DONNÉES DE BASE
+    // PERMISSIONS
+    // ========================================
+
+    #[Computed]
+    public function canPropose()
+    {
+        return $this->canAccessPermission('livret.proposer');
+    }
+
+    #[Computed]
+    public function canAnnuler()
+    {
+        return $this->canAccessPermission('livret.annuler');
+    }
+
+    #[Computed]
+    public function canValidateElements()
+    {
+        return $this->canAccessPermission('livret.valider');
+    }
+
+
+    // ========================================
+    // DONNÉES DE BASE
     // ========================================
 
     #[Computed]
@@ -94,26 +119,28 @@ class LivretFcmLight extends Component
     }
 
     // ========================================
-    // COMPUTED PROPERTIES - DONNÉES POUR FILTRES
+    // DONNÉES POUR FILTRES
     // ========================================
 
     #[Computed]
-    public function anneesDisponibles()
+    public function affectationsDisponibles()
     {
         if (!$this->parcours) return [];
 
-        $annees = [];
-        foreach ($this->parcours['annees'] ?? [] as $annee) {
-            $anneeId = $annee['id'] ?? $annee['uuid'] ?? null;
+        $affectations = [];
+        foreach ($this->parcours['affectations'] ?? [] as $affectation) {
+            $affectationId = $affectation['id'] ?? $affectation['uuid'] ?? null;
            
-            if ($anneeId && !isset($annees[$anneeId])) {
-                $anneeInfos = OutilsFcmLightService::getAnneeInfos((int)$anneeId);
-                $annees[$anneeId] = $anneeInfos;
+            if ($affectationId && !isset($affectations[$affectationId])) {
+                $affectations[$affectationId] = [
+                    'id' => $affectation['id'],
+                    'libelle_court' => $affectation['libelle_court'] ?? 'Affectation',
+                    'color' => $affectation['color'] ?? 'gray',
+                ];
             }
         }
 
-        uasort($annees, fn($a, $b) => $a['ordre'] <=> $b['ordre']);
-        return $annees;
+        return $affectations;
     }
 
     #[Computed]
@@ -122,13 +149,17 @@ class LivretFcmLight extends Component
         if (!$this->parcours) return [];
 
         $competences = [];
-        foreach ($this->parcours['annees'] ?? [] as $annee) {
-            foreach ($annee['savoirfaires'] ?? [] as $savoirfaire) {
-                $competenceId = $this->getCompetenceId($savoirfaire);
+        foreach ($this->parcours['affectations'] ?? [] as $affectation) {
+            foreach ($affectation['competences'] ?? [] as $competence) {
+                $competenceId = $competence['id'] ?? null;
                
                 if ($competenceId && !isset($competences[$competenceId])) {
-                    $competenceInfos = OutilsFcmLightService::getCompetenceInfos($competenceId);
-                    $competences[$competenceId] = $competenceInfos;
+                    $competences[$competenceId] = [
+                        'id' => $competence['id'],
+                        'code' => $competence['code'] ?? 'COMP',
+                        'libelle_court' => $competence['libelle_court'] ?? '',
+                        'color' => $competence['color'] ?? 'gray',
+                    ];
                 }
             }
         }
@@ -142,80 +173,47 @@ class LivretFcmLight extends Component
     {
         if (!$this->parcours) return [];
 
-        $typesUtilises = [];
+        $types = [];
        
-        foreach ($this->parcours['annees'] ?? [] as $annee) {
-            foreach ($annee['savoirfaires'] ?? [] as $savoirfaire) {
-                $typeId = $this->getSavoirfaireTypeId($savoirfaire);
-               
-                if ($typeId && !isset($typesUtilises[$typeId])) {
-                    $typeInfos = OutilsFcmLightService::getSavoirfaireTypeInfos($typeId);
-                    $typesUtilises[$typeId] = $typeInfos;
+        foreach ($this->parcours['affectations'] ?? [] as $affectation) {
+            foreach ($affectation['competences'] ?? [] as $competence) {
+                foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
+                    $typeCode = $csf['savoirfaire_type']['code'] ?? null;
+                   
+                    if ($typeCode && !isset($types[$typeCode])) {
+                        $types[$typeCode] = [
+                            'code' => $typeCode,
+                            'libelle' => $csf['savoirfaire_type']['libelle_court'] ?? $typeCode,
+                            'color' => $csf['savoirfaire_type']['color'] ?? 'info',
+                        ];
+                    }
                 }
             }
         }
 
-        uasort($typesUtilises, fn($a, $b) => $a['ordre'] <=> $b['ordre']);
-        return $typesUtilises;
+        return $types;
     }
 
-    // ✅ COMPUTED PROPERTIES SIMPLIFIÉES
     
-    #[Computed]
-    public function tousLesSavoirfaireTypes()
-    {
-        return OutilsFcmLightService::getSavoirfaireTypeLibellesCourt();
-    }
 
-    #[Computed]
-    public function toutesLesCompetences()
-    {
-        return OutilsFcmLightService::getCompetences()->pluck('libelle_court', 'id')->toArray();
-    }
-
-    #[Computed]
-    public function toutesLesAnnees()
-    {
-        return OutilsFcmLightService::getAnneeLibellesCourt();
-    }
-
-    #[Computed]
-    public function canPropose()
-    {
-        return $this->canAccessMarinLivret();
-    }
-
-    #[Computed]
-    public function canValidateElements()
-    {
-        return $this->canValidateElements();
-    }
-
-    // ✅ SIMPLIFIÉ - Utilise directement les objectifs du parcours sérialisé
     #[Computed]
     public function savoirFaireChildren()
     {
-        if (!$this->parcours) {
-            return [];
-        }
+        if (!$this->parcours) return [];
 
         $mapping = [];
        
-        foreach ($this->parcours['annees'] ?? [] as $annee) {
-            foreach ($annee['savoirfaires'] ?? [] as $savoirfaire) {
-                $pivotId = $savoirfaire['pivot']['id'] ?? null;
-               
-                if ($pivotId) {
-                    $uniqueUuid = 'pivot_' . $pivotId;
-                    $objectifs = $savoirfaire['objectifs'] ?? []; // ✅ Directement depuis les données
+        foreach ($this->parcours['affectations'] ?? [] as $affectation) {
+            foreach ($affectation['competences'] ?? [] as $competence) {
+                foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
+                    $pivotUuid = $csf['uuid'] ?? ('csf_' . $csf['id']);
                    
-                    // ✅ Créer les UUID des objectifs
                     $objectifUuids = [];
-                    foreach ($objectifs as $objectif) {
-                        $objectifUuids[] = 'obj_' . $pivotId . '_' . $objectif['id'];
+                    foreach ($csf['objectifs'] ?? [] as $objectif) {
+                        $objectifUuids[] = $objectif['uuid'] ?? ('obj_' . $csf['id'] . '_' . $objectif['id']);
                     }
                    
-                    $mapping[$uniqueUuid] = $objectifUuids;
+                    $mapping[$pivotUuid] = $objectifUuids;
                 }
             }
         }
@@ -249,71 +247,23 @@ class LivretFcmLight extends Component
     {
         return !empty($this->search) ||
                $this->statutFilter !== 'tous' ||
-               $this->anneeFilter !== 'toutes' ||
+               $this->affectationFilter !== 'toutes' ||
                $this->competenceFilter !== 'toutes' ||
                $this->savoirfaireTypeFilter !== 'tous';
-    }
-
-    // ========================================
-    // MÉTHODES HELPER POUR EXTRACTION DES IDs
-    // ========================================
-
-    private function getCompetenceId(array $savoirfaire): ?int
-    {
-        $competenceId = $savoirfaire['competence_id'] ??
-                       $savoirfaire['pivot']['competence_id'] ??
-                       null;
-       
-        return $competenceId ? (int)$competenceId : null;
-    }
-
-    private function getSavoirfaireTypeId(array $savoirfaire): ?int
-    {
-        $typeId = $savoirfaire['savoirfaire_type_id'] ??
-                 $savoirfaire['pivot']['savoirfaire_type_id'] ??
-                 null;
-       
-        return $typeId ? (int)$typeId : null;
     }
 
     // ========================================
     // MÉTHODES HELPER POUR AFFICHAGE
     // ========================================
 
-    public function getCompetenceCode(array $savoirfaire): string
+    public function getCompetenceCode(array $csf): string
     {
-        $competenceId = $this->getCompetenceId($savoirfaire);
-        if (!$competenceId) return 'COMP';
-       
-        $competenceInfos = OutilsFcmLightService::getCompetenceInfos($competenceId);
-        return $competenceInfos['code'];
+        return $csf['competence']['code'] ?? 'COMP';
     }
 
-    public function getCompetenceColor(array $savoirfaire): string
+    public function getCompetenceColor(array $csf): string
     {
-        $competenceId = $this->getCompetenceId($savoirfaire);
-        if (!$competenceId) return '#6b7280';
-       
-        $competenceInfos = OutilsFcmLightService::getCompetenceInfos($competenceId);
-        return $competenceInfos['color'];
-    }
-
-    public function getSavoirfaireTypeCode(array $savoirfaire): string
-    {
-        $typeId = $this->getSavoirfaireTypeId($savoirfaire);
-        if (!$typeId) return 'SF';
-       
-        $typeInfos = OutilsFcmLightService::getSavoirfaireTypeInfos($typeId);
-        return $typeInfos['code'];
-    }
-
-    public function getSavoirfaireTypeColor(array $savoirfaire): string
-    {
-        $typeId = $this->getSavoirfaireTypeId($savoirfaire);
-        if (!$typeId) return '#3b82f6';
-       
-        $typeInfos = OutilsFcmLightService::getSavoirfaireTypeInfos($typeId);
-        return $typeInfos['color'];
+        return $csf['competence']['color'] ?? 'gray';
     }
 
     // ========================================
@@ -326,47 +276,29 @@ class LivretFcmLight extends Component
         Log::info("=== FILTRE PAR STATUT: {$statut} ===");
     }
 
-    public function filtrerParAnnee(string $anneeId)
+    public function filtrerParAffectation(string $affectationId)
     {
-        $this->anneeFilter = $anneeId;
-       
-        if ($anneeId !== 'toutes') {
-            $anneeInfos = OutilsFcmLightService::getAnneeInfos((int)$anneeId);
-            Log::info("=== FILTRE PAR ANNÉE: {$anneeId} ({$anneeInfos['libelle_court']}) ===");
-        } else {
-            Log::info("=== FILTRE PAR ANNÉE: TOUTES ===");
-        }
+        $this->affectationFilter = $affectationId;
+        Log::info("=== FILTRE PAR AFFECTATION: {$affectationId} ===");
     }
 
     public function filtrerParCompetence(string $competenceId)
     {
         $this->competenceFilter = $competenceId;
-       
-        if ($competenceId !== 'toutes') {
-            $competenceInfos = OutilsFcmLightService::getCompetenceInfos((int)$competenceId);
-            Log::info("=== FILTRE PAR COMPÉTENCE: {$competenceId} ({$competenceInfos['code']}) ===");
-        } else {
-            Log::info("=== FILTRE PAR COMPÉTENCE: TOUTES ===");
-        }
+        Log::info("=== FILTRE PAR COMPÉTENCE: {$competenceId} ===");
     }
 
-    public function filtrerParSavoirfaireType(string $typeId)
+    public function filtrerParSavoirfaireType(string $typeCode)
     {
-        $this->savoirfaireTypeFilter = $typeId;
-       
-        if ($typeId !== 'tous') {
-            $typeInfos = OutilsFcmLightService::getSavoirfaireTypeInfos((int)$typeId);
-            Log::info("=== FILTRE PAR TYPE SF: {$typeId} ({$typeInfos['code']}) ===");
-        } else {
-            Log::info("=== FILTRE PAR TYPE SF: TOUS ===");
-        }
+        $this->savoirfaireTypeFilter = $typeCode;
+        Log::info("=== FILTRE PAR TYPE SF: {$typeCode} ===");
     }
 
     public function resetAllFilters()
     {
         $this->search = '';
         $this->statutFilter = 'tous';
-        $this->anneeFilter = 'toutes';
+        $this->affectationFilter = 'toutes';
         $this->competenceFilter = 'toutes';
         $this->savoirfaireTypeFilter = 'tous';
     }
@@ -379,78 +311,68 @@ class LivretFcmLight extends Component
     {
         $parcoursFiltre = $parcours;
 
-        if (isset($parcoursFiltre['annees'])) {
-            $anneesFiltrees = [];
+        if (isset($parcoursFiltre['affectations'])) {
+            $affectationsFiltrees = [];
            
-            foreach ($parcoursFiltre['annees'] as $annee) {
-                if (!$this->anneeCorrespondAuFiltre($annee)) {
+            foreach ($parcoursFiltre['affectations'] as $affectation) {
+                if (!$this->affectationCorrespondAuFiltre($affectation)) {
                     continue;
                 }
 
-                $anneeFiltre = $this->filtrerAnnee($annee);
-                if ($anneeFiltre !== null) {
-                    $anneesFiltrees[] = $anneeFiltre;
+                $affectationFiltre = $this->filtrerAffectation($affectation);
+                if ($affectationFiltre !== null) {
+                    $affectationsFiltrees[] = $affectationFiltre;
                 }
             }
            
-            $parcoursFiltre['annees'] = $anneesFiltrees;
+            $parcoursFiltre['affectations'] = $affectationsFiltrees;
         }
 
         return $parcoursFiltre;
     }
 
-    private function anneeCorrespondAuFiltre(array $annee): bool
+    private function affectationCorrespondAuFiltre(array $affectation): bool
     {
-        if ($this->anneeFilter === 'toutes') {
+        if ($this->affectationFilter === 'toutes') {
             return true;
         }
 
-        $anneeId = $annee['id'] ?? $annee['uuid'] ?? '';
-        return (string)$anneeId === $this->anneeFilter;
+        $affectationId = $affectation['id'] ?? $affectation['uuid'] ?? '';
+        return (string)$affectationId === $this->affectationFilter;
     }
 
-    private function filtrerAnnee(array $annee): ?array
+    private function filtrerAffectation(array $affectation): ?array
     {
-        $anneeFiltre = $annee;
-        $savoirfairesFiltres = [];
+        $affectationFiltre = $affectation;
+        $competencesFiltrees = [];
 
-        if (isset($annee['savoirfaires'])) {
-            foreach ($annee['savoirfaires'] as $savoirfaire) {
-                if (!$this->savoirfaireCorrespondAuxFiltresGeneraux($savoirfaire)) {
+        if (isset($affectation['competences'])) {
+            foreach ($affectation['competences'] as $competence) {
+                if (!$this->competenceCorrespondAuxFiltres($competence)) {
                     continue;
                 }
 
-                $savoirfaireFiltre = $this->filtrerSavoirFaire($savoirfaire);
-                if ($savoirfaireFiltre !== null) {
-                    $savoirfairesFiltres[] = $savoirfaireFiltre;
+                $competenceFiltre = $this->filtrerCompetence($competence);
+                if ($competenceFiltre !== null) {
+                    $competencesFiltrees[] = $competenceFiltre;
                 }
             }
         }
 
-        if (empty($savoirfairesFiltres)) {
+        if (empty($competencesFiltrees)) {
             return null;
         }
 
-        $anneeFiltre['savoirfaires'] = $savoirfairesFiltres;
-        return $anneeFiltre;
+        $affectationFiltre['competences'] = $competencesFiltrees;
+        return $affectationFiltre;
     }
 
-    private function savoirfaireCorrespondAuxFiltresGeneraux(array $savoirfaire): bool
+    private function competenceCorrespondAuxFiltres(array $competence): bool
     {
-        // Filtre par compétence
         if ($this->competenceFilter !== 'toutes') {
-            $competenceId = $this->getCompetenceId($savoirfaire);
+            $competenceId = $competence['id'] ?? null;
            
             if ((string)$competenceId !== $this->competenceFilter) {
-                return false;
-            }
-        }
-
-        // Filtre par type de savoir-faire
-        if ($this->savoirfaireTypeFilter !== 'tous') {
-            $typeId = $this->getSavoirfaireTypeId($savoirfaire);
-           
-            if ((string)$typeId !== $this->savoirfaireTypeFilter) {
                 return false;
             }
         }
@@ -458,27 +380,67 @@ class LivretFcmLight extends Component
         return true;
     }
 
-    private function filtrerSavoirFaire(array $savoirfaire): ?array
+    private function filtrerCompetence(array $competence): ?array
     {
-        $savoirfaireCorrespond = $this->elementCorrespondAuxFiltres($savoirfaire, 'savoirfaire');
+        $competenceFiltre = $competence;
+        $csfFiltres = [];
+
+        if (isset($competence['competenceSavoirfaires'])) {
+            foreach ($competence['competenceSavoirfaires'] as $csf) {
+                if (!$this->csfCorrespondAuxFiltresGeneraux($csf)) {
+                    continue;
+                }
+
+                $csfFiltre = $this->filtrerCompetenceSavoirfaire($csf);
+                if ($csfFiltre !== null) {
+                    $csfFiltres[] = $csfFiltre;
+                }
+            }
+        }
+
+        if (empty($csfFiltres)) {
+            return null;
+        }
+
+        $competenceFiltre['competenceSavoirfaires'] = $csfFiltres;
+        return $competenceFiltre;
+    }
+
+    private function csfCorrespondAuxFiltresGeneraux(array $csf): bool
+    {
+        // Filtre par type de savoir-faire
+        if ($this->savoirfaireTypeFilter !== 'tous') {
+            $typeCode = $csf['savoirfaire_type']['code'] ?? null;
+           
+            if ($typeCode !== $this->savoirfaireTypeFilter) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function filtrerCompetenceSavoirfaire(array $csf): ?array
+    {
+        $csfCorrespond = $this->elementCorrespondAuxFiltres($csf, 'savoirfaire');
        
         $objectifsFiltres = [];
-        if (isset($savoirfaire['objectifs'])) {
-            foreach ($savoirfaire['objectifs'] as $objectif) {
+        if (isset($csf['objectifs'])) {
+            foreach ($csf['objectifs'] as $objectif) {
                 if ($this->elementCorrespondAuxFiltres($objectif, 'objectif')) {
                     $objectifsFiltres[] = $objectif;
                 }
             }
         }
 
-        if (!$savoirfaireCorrespond && empty($objectifsFiltres)) {
+        if (!$csfCorrespond && empty($objectifsFiltres)) {
             return null;
         }
 
-        $savoirfaireFiltre = $savoirfaire;
-        $savoirfaireFiltre['objectifs'] = $objectifsFiltres;
+        $csfFiltre = $csf;
+        $csfFiltre['objectifs'] = $objectifsFiltres;
 
-        return $savoirfaireFiltre;
+        return $csfFiltre;
     }
 
     private function elementCorrespondAuxFiltres(array $element, string $type): bool
@@ -505,23 +467,35 @@ class LivretFcmLight extends Component
     private function correspondRecherche(array $element): bool
     {
         $recherche = strtolower(trim($this->search));
-        $texteElement = strtolower(
-            ($element['libelle_court'] ?? '') . ' '
-            .($element['libelle_long'] ?? '') . ' '
-            .($element['code'] ?? '') . ' '
-        );
+        
+        // Pour un savoir-faire, chercher dans savoirfaire.libelle_*
+        $libelleCourt = '';
+        $libelleLong = '';
+        $code = '';
+        
+        if (isset($element['savoirfaire'])) {
+            $libelleCourt = $element['savoirfaire']['libelle_court'] ?? '';
+            $libelleLong = $element['savoirfaire']['libelle_long'] ?? '';
+            $code = $element['savoirfaire']['code'] ?? '';
+        } else {
+            $libelleCourt = $element['libelle_court'] ?? '';
+            $libelleLong = $element['libelle_long'] ?? '';
+            $code = $element['code'] ?? '';
+        }
+        
+        $texteElement = strtolower($libelleCourt . ' ' . $libelleLong . ' ' . $code);
        
         return str_contains($texteElement, $recherche);
     }
 
     private function verifierStatut(array $element): bool
     {
-        $etatValid = ($element['etat_valid'] ?? 0);
+        $etatValid = ($element['etat_valid'] ?? false);
         $dateProposition = $element['date_proposition'] ?? null;
        
         $estValide = ($etatValid === true);
         $estPropose = !empty($dateProposition);
-        $nonValide = ($etatValid == null);
+        $nonValide = !$estValide;
 
         return match($this->statutFilter) {
             'valides' => $estValide,
@@ -541,31 +515,27 @@ class LivretFcmLight extends Component
         $valides = 0;
         $proposes = 0;
 
-        foreach ($this->parcours['annees'] ?? [] as $annee) {
-            foreach ($annee['savoirfaires'] ?? [] as $savoirfaire) {
-                $total++;
-               
-                $etatValid = ($savoirfaire['etat_valid'] ?? 0) == 1;
-                $dateProposition = !empty($savoirfaire['date_proposition']);
-               
-                if ($etatValid) {
-                    $valides++;
-                }
-                if ($dateProposition) {
-                    $proposes++;
-                }
-
-                foreach ($savoirfaire['objectifs'] ?? [] as $objectif) {
+        foreach ($this->parcours['affectations'] ?? [] as $affectation) {
+            foreach ($affectation['competences'] ?? [] as $competence) {
+                foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
                     $total++;
                    
-                    $etatValidObjectif = ($objectif['etat_valid'] ?? 0) == 1;
-                    $datePropositionObjectif = !empty($objectif['date_proposition']);
-                   
-                    if ($etatValidObjectif) {
+                    if ($csf['etat_valid'] ?? false) {
                         $valides++;
                     }
-                    if ($datePropositionObjectif) {
+                    if (!empty($csf['date_proposition'])) {
                         $proposes++;
+                    }
+
+                    foreach ($csf['objectifs'] ?? [] as $objectif) {
+                        $total++;
+                       
+                        if ($objectif['etat_valid'] ?? false) {
+                            $valides++;
+                        }
+                        if (!empty($objectif['date_proposition'])) {
+                            $proposes++;
+                        }
                     }
                 }
             }
@@ -579,14 +549,57 @@ class LivretFcmLight extends Component
         ];
     }
 
+    protected function getStatistiquesGenerales(): array
+    {
+        $parcours = $this->marin->complements_fcm->donnees_du_parcours->parcoursmarin ?? [];
+
+        if (empty($parcours)) {
+            return [
+                'affectations_total' => 0,
+                'affectations_validees' => 0,
+                'heures_total' => 0,
+                'heures_validees' => 0,
+                'taux_heures' => 0,
+            ];
+        }
+
+        $affectationsTotal = count($parcours['affectations'] ?? []);
+        $affectationsValidees = collect($parcours['affectations'] ?? [])
+            ->where('etat_valid', true)
+            ->count();
+
+        // ✅ Calcul des heures totales
+        $heuresTotal = 0;
+        $heuresValidees = 0;
+
+        foreach ($parcours['affectations'] ?? [] as $affectation) {
+            foreach ($affectation['competences'] ?? [] as $competence) {
+                foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
+                    $heures = (float) ($csf['heures'] ?? (($csf['jours'] ?? 0) * 7));
+                    $heuresTotal += $heures;
+
+                    if ($csf['etat_valid'] ?? false) {
+                        $heuresValidees += $heures;
+                    }
+                }
+            }
+        }
+
+        $tauxHeures = $heuresTotal > 0 ? round(($heuresValidees / $heuresTotal) * 100, 2) : 0;
+
+        return [
+            'affectations_total' => $affectationsTotal,
+            'affectations_validees' => $affectationsValidees,
+            'heures_total' => round($heuresTotal, 2),
+            'heures_validees' => round($heuresValidees, 2),
+            'taux_heures' => $tauxHeures,
+        ];
+    }
+
+
     // ========================================
     // MÉTHODES UTILITAIRES
     // ========================================
-
-    public function getSavoirfaireTypeInfos(int $typeId): array
-    {
-        return OutilsFcmLightService::getSavoirfaireTypeInfos($typeId);
-    }
 
     public function escapeForTooltip($text): string
     {
@@ -743,13 +756,12 @@ class LivretFcmLight extends Component
             'parcours' => $this->parcoursFiltre,
             'isCurrentUser' => $this->isCurrentUser,
             'savoirFaireChildren' => $this->savoirFaireChildren,
-            'canPropose' => $this->canPropose,
+            
             'statistiques' => $this->statistiques,
            
-            'anneesDisponibles' => $this->anneesDisponibles,
+            'affectationsDisponibles' => $this->affectationsDisponibles,
             'competencesDisponibles' => $this->competencesDisponibles,
             'savoirfaireTypesDisponibles' => $this->savoirfaireTypesDisponibles,
-            'tousLesSavoirfaireTypes' => $this->tousLesSavoirfaireTypes,
             'hasActiveFilters' => $this->hasActiveFilters,
         ]);
     }

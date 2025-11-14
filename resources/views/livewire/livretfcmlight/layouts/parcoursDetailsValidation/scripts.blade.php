@@ -37,12 +37,10 @@
                 this.debugStructure();
             },
 
-            // ✅ DEBUG POUR COMPRENDRE LA STRUCTURE
             debugStructure() {
                 console.log('=== DEBUG STRUCTURE ===');
                 console.log('savoirFaireChildren:', this.savoirFaireChildren);
                
-                // Analyser les clés pour comprendre le format
                 for (const [key, values] of Object.entries(this.savoirFaireChildren)) {
                     console.log(`Clé: "${key}" → Valeurs:`, values);
                 }
@@ -112,9 +110,67 @@
                     this.handleObjectifToggle(uuid, isNowChecked);
                 } else if (type === 'savoirfaire') {
                     this.handleSavoirFaireToggle(uuid, isNowChecked);
+                } else if (type === 'competence') {
+                    this.handleCompetenceToggle(uuid, isNowChecked);
+                } else if (type === 'affectation') {
+                    this.handleAffectationToggle(uuid, isNowChecked);
                 }
                
                 console.log('Résultat final:', this.selectedItems);
+            },
+
+            // ✅ GESTION DU TOGGLE AFFECTATION (descendant)
+            handleAffectationToggle(affectationUuid, isNowChecked) {
+                console.log(`Affectation ${affectationUuid} ${isNowChecked ? 'COCHÉE' : 'DÉCOCHÉE'}`);
+               
+                const competences = this.getCompetencesAffectation(affectationUuid);
+                console.log(`Compétences de l'affectation ${affectationUuid}:`, competences);
+               
+                competences.forEach(competenceUuid => {
+                    if (isNowChecked) {
+                        if (!this.selectedItems['competence']) this.selectedItems['competence'] = {};
+                        this.selectedItems['competence'][competenceUuid] = true;
+                        console.log(`→ Compétence ${competenceUuid} COCHÉE`);
+                        this.handleCompetenceToggle(competenceUuid, true);
+                    } else {
+                        if (this.selectedItems['competence']?.[competenceUuid]) {
+                            delete this.selectedItems['competence'][competenceUuid];
+                            console.log(`→ Compétence ${competenceUuid} DÉCOCHÉE`);
+                            this.handleCompetenceToggle(competenceUuid, false);
+                        }
+                    }
+                });
+               
+                if (!isNowChecked && this.selectedItems['competence'] && Object.keys(this.selectedItems['competence']).length === 0) {
+                    delete this.selectedItems['competence'];
+                }
+            },
+
+            // ✅ GESTION DU TOGGLE COMPÉTENCE (descendant)
+            handleCompetenceToggle(competenceUuid, isNowChecked) {
+                console.log(`Compétence ${competenceUuid} ${isNowChecked ? 'COCHÉE' : 'DÉCOCHÉE'}`);
+               
+                const savoirfaires = this.getSavoirfairesCompetence(competenceUuid);
+                console.log(`Savoir-faires de la compétence ${competenceUuid}:`, savoirfaires);
+               
+                savoirfaires.forEach(sfUuid => {
+                    if (isNowChecked) {
+                        if (!this.selectedItems['savoirfaire']) this.selectedItems['savoirfaire'] = {};
+                        this.selectedItems['savoirfaire'][sfUuid] = true;
+                        console.log(`→ Savoir-faire ${sfUuid} COCHÉ`);
+                        this.handleSavoirFaireToggle(sfUuid, true);
+                    } else {
+                        if (this.selectedItems['savoirfaire']?.[sfUuid]) {
+                            delete this.selectedItems['savoirfaire'][sfUuid];
+                            console.log(`→ Savoir-faire ${sfUuid} DÉCOCHÉ`);
+                            this.handleSavoirFaireToggle(sfUuid, false);
+                        }
+                    }
+                });
+               
+                if (!isNowChecked && this.selectedItems['savoirfaire'] && Object.keys(this.selectedItems['savoirfaire']).length === 0) {
+                    delete this.selectedItems['savoirfaire'];
+                }
             },
 
             // ✅ GESTION DU TOGGLE SAVOIR-FAIRE (descendant)
@@ -125,107 +181,160 @@
                 console.log(`Enfants du savoir-faire ${savoirfaireUuid}:`, enfants);
                
                 if (isNowChecked) {
-                    // ✅ COCHER tous les objectifs enfants
-                    if (!this.selectedItems['objectif']) {
-                        this.selectedItems['objectif'] = {};
-                    }
+                    if (!this.selectedItems['objectif']) this.selectedItems['objectif'] = {};
                     enfants.forEach(childUuid => {
                         this.selectedItems['objectif'][childUuid] = true;
                         console.log(`→ Objectif ${childUuid} COCHÉ`);
                     });
                 } else {
-                    // ✅ DÉCOCHER tous les objectifs enfants
                     enfants.forEach(childUuid => {
-                        if (this.selectedItems['objectif'] && this.selectedItems['objectif'][childUuid]) {
+                        if (this.selectedItems['objectif']?.[childUuid]) {
                             delete this.selectedItems['objectif'][childUuid];
                             console.log(`→ Objectif ${childUuid} DÉCOCHÉ`);
                         }
                     });
                    
-                    // Nettoyer si plus d'objectifs
                     if (this.selectedItems['objectif'] && Object.keys(this.selectedItems['objectif']).length === 0) {
                         delete this.selectedItems['objectif'];
                     }
                 }
             },
 
-            // ✅ GESTION DU TOGGLE OBJECTIF (remontant) - CORRIGÉ
+            // ✅ GESTION DU TOGGLE OBJECTIF (remontant)
             handleObjectifToggle(objectifUuid, isNowChecked) {
                 console.log(`Objectif ${objectifUuid} ${isNowChecked ? 'COCHÉ' : 'DÉCOCHÉ'}`);
                
-                // ✅ Trouver le savoir-faire parent
                 const parentSavoirFaire = this.findParentSavoirFaire(objectifUuid);
                
                 if (parentSavoirFaire) {
-                    console.log(`Parent trouvé: ${parentSavoirFaire}`);
+                    console.log(`Parent savoir-faire: ${parentSavoirFaire}`);
                    
-                    // ✅ Récupérer TOUS les objectifs de ce savoir-faire
                     const tousLesObjectifs = this.getEnfantsSavoirFaire(parentSavoirFaire);
                     console.log('Tous les objectifs du parent:', tousLesObjectifs);
                    
-                    // ✅ Vérifier si TOUS les objectifs sont maintenant cochés
-                    const allChecked = tousLesObjectifs.every(objUuid => {
-                        const isChecked = this.selectedItems['objectif'] && this.selectedItems['objectif'][objUuid];
-                        console.log(`Objectif ${objUuid}: ${isChecked ? 'COCHÉ' : 'DÉCOCHÉ'}`);
-                        return isChecked;
-                    });
+                    const allChecked = tousLesObjectifs.every(objUuid => 
+                        this.selectedItems['objectif']?.[objUuid]
+                    );
                    
                     console.log('Tous les objectifs cochés?', allChecked);
                    
                     if (allChecked) {
-                        // ✅ COCHER le savoir-faire parent
-                        if (!this.selectedItems['savoirfaire']) {
-                            this.selectedItems['savoirfaire'] = {};
-                        }
+                        if (!this.selectedItems['savoirfaire']) this.selectedItems['savoirfaire'] = {};
                         this.selectedItems['savoirfaire'][parentSavoirFaire] = true;
                         console.log(`→ Savoir-faire parent ${parentSavoirFaire} COCHÉ`);
+                       
+                        // ✅ REMONTER À LA COMPÉTENCE
+                        const parentCompetence = this.findParentCompetence(parentSavoirFaire);
+                        if (parentCompetence) {
+                            this.checkAndToggleCompetence(parentCompetence);
+                        }
                     } else {
-                        // ✅ DÉCOCHER le savoir-faire parent
-                        if (this.selectedItems['savoirfaire'] && this.selectedItems['savoirfaire'][parentSavoirFaire]) {
+                        if (this.selectedItems['savoirfaire']?.[parentSavoirFaire]) {
                             delete this.selectedItems['savoirfaire'][parentSavoirFaire];
                             console.log(`→ Savoir-faire parent ${parentSavoirFaire} DÉCOCHÉ`);
                            
                             if (Object.keys(this.selectedItems['savoirfaire']).length === 0) {
                                 delete this.selectedItems['savoirfaire'];
                             }
+                           
+                            // ✅ DÉCOCHER LA COMPÉTENCE PARENT
+                            const parentCompetence = this.findParentCompetence(parentSavoirFaire);
+                            if (parentCompetence && this.selectedItems['competence']?.[parentCompetence]) {
+                                delete this.selectedItems['competence'][parentCompetence];
+                                this.checkAndToggleAffectation(parentCompetence);
+                            }
                         }
                     }
-                } else {
-                    console.log(`❌ Aucun parent trouvé pour l'objectif ${objectifUuid}`);
                 }
             },
 
-            // ✅ NOUVELLE MÉTHODE POUR TROUVER LE PARENT D'UN OBJECTIF
-            findParentSavoirFaire(objectifUuid) {
-                console.log(`Recherche du parent pour l'objectif: ${objectifUuid}`);
+            // ✅ VÉRIFIER ET TOGGLE COMPÉTENCE SI TOUS SES SF SONT COCHÉS
+            checkAndToggleCompetence(competenceUuid) {
+                const savoirfaires = this.getSavoirfairesCompetence(competenceUuid);
+                const allChecked = savoirfaires.every(sfUuid => this.selectedItems['savoirfaire']?.[sfUuid]);
                
-                // ✅ 1. Chercher dans savoirFaireChildren (mapping pivot → objectifs)
-                for (const [pivotKey, objectifs] of Object.entries(this.savoirFaireChildren)) {
-                    if (objectifs.includes(objectifUuid)) {
-                        console.log(`Trouvé dans pivot ${pivotKey}, recherche du savoir-faire correspondant...`);
-                       
-                        // ✅ 2. Trouver le savoir-faire qui correspond à ce pivot
-                        const savoirfaireUuid = this.findSavoirFaireUuidFromPivot(pivotKey);
-                        if (savoirfaireUuid) {
-                            console.log(`Parent trouvé: ${savoirfaireUuid}`);
-                            return savoirfaireUuid;
+                if (allChecked) {
+                    if (!this.selectedItems['competence']) this.selectedItems['competence'] = {};
+                    this.selectedItems['competence'][competenceUuid] = true;
+                    console.log(`→ Compétence ${competenceUuid} COCHÉE (tous SF cochés)`);
+                   
+                    const parentAffectation = this.findParentAffectation(competenceUuid);
+                    if (parentAffectation) {
+                        this.checkAndToggleAffectation(parentAffectation);
+                    }
+                } else {
+                    if (this.selectedItems['competence']?.[competenceUuid]) {
+                        delete this.selectedItems['competence'][competenceUuid];
+                        console.log(`→ Compétence ${competenceUuid} DÉCOCHÉE (SF manquants)`);
+                    }
+                }
+            },
+
+            // ✅ VÉRIFIER ET TOGGLE AFFECTATION SI TOUTES SES COMPÉTENCES SONT COCHÉES
+            checkAndToggleAffectation(affectationUuid) {
+                const competences = this.getCompetencesAffectation(affectationUuid);
+                const allChecked = competences.every(compUuid => this.selectedItems['competence']?.[compUuid]);
+               
+                if (allChecked) {
+                    if (!this.selectedItems['affectation']) this.selectedItems['affectation'] = {};
+                    this.selectedItems['affectation'][affectationUuid] = true;
+                    console.log(`→ Affectation ${affectationUuid} COCHÉE (toutes compétences cochées)`);
+                } else {
+                    if (this.selectedItems['affectation']?.[affectationUuid]) {
+                        delete this.selectedItems['affectation'][affectationUuid];
+                        console.log(`→ Affectation ${affectationUuid} DÉCOCHÉE (compétences manquantes)`);
+                    }
+                }
+            },
+
+            // ✅ MÉTHODES HELPER POUR TROUVER LES PARENTS
+            findParentAffectation(competenceUuid) {
+                if (!this.parcours?.affectations) return null;
+               
+                for (const affectation of this.parcours.affectations) {
+                    if (affectation.competences?.some(c => c.uuid === competenceUuid)) {
+                        return affectation.uuid;
+                    }
+                }
+                return null;
+            },
+
+            findParentCompetence(savoirfaireUuid) {
+                if (!this.parcours?.affectations) return null;
+               
+                for (const affectation of this.parcours.affectations) {
+                    for (const competence of affectation.competences || []) {
+                        for (const csf of competence.competenceSavoirfaires || []) {
+                            const csfUuid = csf.uuid || `csf_${csf.id}`;
+                            if (csfUuid === savoirfaireUuid) {
+                                return competence.uuid;
+                            }
                         }
                     }
                 }
+                return null;
+            },
+
+            findParentSavoirFaire(objectifUuid) {
+                console.log(`Recherche du parent pour l'objectif: ${objectifUuid}`);
                
-                // ✅ 3. Fallback: chercher directement dans les données du parcours
-                if (this.parcours && this.parcours.annees) {
-                    for (const annee of this.parcours.annees) {
-                        if (annee.savoirfaires) {
-                            for (const sf of annee.savoirfaires) {
-                                if (sf.objectifs) {
-                                    for (const obj of sf.objectifs) {
-                                        const objUuid = obj.uuid || `obj_${sf.pivot?.id}_${obj.id}`;
-                                        if (objUuid === objectifUuid) {
-                                            const sfUuid = sf.uuid + '_' + (sf.pivot?.uuid || sf.pivot?.id || '');
-                                            console.log(`Parent trouvé via parcours: ${sfUuid}`);
-                                            return sfUuid;
-                                        }
+                // ✅ 1. Chercher dans savoirFaireChildren
+                for (const [pivotKey, objectifs] of Object.entries(this.savoirFaireChildren)) {
+                    if (objectifs.includes(objectifUuid)) {
+                        console.log(`Trouvé dans pivot ${pivotKey}`);
+                        return pivotKey;
+                    }
+                }
+               
+                // ✅ 2. Fallback: chercher dans le parcours
+                if (this.parcours?.affectations) {
+                    for (const affectation of this.parcours.affectations) {
+                        for (const competence of affectation.competences || []) {
+                            for (const csf of competence.competenceSavoirfaires || []) {
+                                for (const obj of csf.objectifs || []) {
+                                    const objUuid = obj.uuid || `obj_${csf.id}_${obj.id}`;
+                                    if (objUuid === objectifUuid) {
+                                        return csf.uuid || `csf_${csf.id}`;
                                     }
                                 }
                             }
@@ -233,91 +342,52 @@
                     }
                 }
                
-                console.log(`❌ Aucun parent trouvé pour ${objectifUuid}`);
                 return null;
             },
 
-            // ✅ MÉTHODES HELPER AMÉLIORÉES
-            findSavoirFaireUuidFromPivot(pivotKey) {
-                console.log(`Recherche savoir-faire pour pivot: ${pivotKey}`);
+            // ✅ MÉTHODES HELPER POUR RÉCUPÉRER LES ENFANTS
+            getCompetencesAffectation(affectationUuid) {
+                if (!this.parcours?.affectations) return [];
                
-                if (this.parcours && this.parcours.annees) {
-                    for (const annee of this.parcours.annees) {
-                        if (annee.savoirfaires) {
-                            for (const sf of annee.savoirfaires) {
-                                // ✅ Vérifier différents formats de clé pivot
-                                const pivotId = sf.pivot?.id?.toString();
-                                const pivotUuid = sf.pivot?.uuid?.toString();
-                                const pivotKey1 = `pivot_${pivotId}`;
-                               
-                                if (pivotId === pivotKey ||
-                                    pivotUuid === pivotKey ||
-                                    pivotKey1 === pivotKey ||
-                                    `pivot_${sf.pivot?.id}` === pivotKey) {
-                                   
-                                    const sfUuid = sf.uuid + '_' + (sf.pivot?.uuid || sf.pivot?.id || '');
-                                    console.log(`Savoir-faire trouvé: ${sfUuid} pour pivot ${pivotKey}`);
-                                    return sfUuid;
-                                }
-                            }
-                        }
+                const affectation = this.parcours.affectations.find(a => a.uuid === affectationUuid);
+                return affectation?.competences?.map(c => c.uuid) || [];
+            },
+
+            getSavoirfairesCompetence(competenceUuid) {
+                if (!this.parcours?.affectations) return [];
+               
+                for (const affectation of this.parcours.affectations) {
+                    const competence = affectation.competences?.find(c => c.uuid === competenceUuid);
+                    if (competence) {
+                        return competence.competenceSavoirfaires?.map(csf => csf.uuid || `csf_${csf.id}`) || [];
                     }
                 }
-               
-                console.log(`❌ Aucun savoir-faire trouvé pour pivot ${pivotKey}`);
-                return null;
+                return [];
             },
 
             getEnfantsSavoirFaire(savoirfaireUuid) {
                 console.log(`Recherche enfants pour: ${savoirfaireUuid}`);
                
-                // ✅ 1. Essayer de trouver directement dans savoirFaireChildren
+                // ✅ 1. Essayer savoirFaireChildren
                 if (this.savoirFaireChildren[savoirfaireUuid]) {
-                    console.log('Trouvé directement:', this.savoirFaireChildren[savoirfaireUuid]);
                     return this.savoirFaireChildren[savoirfaireUuid];
                 }
                
-                // ✅ 2. Essayer d'extraire le pivot ID depuis l'UUID
-                const parts = savoirfaireUuid.split('_');
-                if (parts.length >= 2) {
-                    const lastPart = parts[parts.length - 1];
-                    const pivotKey = `pivot_${lastPart}`;
-                   
-                    if (this.savoirFaireChildren[pivotKey]) {
-                        console.log(`Trouvé avec clé pivot ${pivotKey}:`, this.savoirFaireChildren[pivotKey]);
-                        return this.savoirFaireChildren[pivotKey];
-                    }
-                   
-                    if (this.savoirFaireChildren[lastPart]) {
-                        console.log(`Trouvé avec ID ${lastPart}:`, this.savoirFaireChildren[lastPart]);
-                        return this.savoirFaireChildren[lastPart];
-                    }
-                }
-               
-                // ✅ 3. Fallback: chercher dans les données du parcours
-                const enfantsFromParcours = this.findObjectifsFromParcours(savoirfaireUuid);
-                console.log('Trouvé dans parcours:', enfantsFromParcours);
-                return enfantsFromParcours;
-            },
-
-            findObjectifsFromParcours(savoirfaireUuid) {
-                const objectifs = [];
-                if (this.parcours && this.parcours.annees) {
-                    for (const annee of this.parcours.annees) {
-                        if (annee.savoirfaires) {
-                            for (const sf of annee.savoirfaires) {
-                                const sfUuid = sf.uuid + '_' + (sf.pivot?.uuid || sf.pivot?.id || '');
-                                if (sfUuid === savoirfaireUuid && sf.objectifs) {
-                                    sf.objectifs.forEach(obj => {
-                                        const objUuid = obj.uuid || `obj_${sf.pivot?.id}_${obj.id}`;
-                                        objectifs.push(objUuid);
-                                    });
+                // ✅ 2. Fallback: chercher dans le parcours
+                if (this.parcours?.affectations) {
+                    for (const affectation of this.parcours.affectations) {
+                        for (const competence of affectation.competences || []) {
+                            for (const csf of competence.competenceSavoirfaires || []) {
+                                const csfUuid = csf.uuid || `csf_${csf.id}`;
+                                if (csfUuid === savoirfaireUuid) {
+                                    return csf.objectifs?.map(obj => obj.uuid || `obj_${csf.id}_${obj.id}`) || [];
                                 }
                             }
                         }
                     }
                 }
-                return objectifs;
+               
+                return [];
             },
            
             initLivret() {
@@ -326,4 +396,3 @@
         }
     }
 </script>
-
