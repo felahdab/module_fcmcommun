@@ -17,7 +17,7 @@ class Note extends Model
         'marin_id',
         'typenote_id',
         'date',
-        'redacteur',
+        //'redacteur',
         'valide_bcf',
         'lienurl',
         'objet_type',

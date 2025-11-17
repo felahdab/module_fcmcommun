@@ -90,7 +90,7 @@
         @if(($type === 'savoirfaire')||($type === 'objectif'))
             @if(!$isChecked && !$isProposed  )
                 @can('fcmcentral::livret.proposer')
-                   3<x-filament::icon-button
+                   <x-filament::icon-button
                         size="lg"
                         icon="heroicon-o-chat-bubble-left-right"
                         x-on:click="a_proposer = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' };
@@ -102,6 +102,7 @@
 
             @if(!$isChecked && !$isProposed )
                 @can('fcmcentral::livret.valider')
+    
                     <button
                         type="button"
                         class="tree-checkbox"
@@ -216,7 +217,7 @@
 
             @if($isChecked || $isProposed )
                 @can('fcmcentral::livret.annuler')
-                   4 <x-filament::icon-button
+                    <x-filament::icon-button
                         size="lg"
                         color="danger"
                         icon="heroicon-s-x-circle"
