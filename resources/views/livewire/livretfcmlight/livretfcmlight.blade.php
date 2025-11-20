@@ -236,7 +236,7 @@
         
         <div class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-3">
             {{-- Affectations --}}
-            <x-filament::section>
+            {{-- <x-filament::section>
                 <x-slot name="heading">Affectations</x-slot>
                 <div class="text-center">
                     <div class="text-3xl font-bold text-primary-600">
@@ -245,7 +245,7 @@
                     <div class="text-sm text-gray-600">Affectations validées</div>
                 </div>
             </x-filament::section>
-        
+         --}}
             {{-- Heures --}}
             <x-filament::section>
                 <x-slot name="heading">Progression Générale </x-slot>
@@ -259,7 +259,7 @@
             </x-filament::section>
         
             {{-- Autre stat si besoin --}}
-            <x-filament::section>
+            {{-- <x-filament::section>
                 <x-slot name="heading">État global</x-slot>
                 <div class="text-center">
                     <x-filament::badge
@@ -268,7 +268,7 @@
                         {{ $stats['taux_heures'] }}% validé
                     </x-filament::badge>
                 </div>
-            </x-filament::section>
+            </x-filament::section> --}}
         </div>
         
 
