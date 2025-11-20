@@ -53,7 +53,7 @@
         $objectifsValides = collect($objectifs)->where('etat_valid', true)->count();
         $pourcentage = $totalObjectifs > 0 ? round(($objectifsValides / $totalObjectifs) * 100) : 0;
 
-        $libelleLongTronque = strlen($libelleLong ?? '') > 70 ? substr(str_replace(['&amp;#39;','$apos;'],"'",$libelleLong), 0, 67) . '...' : ($libelleLong ?? '');
+        $libelleLongTronque = strlen($libelleLong ?? '') > 70 ? substr(str_replace(['&amp;#39;','$apos;'],"'",$libelleLong), 0, 67) . '...' : (str_replace(['&amp;#39;','$apos;'],"'",$libelleLong) ?? '');
         $hasObjectifs = $isCompagnonnage && $totalObjectifs > 0;
     } else {
         $hasObjectifs = false;
