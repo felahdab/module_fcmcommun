@@ -42,4 +42,17 @@
     .btn-green:hover { background-color: #15803d; border-color: #16a34a; transform: scale(1.05); }
     .btn-green:focus { outline: 2px solid transparent; outline-offset: 2px; box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.5); }
     .btn-green:active { transform: scale(0.98); }
+
+    /* Marron */
+.fcm-item-brown { border-left: 4px solid #8B4513; background-color: rgba(139, 69, 19, 0.08); padding: 8px; border-radius: 4px; }
+.fcm-text-brown { color: #8B4513; font-weight: bold; }
+.fcm-item-brown:hover { background-color: rgba(139, 69, 19, 0.15); }
+.progress-fill-brown { background-color: #8B4513; }
+
+/* Violet */
+.fcm-item-purple { border-left: 4px solid #800080; background-color: rgba(128, 0, 128, 0.08); padding: 8px; border-radius: 4px; }
+.fcm-text-purple { color: #800080; font-weight: bold; }
+.fcm-item-purple:hover { background-color: rgba(128, 0, 128, 0.15); }
+.progress-fill-purple { background-color: #800080; }
+
 </style>
