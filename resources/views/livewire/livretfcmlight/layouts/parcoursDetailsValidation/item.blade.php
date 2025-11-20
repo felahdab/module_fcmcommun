@@ -53,7 +53,7 @@
         $objectifsValides = collect($objectifs)->where('etat_valid', true)->count();
         $pourcentage = $totalObjectifs > 0 ? round(($objectifsValides / $totalObjectifs) * 100) : 0;
 
-        $libelleLongTronque = strlen($libelleLong ?? '') > 50 ? substr($libelleLong, 0, 47) . '...' : ($libelleLong ?? '');
+        $libelleLongTronque = strlen($libelleLong ?? '') > 70 ? substr(str_replace(['&amp;#39;','$apos;'],"'",$libelleLong), 0, 67) . '...' : ($libelleLong ?? '');
         $hasObjectifs = $isCompagnonnage && $totalObjectifs > 0;
     } else {
         $hasObjectifs = false;
@@ -168,7 +168,7 @@
                 {{ $codeElement }}
             </x-filament::badge>
             <strong class="ml1 {{ $textColorClasses }}" title="{{ $tooltipText }}">
-                {{ $label }} 
+                {{ str_replace(['&amp;#39;','$apos;'],"'",$label) }} 
             </strong>
 
         @endif

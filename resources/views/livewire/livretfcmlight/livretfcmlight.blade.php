@@ -248,12 +248,13 @@
         
             {{-- Heures --}}
             <x-filament::section>
-                <x-slot name="heading">Progression Générale (Heures)</x-slot>
+                <x-slot name="heading">Progression Générale </x-slot>
                 <div class="text-center">
                     <div class="text-3xl font-bold text-success-600">
-                        {{ $stats['heures_validees'] }}h / {{ $stats['heures_total'] }}h
+                        {{-- {{ $stats['heures_validees'] }}h / {{ $stats['heures_total'] }}h --}}
+                        {{ $stats['taux_heures'] }}% complété
                     </div>
-                    <div class="text-sm text-gray-600">{{ $stats['taux_heures'] }}% complété</div>
+                    <div class="text-sm text-gray-600"></div>
                 </div>
             </x-filament::section>
         

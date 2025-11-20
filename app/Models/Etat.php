@@ -11,9 +11,8 @@ class Etat extends Model
     
     protected $fillable = [
         'uuid',
-        'marin_parcours_id',
-        'raison', 
-        'typeetat_id',
+        'marin_id',
+        'type_etat_id',
         'date_debut',
         'date_fin',
     ];

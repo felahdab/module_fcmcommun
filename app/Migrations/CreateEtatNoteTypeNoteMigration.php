@@ -30,8 +30,8 @@ class CreateEtatNoteTypeNoteMigration extends Migration
         // Creation table FcmCentralTypeNotes
      Schema::create($this->prefix . 'type_notes', function (Blueprint $table) {
         $table->id();
+        $table->string('code')->unique();
         $table->string('libelle_court');
-        $table->string('libelle_long');
         $table->timestamps();
     });
 
@@ -53,7 +53,14 @@ class CreateEtatNoteTypeNoteMigration extends Migration
         $table->timestamps();
     });
 
-   
+    
+    Schema::create($this->prefix .'type_etats', function (Blueprint $table) {
+        $table->id();
+        $table->string('code')->unique(); // ex: en_fcm, en_sedimentation, fin_sedimentation, en_pause, fin_pause
+        $table->string('libelle_court');
+        $table->timestamps();
+    });
+    
 
   
 
@@ -61,11 +68,12 @@ class CreateEtatNoteTypeNoteMigration extends Migration
      Schema::create($this->prefix . 'etats', function (Blueprint $table) use ($default_value) {
         $table->id();
         $table->uuid('uuid')->default($default_value);
-        $table->foreignId('marin_parcours_id')->constrained($this->prefix . 'marin_parcours')->onDelete('cascade');
-        $table->string('raison');
-        $table->date('date_debut')->nullable();
-        $table->date('date_fin')->nullable();
+        $table->foreignId('marin_id')->constrained($this->prefix . 'fcm_marins');
+        $table->foreignId('type_etat_id')->constrained($this->prefix . 'type_etats');
+        $table->dateTime('date_debut');
+        $table->dateTime('date_fin')->nullable();
         $table->timestamps();
+
     });
      }
  
@@ -75,9 +83,11 @@ class CreateEtatNoteTypeNoteMigration extends Migration
      public function down(): void
      {
         // Supp table
+        
         Schema::dropIfExists($this->prefix . 'notes');
-        Schema::dropIfExists($this->prefix . 'typenotes');
+        Schema::dropIfExists($this->prefix . 'type_notes');
         Schema::dropIfExists($this->prefix . 'etats');
+        Schema::dropIfExists($this->prefix . 'type_etats');
      }
  };
  
