@@ -215,8 +215,8 @@
                 x-on:click="infos = {
                             'type': '{{$type}}',
                             'uuid': '{{$uuid}}',
-                            'libelleCourt': '{{ $popupInfos }}',
-                            'libelleLong': '{{ $popupInfos }}',
+                            'intitule': '{{ $popupInfos }}',
+                           
                             'dateValidation': '{{ $dateValidation ?? '' }}',
                             'valideur': '{{ $valideur ?? 'Inconnu' }}',
                             'commentaire': '{{ $commentaire ?? '' }}'
