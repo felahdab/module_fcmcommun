@@ -43,7 +43,7 @@
 
     // PopUp Infos
    
-    $popupInfos = $label;
+    $popupInfos = $libelleLong;
 
     // Spécifique aux savoir-faire
     if ($type === 'savoirfaire') {
@@ -63,7 +63,7 @@
 
         $popupInfos = ($infos['savoirfaire_type_code'] == 'S')
         ? $intitule
-        : $label
+        : $libelleLong
         ;
     
 
