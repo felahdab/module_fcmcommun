@@ -43,7 +43,7 @@
 
     // PopUp Infos
    
-    $popupInfos = (str_replace(['&amp;#39;', '&apos;'], "'", $libelleLong);
+    $popupInfos = str_replace(['&amp;#39;', '&apos;'], "'", $libelleLong);
 
     // Spécifique aux savoir-faire
     if ($type === 'savoirfaire') {
