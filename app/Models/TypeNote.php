@@ -14,7 +14,6 @@ class TypeNote extends Model
     
     protected $fillable = [
         'code',
-        'libelle_long',
         'libelle_court', 
     ];
 
