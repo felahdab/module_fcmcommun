@@ -58,7 +58,7 @@
         $hasObjectifs = $isCompagnonnage && $totalObjectifs > 0;
 
         $popupInfos = (($infos['savoirfaire_type_code']=='S')?
-        str_replace(['&amp;#39;','$apos;'],"'",libelleCourt)
+        str_replace(['&amp;#39;','$apos;'],"'", $libelleCourt)
         :
         strlen($libelleLong ?? '') > 70 ? 
         substr(str_replace(['&amp;#39;','$apos;'],"'",$libelleLong), 0, 67) . '...' : 
