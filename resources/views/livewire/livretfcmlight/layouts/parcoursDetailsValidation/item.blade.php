@@ -62,7 +62,7 @@
         $hasObjectifs = $isCompagnonnage && $totalObjectifs > 0;
 
         $popupInfos = ($infos['savoirfaire_type_code'] == 'S')
-        ? $infos['intitule'] 
+        ? $intitule
         : $libelleLong
         ;
     
