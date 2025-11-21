@@ -45,6 +45,8 @@
    
     $popupInfos = str_replace(['&amp;#39;', '&apos;'], "'", $libelleLong);
 
+    
+
     // Spécifique aux savoir-faire
     if ($type === 'savoirfaire') {
         $competenceCode = $infos['competence_code'] ?? 'COMP';

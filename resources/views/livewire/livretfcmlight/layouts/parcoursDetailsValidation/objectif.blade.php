@@ -7,8 +7,8 @@
         'id'              => $objectif['id'] ?? null,
         'uuid'            => $objectif['uuid'] ?? null, // ✅ Utiliser l'UUID passé ou l'ID
         'label'           => $objectif['libelle_long'] ?? $objectif['libelle_court'] ?? 'Objectif sans nom',
-        'libelleLong'     => $this->escapeForTooltip($objectif['libelle_long'] ?? ''),
-        'libelleLongJs'   => $this->escapeForJs($objectif['libelle_long'] ?? ''),
+        'libelleLong'     => $this->escapeForTooltip($objectif['libelle_long'] ?? $objectif['libelle_court'] ?? 'Objectif sans nom'),
+        'libelleLongJs'   => $this->escapeForJs($objectif['libelle_long'] ?? $objectif['libelle_court'] ?? 'Objectif sans nom'),
         'libelleCourt'    => $objectif['libelle_court'] ?? '',
         'etatValid'       => $objectif['etat_valid'] ?? false,
         'dateValidation'  => $objectif['date_validation'] ?? '',
