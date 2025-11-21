@@ -32,6 +32,7 @@
     $sectionId = $type.'_'.$uuid;
     $tooltipText = !empty($libelleLong) ? $libelleLong : $label;
 
+
     // ✅ CODE BADGE POUR TOUS LES TYPES
     $codeElement = $code ?? match($type) {
         'affectation' => "AFF{$id}",
@@ -55,6 +56,15 @@
 
         $libelleLongTronque = strlen($libelleLong ?? '') > 70 ? substr(str_replace(['&amp;#39;','$apos;'],"'",$libelleLong), 0, 67) . '...' : (str_replace(['&amp;#39;','$apos;'],"'",$libelleLong) ?? '');
         $hasObjectifs = $isCompagnonnage && $totalObjectifs > 0;
+
+        $popupInfos = (($infos['savoirfaire_type_code']=='S')?
+        str_replace(['&amp;#39;','$apos;'],"'",libelleCourt)
+        :
+        strlen($libelleLong ?? '') > 70 ? 
+        substr(str_replace(['&amp;#39;','$apos;'],"'",$libelleLong), 0, 67) . '...' : 
+        (str_replace(['&amp;#39;','$apos;'],"'",$libelleLong) ?? '')
+        );
+
     } else {
         $hasObjectifs = false;
     }
@@ -206,8 +216,8 @@
                 x-on:click="infos = {
                             'type': '{{$type}}',
                             'uuid': '{{$uuid}}',
-                            'libelleCourt': '{{ $libelleCourt }}',
-                            'libelleLong': '{{ $libelleLong }}',
+                            'libelleCourt': '{{ $popupInfos }}',
+                            'libelleLong': '{{ $popupInfos }}',
                             'dateValidation': '{{ $dateValidation ?? '' }}',
                             'valideur': '{{ $valideur ?? 'Inconnu' }}',
                             'commentaire': '{{ $commentaire ?? '' }}'
