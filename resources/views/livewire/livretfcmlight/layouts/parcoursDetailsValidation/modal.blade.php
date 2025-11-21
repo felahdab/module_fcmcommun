@@ -177,7 +177,7 @@ icon="heroicon-o-information-circle"
    
     
    
-   
+    <p><strong>Description : </strong><span x-text="infos['intitule']"></span></p>
    
     <p><strong>Date de validation : </strong><span x-text="infos['dateValidation']"></span></p>
     <p><strong>Validé par : </strong><span x-text="infos['valideur']"></span></p>
