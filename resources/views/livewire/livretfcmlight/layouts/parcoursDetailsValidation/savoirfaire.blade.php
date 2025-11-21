@@ -22,6 +22,9 @@
         'valideur'        => $savoirfaire['valideur'] ?? '',
         'commentaire'     => $savoirfaire['commentaire'] ?? '',
         'couleurLigne'    => $savoirfaire['savoirfaire']['color'],
+        'heures'                   => $savoirfaire['heures'] ?? null,
+        'jours'                    => $savoirfaire['jours'] ?? null,
+        'intitule'                 => $savoirfaire['libelle_court'] ?? '',
         'infos'           => [
             'code'                     => $savoirfaire['savoirfaire']['code'] ?? '',
             'competence_code'          => $this->getCompetenceCode($savoirfaire),
@@ -29,9 +32,7 @@
             'savoirfaire_type_code'    => $savoirfaire['savoirfaire_type']['code'] ?? 'C',
             'savoirfaire_type_color'   => $savoirfaire['savoirfaire_type']['color'] ?? 'info',
             'objectifs_list'           => $objectifsList,
-            'heures'                   => $savoirfaire['heures'] ?? null,
-            'jours'                    => $savoirfaire['jours'] ?? null,
-            'intitule'                 => $savoirfaire['libelle_court'] ?? '',
+            
         ],
         
     ])
