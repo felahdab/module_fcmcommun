@@ -45,8 +45,6 @@
    
     $popupInfos = str_replace(['&amp;#39;', '&apos;'], "'", $libelleLong);
 
-    
-
     // Spécifique aux savoir-faire
     if ($type === 'savoirfaire') {
         $competenceCode = $infos['competence_code'] ?? 'COMP';
@@ -63,7 +61,14 @@
         $libelleLongTronque = strlen($libelleLong ?? '') > 70 ? substr(str_replace(['&amp;#39;','$apos;'],"'",$libelleLong), 0, 67) . '...' : (str_replace(['&amp;#39;','$apos;'],"'",$libelleLong) ?? '');
         $hasObjectifs = $isCompagnonnage && $totalObjectifs > 0;
 
-        
+        $popupInfos = ($infos['savoirfaire_type_code'] == 'S')
+        ? str_replace(['&amp;#39;', '&apos;'], "'", $infos['intitule'] 
+        : str_replace(['&amp;#39;', '&apos;'], "'", $libelleLong) 
+        )
+        :
+           
+             (str_replace(['&amp;#39;', '&apos;'], "'", $libelleLong) ?? '')
+        ;
     
 
     } else {
@@ -215,12 +220,12 @@
                 icon="heroicon-c-information-circle"
                 tooltip="Voir les infos"
                 x-on:click="infos = {
-                           
-                            'intitule': '{{ $popupInfos }}',
-                           
+                            
+                            'libelleCourt': '{{ $popupInfos }}',
+                            'libelleLong': '{{ $popupInfos }}',
                             'dateValidation': '{{ $dateValidation ?? '' }}',
                             'valideur': '{{ $valideur ?? 'Inconnu' }}',
-                           
+                            'commentaire': '{{ $commentaire ?? '' }}'
                         };
                         $dispatch('open-modal', { id: 'infosModal'});"
             />
