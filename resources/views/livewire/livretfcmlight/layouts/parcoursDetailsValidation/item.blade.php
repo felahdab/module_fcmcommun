@@ -216,11 +216,11 @@
                 tooltip="Voir les infos"
                 x-on:click="infos = {
                            
-                            
+                            'intitule': '{{ $popupInfos }}',
                            
                             'dateValidation': '{{ $dateValidation ?? '' }}',
                             'valideur': '{{ $valideur ?? 'Inconnu' }}',
-                            
+                           
                         };
                         $dispatch('open-modal', { id: 'infosModal'});"
             />
