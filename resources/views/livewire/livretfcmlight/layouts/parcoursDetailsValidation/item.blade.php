@@ -214,7 +214,8 @@
                 tooltip="Voir les infos"
                 x-on:click="infos = {
                             
-                            
+                            'libelleCourt': '{{ $popupInfos }}',
+                            'libelleLong': '{{ $popupInfos }}',
                             'dateValidation': '{{ $dateValidation ?? '' }}',
                             'valideur': '{{ $valideur ?? 'Inconnu' }}',
                             'commentaire': '{{ $commentaire ?? '' }}'
