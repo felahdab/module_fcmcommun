@@ -215,13 +215,12 @@
                 icon="heroicon-c-information-circle"
                 tooltip="Voir les infos"
                 x-on:click="infos = {
-                            'type': '{{$type}}',
-                            'uuid': '{{$uuid}}',
-                            'intitule': '{{ $popupInfos }}',
+                           
+                            
                            
                             'dateValidation': '{{ $dateValidation ?? '' }}',
                             'valideur': '{{ $valideur ?? 'Inconnu' }}',
-                            'commentaire': '{{ $commentaire ?? '' }}'
+                            
                         };
                         $dispatch('open-modal', { id: 'infosModal'});"
             />
