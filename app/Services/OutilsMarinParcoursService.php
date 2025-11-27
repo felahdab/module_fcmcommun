@@ -13,6 +13,17 @@ class OutilsMarinParcoursService
     public $savoirfaire = null;
     public $objectif = null;
 
+
+    public function __construct($ppa = null) 
+{
+    if (is_string($ppa))
+    {
+       $ppa = json_decode($ppa, true);
+    }
+    $this->ppa = $ppa;
+}
+
+
     // ========================================
     // MÉTHODES GÉNÉRIQUES AVEC CLOSURE
     // ========================================
