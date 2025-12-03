@@ -41,12 +41,15 @@ class CreateEtatNoteTypeNoteMigration extends Migration
         $table->id();
         $table->uuid('uuid')->default($default_value);
         $table->string('libelle');
-        $table->foreignId('marin_id')->constrained($this->prefix . 'fcm_marins')->onDelete('cascade');
+        //$table->foreignId('marin_id')->constrained($this->prefix . 'fcm_marins')->onDelete('cascade');
+        $table->foreignId('rh_marin_id')->constrained('rh_marins')->onDelete('cascade');
+        //$table->foreignId('marin_id')->constrained('rh_marins')->onDelete('cascade');
         $table->foreignId('type_note_id')->nullable()->constrained($this->prefix . 'type_notes')->onDelete('set null');
         $table->date('date')->nullable();
         //$table->string('redacteur');
-        $table->foreignId('redacteur_id')->nullable()->constrained($this->prefix . 'fcm_marins')->onDelete('set null'); 
-        $table->boolean('valide_bcf')->default(false);
+       // $table->foreignId('redacteur_id')->nullable()->constrained($this->prefix . 'fcm_marins')->onDelete('set null'); 
+       $table->foreignId('redacteur_id')->nullable()->constrained('rh_marins')->onDelete('set null');
+       $table->boolean('valide_bcf')->default(false);
         $table->string('lienurl')->nullable();
         $table->string('objet_type')->nullable();
         $table->integer('objet_id')->default(0);
@@ -68,7 +71,8 @@ class CreateEtatNoteTypeNoteMigration extends Migration
      Schema::create($this->prefix . 'etats', function (Blueprint $table) use ($default_value) {
         $table->id();
         $table->uuid('uuid')->default($default_value);
-        $table->foreignId('marin_id')->constrained($this->prefix . 'fcm_marins');
+        $table->foreignId('rh_marin_id')->constrained('rh_marins')->onDelete('cascade');
+        //$table->foreignId('marin_id')->constrained('rh_marins')->onDelete('cascade');
         $table->foreignId('type_etat_id')->constrained($this->prefix . 'type_etats');
         $table->dateTime('date_debut');
         $table->dateTime('date_fin')->nullable();

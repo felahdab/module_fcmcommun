@@ -14,7 +14,7 @@ class Note extends Model
     protected $fillable = [
         'uuid',
         'libelle',
-        'marin_id',
+        'rh_marin_id',
         'type_note_id',
         'date',
         'redacteur_id',
