@@ -221,6 +221,42 @@ class LivretFcmLight extends Component
         return $mapping;
     }
 
+
+    #[Computed]
+    public function objectifsParSavoirfaire()
+    {
+        if (!$this->parcours) return [];
+
+        $mapping = [];
+
+        foreach ($this->parcours['affectations'] ?? [] as $affectation) {
+            foreach ($affectation['competences'] ?? [] as $competence) {
+                foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
+                    $savoirfaireId = $csf['savoirfaire']['id'] ?? null;
+                
+                    if (!$savoirfaireId) continue;
+
+                    // Initialiser le tableau si nécessaire
+                    if (!isset($mapping[$savoirfaireId])) {
+                        $mapping[$savoirfaireId] = [];
+                    }
+
+                    // Fusionner les objectifs (sans doublons)
+                    foreach ($csf['objectifs'] ?? [] as $objectif) {
+                        $objectifId = $objectif['id'] ?? null;
+                        if ($objectifId && !isset($mapping[$savoirfaireId][$objectifId])) {
+                            $mapping[$savoirfaireId][$objectifId] = $objectif;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Convertir en tableaux indexés
+        return array_map(fn($objectifs) => array_values($objectifs), $mapping);
+    }
+
+
     #[Computed]
     public function isCurrentUser()
     {
@@ -756,7 +792,7 @@ class LivretFcmLight extends Component
             'parcours' => $this->parcoursFiltre,
             'isCurrentUser' => $this->isCurrentUser,
             'savoirFaireChildren' => $this->savoirFaireChildren,
-            
+            'objectifsParSavoirfaire' => $this->objectifsParSavoirfaire, 
             'statistiques' => $this->statistiques,
            
             'affectationsDisponibles' => $this->affectationsDisponibles,

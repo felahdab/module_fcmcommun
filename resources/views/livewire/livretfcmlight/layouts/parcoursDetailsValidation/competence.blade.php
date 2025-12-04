@@ -31,7 +31,7 @@
                 @include('fcmcommun::livewire.livretfcmlight.layouts.parcoursDetailsValidation.savoirfaire', [
                     'parcoursId'   => $parcoursId,
                     'savoirfaire'  => $csf,
-                    
+                    'objectifsParSavoirfaire' => $objectifsParSavoirfaire, // ✅ AJOUT
                     
                 ])
             @endforeach

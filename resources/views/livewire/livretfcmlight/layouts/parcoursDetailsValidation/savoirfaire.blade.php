@@ -1,10 +1,14 @@
-@props(['parcoursId', 'savoirfaire'])
+@props(['parcoursId', 'savoirfaire', 'objectifsParSavoirfaire'])
 
 <li class="mb-2">
     @php
-        // UUID unique pour le savoirfaire-competence lié
         $pivotUuid = $savoirfaire['uuid'] ?? ('csf_' . $savoirfaire['id']);
-        $objectifsList = $savoirfaire['objectifs'] ?? [];
+        $savoirfaireId = $savoirfaire['savoirfaire']['id'] ?? null;
+       
+        // ✅ Récupérer tous les objectifs pour ce savoirfaire_id (Compagnonnage + Stage)
+        $objectifsList = $savoirfaireId && isset($objectifsParSavoirfaire[$savoirfaireId])
+            ? $objectifsParSavoirfaire[$savoirfaireId]
+            : ($savoirfaire['objectifs'] ?? []);
     @endphp
 
     @include('fcmcommun::livewire.livretfcmlight.layouts.parcoursDetailsValidation.item', [
@@ -22,19 +26,17 @@
         'valideur'        => $savoirfaire['valideur'] ?? '',
         'commentaire'     => $savoirfaire['commentaire'] ?? '',
         'couleurLigne'    => $savoirfaire['savoirfaire']['color'],
-        'heures'                   => $savoirfaire['heures'] ?? null,
-        'jours'                    => $savoirfaire['jours'] ?? null,
-        'intitule'                 => $savoirfaire['libelle_court'] ?? '',
+        'heures'          => $savoirfaire['heures'] ?? null,
+        'jours'           => $savoirfaire['jours'] ?? null,
+        'intitule'        => $savoirfaire['libelle_court'] ?? '',
         'infos'           => [
             'code'                     => $savoirfaire['savoirfaire']['code'] ?? '',
             'competence_code'          => $this->getCompetenceCode($savoirfaire),
             'competence_color'         => $this->getCompetenceColor($savoirfaire),
             'savoirfaire_type_code'    => $savoirfaire['savoirfaire_type']['code'] ?? 'C',
             'savoirfaire_type_color'   => $savoirfaire['savoirfaire_type']['color'] ?? 'info',
-            'objectifs_list'           => $objectifsList,
-            
+            'objectifs_list'           => $objectifsList, // ✅ OBJECTIFS FUSIONNÉS
         ],
-        
     ])
 
     @if (!empty($objectifsList))
@@ -50,8 +52,6 @@
                     'parcoursId'   => $parcoursId,
                     'objectif'     => array_merge($objectif, ['uuid' => $objectifUuid]),
                     'couleurLigne' => $savoirfaire['savoirfaire']['color'],
-                    
-
                 ])
             @endforeach
         </ul>
