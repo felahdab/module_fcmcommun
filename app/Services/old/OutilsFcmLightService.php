@@ -3,10 +3,12 @@
 
 namespace Modules\FcmCommun\Services;
 
-use Modules\FcmCentral\Models\SavoirfaireType;
+use Modules\FcmCentral\Models\SavoirfaireType; # TODO: ajuster pour PSR-4
 use Modules\FcmCentral\Models\Competence;
 use Modules\FcmCentral\Models\Affectation;
 use Illuminate\Support\Collection;
+
+# TODO: revoir les dépendances à FcmCentral
 
 class OutilsFcmLightService
 {

@@ -22,7 +22,7 @@ class CreateFcmMarinMigration extends Migration
             $table->foreignId('rh_marin_id')->constrained('rh_marins')->onDelete('cascade');
             
             $table->foreignId('mentor_id')->nullable()->constrained('rh_marins')->onDelete('cascade');
-            $table->unsignedBigInteger('cohorte_id')->nullable()->after('data');
+            $table->unsignedBigInteger('cohorte_id')->nullable();
             $table->foreign('cohorte_id')->references('id')->on('fcmcommun_cohortes')->onDelete('cascade');
             $table->json('data')->nullable();
             $table->timestamps();

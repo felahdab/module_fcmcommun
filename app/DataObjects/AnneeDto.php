@@ -7,7 +7,7 @@ namespace Modules\FcmCommun\DataObjects;
 use Spatie\LaravelData\Data;
 use Illuminate\Support\Collection;
 
-use Modules\FcmCommun\DataObjects\SavoirfaireDto;
+use Modules\FcmCommun\DataObjects\SavoirFaireDto;
 
 class AnneeDto extends Data
 {
@@ -19,7 +19,7 @@ class AnneeDto extends Data
     public ?string $color;
     public array $state = ["checked" => false, "opened" => false];
 
-     /** @var Collection<int, SavoirfaireDto> */
+     /** @var Collection<int, SavoirFaireDto> */
      public Collection $savoirfaires;
     
 }

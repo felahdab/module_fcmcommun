@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 
 use Modules\FcmCommun\DataObjects\ObjectifDto;
 
-class SavoirfaireDto extends Data
+class SavoirFaireDto extends Data
 {
     public int $id;
     public string $savoirfaire_id;

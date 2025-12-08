@@ -9,6 +9,9 @@ use Modules\FcmUnite\Models\FcmMarin as FcmUniteMarin;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Modules\FcmCommun\Database\Factories\CohorteFactory;
 
+# TODO: déplacer les méthodes fcmCentralMarins vers le modele Cohorte de FCMCentral
+# Idem pour fcmUniteMarins vers le modele Cohorte de FcmUnite
+# Vérifier dans les module qu'on utilise le bon modèle.
 
 class Cohorte extends Model
 {

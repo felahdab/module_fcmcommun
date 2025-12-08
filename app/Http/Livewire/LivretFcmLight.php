@@ -18,6 +18,8 @@ use Modules\FcmCentral\Events\UserGeneratedEvent;
 use Modules\FcmCentral\Traits\FcmPermissionTrait;
 use Modules\FcmCentral\Traits\FilamentPermissionTrait;
 
+#TODO: vérifier les dépendances avec FcmCentral et FcmUnite
+
 class LivretFcmLight extends Component
 {
     use FcmPermissionTrait;

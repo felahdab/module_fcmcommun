@@ -18,6 +18,8 @@ use Illuminate\Support\Facades\Log;
 
 use Modules\FcmCommun\Services\OutilsMarinParcoursService;
 
+#TODO: regarder s'il ne vaut pas mieux le passer dans FcmCentral. Même problématique que pour le livretFCM.
+
 class MajPpaMarinfcm implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
