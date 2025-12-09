@@ -5,7 +5,7 @@ namespace Modules\FcmCommun\Services;
 
 use Illuminate\Support\Facades\Log;
 
-class CalculHeuresParcoursService
+class ReCalculEtatParcoursService
 {
     /**
      * Point d'entrée principal pour mettre à jour toutes les heures dans le JSON
