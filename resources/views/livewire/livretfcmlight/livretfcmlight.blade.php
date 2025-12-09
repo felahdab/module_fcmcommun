@@ -335,7 +335,7 @@
            
         {{-- ✅ BOUTON DE VALIDATION FLOTTANT --}}
         <div class="mt-6">
-            @can('fcmcentral::livret.valider')
+            @can($PermissionPrefix . '::livret.valider')
                 <div
                     x-data="{ hasSelectedItems: false }"
                     x-init="$watch('selectedItems', () => {

@@ -28,6 +28,17 @@ class LivretFcmLight extends Component
     #[Locked]
     public $marinId;
 
+    #[Locked]
+    public $Marin;
+
+    #[Locked]
+    public $UserGeneratedEvent;
+
+    #[Locked]
+    public $PermissionPrefix;
+
+
+
    // private OutilsMarinParcoursService $service;
 
     // ========================================
@@ -95,7 +106,7 @@ class LivretFcmLight extends Component
     #[Computed]
     public function marin()
     {
-        return Marin::select(['id', 'uuid', 'nom', 'prenom'])
+        return $this->Marin::select(['id', 'uuid', 'nom', 'prenom'])
             ->with(['complementsFcm:id,rh_marin_id'])
             ->find($this->marinId);
     }
@@ -669,7 +680,7 @@ class LivretFcmLight extends Component
     {
         logger()->info("Dévalider: ", $element_a_devalider);
 
-        $event = new UserGeneratedEvent(
+        $event = new ($this->UserGeneratedEvent)(
             event_type: UserGeneratedEventTypes::ANNUL_ELMT_MARIN_PARCOURS,
             user_uuid: auth()->user()->uuid,
             object_class: ObjectClasses::MARIN,
@@ -712,7 +723,7 @@ class LivretFcmLight extends Component
     {
         logger()->info("Proposer: ", $element_a_proposer);
 
-        $event = new UserGeneratedEvent(
+        $event = new ($this->UserGeneratedEvent)(
             event_type: UserGeneratedEventTypes::PROPOS_ELMT_MARIN_PARCOURS,
             user_uuid: auth()->user()->uuid,
             object_class: ObjectClasses::MARIN,
@@ -735,7 +746,7 @@ class LivretFcmLight extends Component
 
     private function createValidationEvent(string $type, string $uuid, string $commentaire): void
     {
-        $event = new UserGeneratedEvent(
+        $event = new ($this->UserGeneratedEvent)(
             event_type: UserGeneratedEventTypes::VALID_ELMT_MARIN_PARCOURS,
             user_uuid: auth()->user()->uuid,
             object_class: ObjectClasses::MARIN,
