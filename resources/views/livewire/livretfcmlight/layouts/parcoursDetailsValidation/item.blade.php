@@ -101,7 +101,7 @@
         {{-- Boutons proposer / sélectionner / attente (savoirfaire + objectif uniquement) --}}
         @if(($type === 'savoirfaire')||($type === 'objectif'))
             @if(!$isChecked && !$isProposed  )
-                @can('fcmcentral::livret.proposer')
+                @can($PermissionPrefix . 'livret.proposer')
                    <x-filament::icon-button
                         size="lg"
                         icon="heroicon-o-chat-bubble-left-right"
@@ -113,7 +113,7 @@
             @endif
 
             @if(!$isChecked && !$isProposed )
-                @can('fcmcentral::livret.valider')
+                @can($PermissionPrefix . 'livret.valider')
     
                     <button
                         type="button"
@@ -129,7 +129,7 @@
             @endif
 
             @if(!$isChecked && $isProposed )
-                @can('fcmcentral::livret.valider')
+                @can($PermissionPrefix . 'livret.valider')
                     <x-filament::icon-button
                         size="lg"
                         color='info'
@@ -227,7 +227,7 @@
             />
 
             @if($isChecked || $isProposed )
-                @can('fcmcentral::livret.annuler')
+                @can($PermissionPrefix . 'livret.annuler')
                     <x-filament::icon-button
                         size="lg"
                         color="danger"
