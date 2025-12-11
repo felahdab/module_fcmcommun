@@ -44,11 +44,11 @@ class CalculHeuresParcoursService
                 }
 
                 // ✅ Mise à jour dans l'affectation
-                $affectation['heures_total'] = round($heuresTotal, 2);
-                $affectation['heures_validees'] = round($heuresValidees, 2);
-                $affectation['heures_restantes'] = round($heuresTotal - $heuresValidees, 2);
+                $affectation['heures_total'] = round($heuresTotal, 0);
+                $affectation['heures_validees'] = round($heuresValidees, 0);
+                $affectation['heures_restantes'] = round($heuresTotal - $heuresValidees, 0);
                 $affectation['taux_heures'] = $heuresTotal > 0
-                    ? round(($heuresValidees / $heuresTotal) * 100, 2)
+                    ? round(($heuresValidees / $heuresTotal) * 100, 0)
                     : 0;
 
                 // ✅ Cumul pour le taux global
@@ -66,7 +66,7 @@ class CalculHeuresParcoursService
 
             // ✅ CALCUL DU TAUX GLOBAL (tout le parcours)
             $parcoursMarin['taux_global'] = $heuresGlobalTotal > 0
-                ? round(($heuresGlobalValidees / $heuresGlobalTotal) * 100, 2)
+                ? round(($heuresGlobalValidees / $heuresGlobalTotal) * 100, 0)
                 : 0;
 
             Log::info("Taux global calculé", [
@@ -114,4 +114,36 @@ class CalculHeuresParcoursService
 
         return true;
     }
+
+    /**
+     * ✅ Calcul Pourcentage
+     */
+    public static function calculerPourcentageEtatValid(array $parcoursMarin): float
+    {
+        $total = 0;
+        $valid = 0;
+
+        foreach ($parcoursMarin['affectations'] ?? [] as $affectation) {
+            //$total++;
+            //if ($affectation['etat_valid'] ?? false) $valid++;
+
+            foreach ($affectation['competences'] ?? [] as $competence) {
+                //$total++;
+                //if ($competence['etat_valid'] ?? false) $valid++;
+
+                foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
+                    $total++;
+                    if ($csf['etat_valid'] ?? false) $valid++;
+
+                    foreach ($csf['objectifs'] ?? [] as $objectif) {
+                        $total++;
+                        if ($objectif['etat_valid'] ?? false) $valid++;
+                    }
+                }
+            }
+        }
+
+        return $total > 0 ? round(($valid / $total) * 100, 0) : 0;
+    }
+
 }

@@ -634,7 +634,7 @@ class LivretFcmLight extends Component
             }
         }
 
-        $tauxHeures = $heuresTotal > 0 ? round(($heuresValidees / $heuresTotal) * 100, 2) : 0;
+        $tauxHeures =  \Modules\FcmCommun\Services\CalculHeuresParcoursService::calculerPourcentageEtatValid($parcours);
 
         return [
             'affectations_total' => $affectationsTotal,

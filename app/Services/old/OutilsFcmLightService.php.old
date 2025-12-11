@@ -1,7 +1,7 @@
 <?php
 // filepath: Modules/FcmCommun/Services/OutilsFcmLightService.php
 
-namespace Modules\FcmCommun\Services;
+namespace Modules\FcmCommun\Services\old;
 
 use Modules\FcmCentral\Models\SavoirfaireType; # TODO: ajuster pour PSR-4
 use Modules\FcmCentral\Models\Competence;
