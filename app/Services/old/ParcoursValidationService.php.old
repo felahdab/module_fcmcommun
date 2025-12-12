@@ -1,6 +1,6 @@
 <?php
 
-namespace Modules\FcmCommun\Services;
+namespace Modules\FcmCommun\Services\old;
 
 use Modules\FcmCommun\Helpers\HierarchyPropagatorHelper;
 use Modules\FcmCommun\Helpers\HierarchyParentsVerifierHelper;
