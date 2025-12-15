@@ -11,10 +11,6 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Modules\FcmCommun\DataObjects\Enums\ObjectClasses;
 use Modules\FcmCommun\DataObjects\Enums\UserGeneratedEventTypes;
-//use Modules\FcmCommun\Services\OutilsMarinParcoursService;
-//use Modules\FcmCommun\Services\OutilsFcmLightService;
-use Modules\FcmCentral\Models\Marin;
-use Modules\FcmCentral\Events\UserGeneratedEvent;
 use Modules\FcmCentral\Traits\FcmPermissionTrait;
 use Modules\FcmCentral\Traits\FilamentPermissionTrait;
 
@@ -65,9 +61,9 @@ class LivretFcmLight extends Component
     // INIT
     // ========================================
 
-    public function mount(Marin $marin)
+    public function mount()
     {
-        $this->marinId = $marin->id;
+
     }
 
     public function boot()
