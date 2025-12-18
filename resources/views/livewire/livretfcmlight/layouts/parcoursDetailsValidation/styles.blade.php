@@ -14,7 +14,7 @@
     .fcm-item-danger { border-left: 4px solid #ef4444; background-color: rgba(239, 68, 68, 0.1); padding: 8px; border-radius: 4px; }
     .fcm-item-info { border-left: 4px solid #0ea5e9; background-color: rgba(14, 165, 233, 0.1); padding: 8px; border-radius: 4px; }
     .fcm-item-gray { border-left: 4px solid #6b7280; background-color: rgba(107, 114, 128, 0.1); padding: 8px; border-radius: 4px; }
-
+    
     /* Classes de texte */
     .fcm-text-success { color: #10b981; font-weight: bold; }
     .fcm-text-warning { color: #f59e0b; font-weight: bold; }

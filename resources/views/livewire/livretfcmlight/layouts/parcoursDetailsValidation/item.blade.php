@@ -58,7 +58,7 @@
         $objectifsValides = collect($objectifs)->where('etat_valid', true)->count();
         $pourcentage = $totalObjectifs > 0 ? round(($objectifsValides / $totalObjectifs) * 100) : 0;
 
-        $libelleLongTronque = strlen($libelleLong ?? '') > 70 ? substr(str_replace(['&amp;#39;','$apos;'],"'",$libelleLong), 0, 67) . '...' : (str_replace(['&amp;#39;','$apos;'],"'",$libelleLong) ?? '');
+        $libelleLongTronque = (str_replace(['&amp;#39;','$apos;'],"'",$libelleLong) ?? '');
         $hasObjectifs = $isCompagnonnage && $totalObjectifs > 0;
 
         $popupInfos = ($infos['savoirfaire_type_code'] <> 'C')
@@ -100,8 +100,8 @@
 
         {{-- Boutons proposer / sélectionner / attente (savoirfaire + objectif uniquement) --}}
         @if(($type === 'savoirfaire')||($type === 'objectif'))
-            @if(!$isChecked && !$isProposed  )
-                @can($PermissionPrefix . 'livret.proposer')
+            @if(!$isChecked && !$isProposed  ) 
+                @can($PermissionPrefix . '::livret.proposer')
                    <x-filament::icon-button
                         size="lg"
                         icon="heroicon-o-chat-bubble-left-right"
@@ -112,8 +112,8 @@
                 @endcan
             @endif
 
-            @if(!$isChecked && !$isProposed )
-                @can($PermissionPrefix . 'livret.valider')
+            @if(!$isChecked && !$isProposed ) 
+                @can($PermissionPrefix . '::livret.valider')
     
                     <button
                         type="button"
@@ -129,8 +129,8 @@
             @endif
 
             @if(!$isChecked && $isProposed )
-                @can($PermissionPrefix . 'livret.valider')
-                    <x-filament::icon-button
+                @can($PermissionPrefix . '::livret.valider')
+                   <x-filament::icon-button
                         size="lg"
                         color='info'
                         icon="heroicon-s-clock"
@@ -154,7 +154,7 @@
             <x-filament::badge size="sm" color="{{ $savoirfaireTypeColor }}" style="margin: 0px 4px 0px 4px;">
                 {{ $savoirfaireTypeCode }}
             </x-filament::badge>
-            <strong class="ml1 {{ $textColorClasses }}" title="{{ $tooltipText }}">{{ $libelleLongTronque }}</strong>
+            <strong class="ml1 {{ $textColorClasses }}" title="{{ $tooltipText }}"> {{ $libelleLongTronque }}</strong>
 
             @if ($isCompagnonnage)
                 <div class="flex items-center ml-2 space-x-2">
@@ -227,7 +227,7 @@
             />
 
             @if($isChecked || $isProposed )
-                @can($PermissionPrefix . 'livret.annuler')
+                @can($PermissionPrefix . '::livret.annuler')
                     <x-filament::icon-button
                         size="lg"
                         color="danger"
