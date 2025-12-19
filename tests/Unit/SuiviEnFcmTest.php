@@ -14,7 +14,7 @@ beforeEach(function () {
 });
 
 it('has at least 1 Marin to work on', function() {
-    $this->assertTrue(Marin::all()->count() > 0);
+    $this->assertTrue(Marin::count() > 0);
 });
 
 it('can mark a Marin as suivi en FCM', function() {
