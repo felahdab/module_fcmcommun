@@ -6,7 +6,9 @@ use Dompdf\Dompdf;
 use Dompdf\Options;
 use Modules\FcmCentral\Models\Marin;
 use Illuminate\Support\Facades\View;
- 
+
+#TODO: revoir les dépendances au module FcmCentral.
+
 class LivretPdfService
 {
     private $dompdf;

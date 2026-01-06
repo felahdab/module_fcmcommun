@@ -31,17 +31,13 @@ return new class extends Migration
                $table->timestamps();
             });
 
-        // Laision avec table FcmCentralMarins et FcmCohortes
-        Schema::table('fcmcentral_fcm_marins', function (Blueprint $table){
-            $table->unsignedBigInteger('cohorte_id')->nullable()->after('data');
-            $table->foreign('cohorte_id')->references('id')->on('fcmcommun_cohortes')->onDelete('cascade');
-        });
+       
 
-        // Laision avec table FcmUniteMarins et FcmCohortes
-        Schema::table('fcmunite_fcm_marins', function (Blueprint $table){
-            $table->unsignedBigInteger('cohorte_id')->nullable()->after('data');
-            $table->foreign('cohorte_id')->references('id')->on('fcmcommun_cohortes')->onDelete('cascade');
-        });
+        // Liaision avec table FcmUniteMarins et FcmCohortes
+        // Schema::table('fcmunite_fcm_marins', function (Blueprint $table){
+        //     $table->unsignedBigInteger('cohorte_id')->nullable()->after('data');
+        //     $table->foreign('cohorte_id')->references('id')->on('fcmcommun_cohortes')->onDelete('cascade');
+        // });
     }
 
     /**
@@ -49,6 +45,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('fcm_cohortes');
+        Schema::dropIfExists('fcmcommun_cohortes');
     }
 };

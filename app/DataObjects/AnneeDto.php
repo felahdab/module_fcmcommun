@@ -9,15 +9,18 @@ use Illuminate\Support\Collection;
 
 use Modules\FcmCommun\DataObjects\SavoirFaireDto;
 
-class CompetenceDto extends Data
+class AnneeDto extends Data
 {
     public string $id;
+    public string $uuid;
     public string $libelle_long;
     public string $libelle_court;
-    public string $url;
-    public ?string $same;
+    public int $ordre;
+    public ?string $color;
+    public array $state = ["checked" => false, "opened" => false];
 
-    /** @var Collection<int, SavoirFaireDto> */
-    public Collection $savoirfaires;
+     /** @var Collection<int, SavoirFaireDto> */
+     public Collection $savoirfaires;
     
 }
+

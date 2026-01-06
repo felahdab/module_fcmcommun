@@ -6,20 +6,19 @@ use Illuminate\Database\Eloquent\Model;
 
 
 
+
 class TypeNote extends Model
 {
 
 
     
     protected $fillable = [
-        'libelle_long',
+        'code',
         'libelle_court', 
     ];
 
-    public function notes()
-    {
-        return $this->hasMany(Note::class);
-    }
+    
+
 
 
     

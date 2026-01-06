@@ -28,15 +28,23 @@ class CohorteSeeder extends Seeder
         // Creer une cohorte
         Cohorte::create([
             'uuid'      =>  (string) \Illuminate\Support\Str::uuid(),
-            'libelle_court' => '32.1',
-            'libelle_long' => 'BAT DEASM 32.1',
+            'libelle_court' => '22.2',
+            'libelle_long' => 'BAT DEASM 22.2',
         ]);
 
         // Creer une cohorte
         Cohorte::create([
             'uuid'      =>  (string) \Illuminate\Support\Str::uuid(),
-            'libelle_court' => '49.3',
-            'libelle_long' => 'BAT MAN 2.1',
+            'libelle_court' => '23.1',
+            'libelle_long' => 'BAT DEASM 23.1',
+        ]);
+
+
+         // Creer une cohorte
+         Cohorte::create([
+            'uuid'      =>  (string) \Illuminate\Support\Str::uuid(),
+            'libelle_court' => '23.2',
+            'libelle_long' => 'BAT DEASM 23.2',
         ]);
 
     }

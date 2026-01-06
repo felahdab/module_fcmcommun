@@ -10,20 +10,17 @@ class Etat extends Model
 
     
     protected $fillable = [
-        'marin_parcours_id',
-        'raison', 
+        'uuid',
+        'rh_marin_id',
+        'type_etat_id',
         'date_debut',
         'date_fin',
     ];
 
-    public function marinParcours()
-    {
-        return $this->belongsTo(MarinParcours::class,'marin_parcours_id');
-    }
-
-    public function etats()
-    {
-        return $this->hasMany(Etat::class);
-    }
+    
+    protected $casts = [
+        'date_debut' => 'date',
+        'date_fin'=> 'date',
+    ];
     
     }

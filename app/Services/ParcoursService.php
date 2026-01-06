@@ -53,17 +53,17 @@ class ParcoursService
         foreach($dtos_as_array as $arr){
             $arr["text"] = $arr["libelle_long"];
 
-            if (Arr::exists($arr, "fonctions")){
-                $ret = array_merge($ret, $this->generate_node_from_array_by_key($arr, 'fonctions'));
+            if (Arr::exists($arr, "annees")){
+                $ret = array_merge($ret, $this->generate_node_from_array_by_key($arr, 'annees'));
             }
-            elseif (Arr::exists($arr, "competences")){
-                $ret = $this->generate_node_from_array_by_key($arr, 'competences');
-            }
+            // elseif (Arr::exists($arr, "competences")){
+            //     $ret = $this->generate_node_from_array_by_key($arr, 'competences');
+            // }
             elseif (Arr::exists($arr, "savoirfaires")){
                 $ret = $this->generate_node_from_array_by_key($arr, 'savoirfaires');
             }
-            elseif (Arr::exists($arr, "activites")){
-                $ret = $this->generate_node_from_array_by_key($arr, 'activites');
+            elseif (Arr::exists($arr, "objectifs")){
+                $ret = $this->generate_node_from_array_by_key($arr, 'objectifs');
             }
             else {
                 $arr = $this->adjust_node_state($arr);
@@ -91,56 +91,83 @@ class ParcoursService
     }
 
     public function applyChanges(Collection $tous_marinparcours_du_marin, $changes, $commentaire)
-    {
-        foreach($tous_marinparcours_du_marin as $marinparcours){
-            $dto = ParcoursDto::from($marinparcours->parcours);
-            
-            foreach($dto->fonctions as $fonction){
-                foreach($fonction->competences as $competence){
-                    foreach ($competence->savoirfaires as $savoirfaire){
-                        foreach($savoirfaire->activites as $activite){
-                            if (Arr::exists($changes, $activite->id)){
-                                $event = new $this->user_generated_event_class(
-                                    event_type: $changes[$activite->id]["state"]["checked"] == "set" ? "valide_activite" : "invalide_activite",
-                                    user_id: auth()->user()->uuid,
-                                    object_class: "Marin", 
-                                    object_uuid: $marinparcours->marin_id,
-                                    detail: [
-                                        "marinparcours_id" => $marinparcours->id,
-                                        "parcours_id" => $marinparcours->parcours_id,
-                                        "activite_id" => $activite->id,
-                                        "commentaire" => $commentaire
-                                    ]
-                                );
+{
+    foreach($tous_marinparcours_du_marin as $marinparcours){
+        $dto = ParcoursDto::from($marinparcours->parcours);
+       
+        // NOUVELLE STRUCTURE
+        foreach($dto->annees as &$annee){
+           
+            // Validation des années
+            if (Arr::exists($changes, $annee['id'])){
+                $annee['state'] = $changes[$annee['id']]["state"];
+               
+                $event = new $this->user_generated_event_class(
+                    event_type: $changes[$annee['id']]["state"]["checked"] == "set" ? "valide_annee" : "invalide_annee",
+                    user_id: auth()->user()->uuid,
+                    object_class: "Marin",
+                    object_uuid: $marinparcours->marin_id,
+                    detail: [
+                        "marinparcours_id" => $marinparcours->id,
+                        "parcours_id" => $marinparcours->parcours_id,
+                        "annee_id" => $annee['id'],
+                        "commentaire" => $commentaire
+                    ]
+                );
 
-                                event($event);
-                            }
-                        }
+                event($event);
+            }
 
-                        if (Arr::exists($changes, $savoirfaire->id)){
-                            $event = new $this->user_generated_event_class(
-                                event_type: $changes[$savoirfaire->id]["state"]["checked"] == "set" ? "valide_savoirfaire" : "invalide_savoirfaire",
-                                user_id: auth()->user()->uuid,
-                                object_class: "Marin", 
-                                object_uuid: $marinparcours->marin_id,
-                                detail: [
-                                    "marinparcours_id" => $marinparcours->id,
-                                    "parcours_id" => $marinparcours->parcours_id,
-                                    "savoirfaire_id" => $savoirfaire->id,
-                                    "commentaire" => $commentaire
-                                ]
-                            );
+            foreach($annee['savoirfaires'] as &$savoirfaire){
+               
+                if (Arr::exists($changes, $savoirfaire['id'])){
+                    $savoirfaire['state'] = $changes[$savoirfaire['id']]["state"];
+                   
+                    $event = new $this->user_generated_event_class(
+                        event_type: $changes[$savoirfaire['id']]["state"]["checked"] == "set" ? "valide_savoirfaire" : "invalide_savoirfaire",
+                        user_id: auth()->user()->uuid,
+                        object_class: "Marin",
+                        object_uuid: $marinparcours->marin_id,
+                        detail: [
+                            "marinparcours_id" => $marinparcours->id,
+                            "parcours_id" => $marinparcours->parcours_id,
+                            "savoirfaire_id" => $savoirfaire['id'],
+                            "commentaire" => $commentaire
+                        ]
+                    );
 
-                            event($event);
-                        }
+                    event($event);
+                }
 
+                foreach($savoirfaire['objectifs'] as &$objectif){
+                   
+                    if (Arr::exists($changes, $objectif['id'])){
+                        $objectif['state'] = $changes[$objectif['id']]["state"];
+                       
+                        $event = new $this->user_generated_event_class(
+                            event_type: $changes[$objectif['id']]["state"]["checked"] == "set" ? "valide_objectif" : "invalide_objectif",
+                            user_id: auth()->user()->uuid,
+                            object_class: "Marin",
+                            object_uuid: $marinparcours->marin_id,
+                            detail: [
+                                "marinparcours_id" => $marinparcours->id,
+                                "parcours_id" => $marinparcours->parcours_id,
+                                "objectif_id" => $objectif['id'],
+                                "commentaire" => $commentaire
+                            ]
+                        );
+
+                        event($event);
                     }
                 }
             }
-            $marinparcours->parcours=$dto;
-            $marinparcours->save();
         }
+
+        $marinparcours->parcours = $dto->toArray();
+        $marinparcours->save();
     }
+}
+
 
     public function attribuer_parcours_a_un_user($marin, $parcours)
     {

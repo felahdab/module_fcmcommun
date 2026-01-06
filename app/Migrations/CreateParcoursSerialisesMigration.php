@@ -26,6 +26,7 @@ class CreateParcoursSerialisesMigration extends Migration
             $default_value = DB::raw('(UUID())');
         }
 
+        # TODO: revoir cette migration: il ne doit pas y avoir de lien vers fcmcentral_parcours pour le cas de fcmunite.
         Schema::create($this->prefix . 'parcours_serialises', function (Blueprint $table) use ($default_value) {
             //$table->uuid('id')->primary();
             $table->id();
