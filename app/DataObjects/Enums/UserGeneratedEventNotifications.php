@@ -72,6 +72,11 @@ class UserGeneratedEventNotifications
         'title' => 'Reboot Data Event  Marin - Parcours',
         'message' => 'Reboot data event   Marin Parcours au  marin %s .',
     ];
+
+    public const DEFINIR_JALON_FCM = [
+        'title' => 'Jalon Marin FCM',
+        'message' => 'Le marin %s est a un nouveau Jalon.',
+    ];
     
 
     /**

@@ -18,5 +18,6 @@ enum UserGeneratedEventTypes:string
     case VALID_PROPOS_ELMT_MARIN_PARCOURS           = 'valid_propos_elmt_marin_parcours';
     case RESTORE_ELMT_MARIN_PARCOURS                = 'restore_elmt_marin_parcours';
     case REBOOT_ELMT_MARIN_PARCOURS                 = 'reboot_elmt_marin_parcours';
+    case DEFINIR_JALON_FCM                          = 'definir_jalon_fcm';
    
 }
