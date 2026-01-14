@@ -1,3 +1,24 @@
+## 0.1.0 (January 13, 2026)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.10 –> 0.1.0
+- Implements art #665468 : Suppression des Helpers des Test  Unit
+- Implements art #663213 : Modification droits dans item (bug)
+- Implements art #658135 : Travaux modication BCF
+- Le livret de FCM a maintenant comme paramètres la classe Marin, la classe UserGeneratedEvent à utiliser, ainsi que le prefixe (fcmcentral ou fcmunite) à utiliser pour construire les permissions utilisées. Ainsi, le composant peut être utilisé aussi bien depuis FcmCentral que FcmUnite à condition d'adapter ces paramètres.
+- Modifications élémentaires pour régler les discordances PSR-4
+- Modification migration pour eviter dépendances dans le mauvais sens vers FcmUnite et FcmCentral.
+- Bug Modal Infos EAD S
+- Correction bug affichage : SF identique mais type different, objectifs existant mais non affichés
+- Correction bug Notes Etats Marin
+- Refonte MarinResource
+- Bug Note
+- PPA version 2
+- Droits FCM Light
+- Modif nouveau parcours PPA
+- Correction bug affichage filtres
+- Misa a jour LivretFcm, moteur de recherche , filtre
+- Modification Visuel Livret pour suggestion marin en attente
+- Remise en place script Alpine Parents / Enfants  Parcours avec OutilsMArinParcoursService
+
 ## 0.0.10 (August 25, 2025)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.9 –> 0.0.10
 - Adaptation du livret de FCM
