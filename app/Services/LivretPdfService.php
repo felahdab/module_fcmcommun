@@ -1,54 +1,48 @@
 <?php
- 
+
 namespace Modules\FcmCommun\Services;
- 
+
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Modules\FcmCentral\Models\Marin;
 use Illuminate\Support\Facades\View;
 
-#TODO: revoir les dépendances au module FcmCentral.
-
 class LivretPdfService
 {
     private $dompdf;
- 
+
     public function __construct()
     {
         $options = new Options();
-        $options->set('defaultFont', 'Arial');
+        $options->set('defaultFont', 'DejaVu Sans');
         $options->set('isRemoteEnabled', true);
         $options->set('isHtml5ParserEnabled', true);
-        $options->set('debugKeepTemp', true);
+        $options->set('debugKeepTemp', false);
         
-         $this->dompdf = new Dompdf($options);
-
-       // $this->dompdf = new Dompdf();
-
-      
+        $this->dompdf = new Dompdf($options);
     }
- 
+
     public function generatePdf(Marin $marin): string
     {
-        // Préparer les données du marin
         $data = $this->prepareMarinData($marin);
-        
-        // Générer le HTML à partir du template
         $html = View::make('fcmcommun::pdf.livret-fcm', $data)->render();
-        // Configurer et générer le PDF
+        
         $this->dompdf->loadHtml($html);
         $this->dompdf->setPaper('A4', 'portrait');
         $this->dompdf->render();
         
         return $this->dompdf->output();
     }
- 
+
     private function prepareMarinData(Marin $marin): array
     {
         $complementsFcm = $marin->complements_fcm;
         $donneesParcours = $complementsFcm->donnees_du_parcours ?? null;
-        $parcoursMarin = $donneesParcours->parcoursmarin;
- 
+        $parcoursMarin = $donneesParcours->parcoursmarin ?? [];
+
+        // Calculer les statistiques détaillées
+        $stats = $this->calculerStatistiques($parcoursMarin);
+
         return [
             'marin' => $marin,
             'grade' => $marin->grade->libelle_court ?? 'N/A',
@@ -62,43 +56,94 @@ class LivretPdfService
             'taux_stage' => $donneesParcours->taux_stage ?? 0,
             'taux_activite' => $donneesParcours->taux_activite ?? 0,
             'parcours_data' => $parcoursMarin,
-            'date_generation' => now()->format('d/m/Y H:i'),
+            'stats' => $stats,
+            'date_generation' => now()->format('d/m/Y à H:i'),
+            'jalons' => [
+                'sedimentation' => $complementsFcm->date_sedimentation ? \Carbon\Carbon::parse($complementsFcm->date_sedimentation)->format('d/m/Y') : 'Non renseigné',
+                'fcm' => $complementsFcm->date_fcm ? \Carbon\Carbon::parse($complementsFcm->date_fcm)->format('d/m/Y') : 'Non renseigné',
+                'competence' => $complementsFcm->date_competence ? \Carbon\Carbon::parse($complementsFcm->date_competence)->format('d/m/Y') : 'Non renseigné',
+            ],
         ];
     }
- 
-    public function getActivitesValidees($parcours_data): array
+
+    private function calculerStatistiques($parcours_data): array
     {
-        $activites = [];
-        
-        if (!isset($parcours_data['fonctions'])) {
-            return $activites;
-        }
- 
-        foreach ($parcours_data['fonctions'] as $fonction) {
-            if (!isset($fonction['competences'])) continue;
-            
-            foreach ($fonction['competences'] as $competence) {
-                if (!isset($competence['savoirfaires'])) continue;
-                
-                foreach ($competence['savoirfaires'] as $savoirfaire) {
-                    if (!isset($savoirfaire['activites'])) continue;
-                    
-                    foreach ($savoirfaire['activites'] as $activite) {
-                        $activites[] = [
-                            'fonction' => $fonction['libelle_court'] ?? 'N/A',
-                            'competence' => $competence['libelle_court'] ?? 'N/A',
-                            'savoirfaire' => $savoirfaire['libelle_court'] ?? 'N/A',
-                            'activite' => $activite['libelle_court'] ?? 'N/A',
-                            'validee' => $activite['etat_valid'] ?? false,
-                            'commentaire' => $activite['commentaire'] ?? '',
-                            'date_validation' => $activite['date_validation'] ?? null,
-                            'valideur' => $activite['valideur'] ?? 'N/A'
-                        ];
+        $totalSF = 0;
+        $sfValides = 0;
+        $totalObj = 0;
+        $objValides = 0;
+        $totalStages = 0;
+        $stagesValides = 0;
+
+        if (isset($parcours_data['affectations'])) {
+            foreach ($parcours_data['affectations'] as $affectation) {
+                foreach ($affectation['competences'] ?? [] as $competence) {
+                    foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
+                        $totalSF++;
+                        if (($csf['etat_valid'] ?? false) === true) {
+                            $sfValides++;
+                        }
+                        
+                        // Détecter les stages
+                        if (($csf['savoirfaire_type']['code'] ?? null) === 'S') {
+                            $totalStages++;
+                            if (($csf['etat_valid'] ?? false) === true) {
+                                $stagesValides++;
+                            }
+                        }
+                        
+                        foreach ($csf['objectifs'] ?? [] as $objectif) {
+                            $totalObj++;
+                            if (($objectif['etat_valid'] ?? false) === true) {
+                                $objValides++;
+                            }
+                        }
                     }
                 }
             }
         }
-        
-        return $activites;
+
+        return [
+            'total_sf' => $totalSF,
+            'sf_valides' => $sfValides,
+            'total_obj' => $totalObj,
+            'obj_valides' => $objValides,
+            'total_stages' => $totalStages,
+            'stages_valides' => $stagesValides,
+        ];
+    }
+
+    public function getParcoursDetaille($parcours_data): array
+    {
+        $detailles = [];
+
+        if (!isset($parcours_data['affectations'])) {
+            return $detailles;
+        }
+
+        foreach ($parcours_data['affectations'] as $affectation) {
+            foreach ($affectation['competences'] ?? [] as $competence) {
+                foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
+                    $detailles[] = [
+                        'affectation' => $affectation['libelle_court'] ?? 'N/A',
+                        'competence' => $competence['libelle_court'] ?? 'N/A',
+                        'savoirfaire' => $csf['libelle_court'] ?? 'N/A',
+                        'savoirfaireType' => $csf['savoirfaire']['libelle_court'] ?? 'N/A',
+                        'type_sf' => $csf['savoirfaire_type']['code'] ?? 'A',
+                        'sf_valide' => ($csf['etat_valid'] ?? false) === true,
+                        'objectifs' => array_map(function($obj) {
+                            return [
+                                'libelle' => $obj['libelle_court'] ?? 'N/A',
+                                'valide' => ($obj['etat_valid'] ?? false) === true,
+                                'date_validation' => $obj['date_validation'] ?? null,
+                                'commentaire' => $obj['commentaire'] ?? '',
+                            ];
+                        }, $csf['objectifs'] ?? []),
+                    ];
+                }
+            }
+        }
+
+        return $detailles;
     }
 }
