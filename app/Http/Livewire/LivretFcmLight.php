@@ -70,9 +70,22 @@ class LivretFcmLight extends Component
     // ========================================
 
     #[Computed]
-    public function canPropose()
+    public function userEstLeMarin(): bool
     {
-        return auth()->user()->can($this->PermissionPrefix . '::livret.proposer');
+        $currentMarin = ($this->Marin)::fromCurrentUser();
+        if ($currentMarin == null) return false;
+
+        if ($currentMarin->id == $this->marinId) return true;
+
+        return false;
+    }
+    
+
+    #[Computed]
+    public function canProposer()
+    {
+        
+        return auth()->user()->can($this->PermissionPrefix . '::livret.proposer') || $this->userEstLeMarin();
     }
 
     #[Computed]
@@ -82,7 +95,7 @@ class LivretFcmLight extends Component
     }
 
     #[Computed]
-    public function canValidateElements()
+    public function canValider()
     {
         return auth()->user()->can($this->PermissionPrefix . '::livret.valider');
     }
@@ -667,6 +680,12 @@ class LivretFcmLight extends Component
 
     public function devalider(array $element_a_devalider)
     {
+        if ( ! $this->canAnnuler() )
+        {
+            logger()->warning("Un utilisateur n'ayant pas l'autorisation d annuler un élément du parcours a tenté de le faire.");
+            abort(403, 'Vous n avez pas le droit de dévalider des éléments du parcours de FCM.');
+        }
+
         logger()->info("Dévalider: ", $element_a_devalider);
 
         $event = new ($this->UserGeneratedEvent)(
@@ -687,6 +706,12 @@ class LivretFcmLight extends Component
 
     public function valider(array $elements_a_valider, string $commentaire)
     {
+        if ( ! $this->canValider() )
+        {
+            logger()->warning("Un utilisateur n'ayant pas l'autorisation de valider un élément du parcours a tenté de le faire.");
+            abort(403, 'Vous n avez pas le droit de valider des éléments du parcours de FCM.');
+        }
+
         logger()->info("Valider: ", $elements_a_valider);
 
         if (array_key_exists("savoirfaire", $elements_a_valider)){
@@ -710,6 +735,12 @@ class LivretFcmLight extends Component
 
     public function proposer(array $element_a_proposer, string $commentaire)
     {
+        if ( ! $this->canProposer() )
+        {
+            logger()->warning("Un utilisateur n'ayant pas l'autorisation de proposer un élément du parcours a tenté de le faire.");
+            abort(403, 'Vous n avez pas le droit de proposer des éléments du parcours de FCM.');
+        }
+
         logger()->info("Proposer: ", $element_a_proposer);
 
         $event = new ($this->UserGeneratedEvent)(

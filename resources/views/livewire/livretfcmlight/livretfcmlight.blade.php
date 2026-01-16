@@ -335,7 +335,7 @@
            
         {{-- ✅ BOUTON DE VALIDATION FLOTTANT --}}
         <div class="mt-6">
-            @can($PermissionPrefix . '::livret.valider')
+            @if($this->canValider())
                 <div
                     x-data="{ hasSelectedItems: false }"
                     x-init="$watch('selectedItems', () => {
@@ -371,7 +371,7 @@
                         </div>
                     </x-filament::button>
                 </div>
-            @endcan
+            @endif
         </div>
 
         @include('fcmcommun::livewire.livretfcmlight.layouts.parcoursDetailsValidation.modal')

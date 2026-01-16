@@ -101,7 +101,7 @@
         {{-- Boutons proposer / sélectionner / attente (savoirfaire + objectif uniquement) --}}
         @if(($type === 'savoirfaire')||($type === 'objectif'))
             @if(!$isChecked && !$isProposed  ) 
-                @can($PermissionPrefix . '::livret.proposer')
+                @if( $this->canProposer() )
                    <x-filament::icon-button
                         size="lg"
                         icon="heroicon-o-chat-bubble-left-right"
@@ -109,12 +109,11 @@
                             message_du_modal = '{{ $label }}';
                             $dispatch('open-modal', { id: 'propos' })"
                         tooltip="Proposer à la validation"/>
-                @endcan
+                @endif
             @endif
 
             @if(!$isChecked && !$isProposed ) 
-                @can($PermissionPrefix . '::livret.valider')
-    
+                @if($this->canValider())
                     <button
                         type="button"
                         class="tree-checkbox"
@@ -125,11 +124,11 @@
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
                     </button>
-                @endcan
+                @endif
             @endif
 
             @if(!$isChecked && $isProposed )
-                @can($PermissionPrefix . '::livret.valider')
+                @if($this->canValider())
                    <x-filament::icon-button
                         size="lg"
                         color='info'
@@ -227,7 +226,7 @@
             />
 
             @if($isChecked || $isProposed )
-                @can($PermissionPrefix . '::livret.annuler')
+                @if($this->canAnnuler())
                     <x-filament::icon-button
                         size="lg"
                         color="danger"
@@ -237,7 +236,7 @@
                                     message_du_modal = '{{ $label }}';
                                     $dispatch('open-modal', { id: 'annul' });"
                     />
-                @endcan
+                @endif
             @endif
         @endif
 
