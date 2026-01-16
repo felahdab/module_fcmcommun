@@ -5,8 +5,7 @@
     "keywords": [],
     "priority": 0,
     "providers": [
-        "Modules\\FcmCommun\\Providers\\FcmCommunServiceProvider",
-        "Modules\\FcmCommun\\Providers\\Filament\\FcmcommunPanelProvider"
+        "Modules\\FcmCommun\\Providers\\FcmCommunServiceProvider"
     ],
     "files": []
 }
