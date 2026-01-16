@@ -11,16 +11,11 @@ use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Modules\FcmCommun\DataObjects\Enums\ObjectClasses;
 use Modules\FcmCommun\DataObjects\Enums\UserGeneratedEventTypes;
-use Modules\FcmCentral\Traits\FcmPermissionTrait;
-use Modules\FcmCentral\Traits\FilamentPermissionTrait;
 
 #TODO: vérifier les dépendances avec FcmCentral et FcmUnite
 
 class LivretFcmLight extends Component
 {
-    use FcmPermissionTrait;
-    use FilamentPermissionTrait;
-
     #[Locked]
     public $marinId;
 
@@ -32,8 +27,6 @@ class LivretFcmLight extends Component
 
     #[Locked]
     public $PermissionPrefix;
-
-
 
    // private OutilsMarinParcoursService $service;
 
@@ -79,19 +72,19 @@ class LivretFcmLight extends Component
     #[Computed]
     public function canPropose()
     {
-        return $this->canAccessPermission('livret.proposer');
+        return auth()->user()->can($this->PermissionPrefix . '::livret.proposer');
     }
 
     #[Computed]
     public function canAnnuler()
     {
-        return $this->canAccessPermission('livret.annuler');
+        return auth()->user()->can($this->PermissionPrefix . '::livret.annuler');
     }
 
     #[Computed]
     public function canValidateElements()
     {
-        return $this->canAccessPermission('livret.valider');
+        return auth()->user()->can($this->PermissionPrefix . '::livret.valider');
     }
 
 

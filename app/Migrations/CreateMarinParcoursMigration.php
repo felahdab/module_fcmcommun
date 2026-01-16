@@ -29,15 +29,6 @@ class CreateMarinParcoursMigration extends Migration
             $table->json('parcoursmarin')->nullable();
             $table->timestamps();
 
-            // Ancien
-            //$table->uuid('id')->primary()->default(DB::raw('UUID()'));
-            //$table->foreignUuid('marin_id');
-            // La relation ci-dessous emporte avec elle l'uuid du parcours et la version de celui-ci.
-            //$table->foreignUuid('parcours_id')->references('id')->on('fcmcentral_parcours_serialises');
-            //$table->json('parcours');
-            //$table->json('data')->nullable()->default(null);
-            //$table->timestamps();
-            //$table->unique(['marin_id', 'parcours_id']);
         });
     }
 
