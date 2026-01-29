@@ -35,9 +35,9 @@
 
     // ✅ CODE BADGE POUR TOUS LES TYPES
     $codeElement = $code ?? match($type) {
-        'affectation' => "AFF{$id}",
-        'competence' => "C{$id}",
-        'objectif' => "OBJ{$id}",
+        'affectation' => "AFF{$uuid}",
+        'competence' => "C{$uuid}",
+        'objectif' => "OBJ{$uuid}",
         default => $infos['code'] ?? ''
     };
 

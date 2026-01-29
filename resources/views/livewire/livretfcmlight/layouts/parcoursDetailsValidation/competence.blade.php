@@ -4,8 +4,9 @@
     @include('fcmcommun::livewire.livretfcmlight.layouts.parcoursDetailsValidation.item', [
         'parcoursId'      => $parcoursId,
         'type'            => 'competence',
-        'id'              => $competence['id'],
+        //'id'              => $competence['id'],
         'uuid'            => $competence['uuid'],
+        'code'              => $competence['code'],
         'label'           => $competence['libelle_long'],
         'libelleLong'     => $this->escapeForTooltip($competence['libelle_long'] ?? ''),
         'libelleLongJs'   => $this->escapeForJs($competence['libelle_long'] ?? ''),

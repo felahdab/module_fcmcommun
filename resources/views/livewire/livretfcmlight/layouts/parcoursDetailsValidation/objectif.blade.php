@@ -4,7 +4,7 @@
     @include('fcmcommun::livewire.livretfcmlight.layouts.parcoursDetailsValidation.item', [
         'parcoursId'      => $parcoursId,
         'type'            => 'objectif',
-        'id'              => $objectif['id'] ?? null,
+        //'id'              => $objectif['id'] ?? null,
         'uuid'            => $objectif['uuid'] ?? null, // ✅ Utiliser l'UUID passé ou l'ID
         'label'           => $objectif['libelle_long'] ?? $objectif['libelle_court'] ?? 'Objectif sans nom',
         'libelleLong'     => $this->escapeForTooltip($objectif['libelle_long'] ?? $objectif['libelle_court'] ?? 'Objectif sans nom'),

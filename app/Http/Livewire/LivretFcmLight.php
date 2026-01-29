@@ -144,11 +144,11 @@ class LivretFcmLight extends Component
 
         $affectations = [];
         foreach ($this->parcours['affectations'] ?? [] as $affectation) {
-            $affectationId = $affectation['id'] ?? $affectation['uuid'] ?? null;
+            $affectationId =  $affectation['uuid'] ?? null;
            
             if ($affectationId && !isset($affectations[$affectationId])) {
                 $affectations[$affectationId] = [
-                    'id' => $affectation['id'],
+                    'id' => $affectation['uuid'],
                     'libelle_court' => $affectation['libelle_court'] ?? 'Affectation',
                     'color' => $affectation['color'] ?? 'gray',
                 ];
@@ -166,11 +166,11 @@ class LivretFcmLight extends Component
         $competences = [];
         foreach ($this->parcours['affectations'] ?? [] as $affectation) {
             foreach ($affectation['competences'] ?? [] as $competence) {
-                $competenceId = $competence['id'] ?? null;
+                $competenceId = $competence['uuid'] ?? null;
                
                 if ($competenceId && !isset($competences[$competenceId])) {
                     $competences[$competenceId] = [
-                        'id' => $competence['id'],
+                        'id' => $competence['uuid'],
                         'code' => $competence['code'] ?? 'COMP',
                         'libelle_court' => $competence['libelle_court'] ?? '',
                         'color' => $competence['color'] ?? 'gray',
@@ -221,11 +221,11 @@ class LivretFcmLight extends Component
         foreach ($this->parcours['affectations'] ?? [] as $affectation) {
             foreach ($affectation['competences'] ?? [] as $competence) {
                 foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
-                    $pivotUuid = $csf['uuid'] ?? ('csf_' . $csf['id']);
+                    $pivotUuid = $csf['uuid'] ;
                    
                     $objectifUuids = [];
                     foreach ($csf['objectifs'] ?? [] as $objectif) {
-                        $objectifUuids[] = $objectif['uuid'] ?? ('obj_' . $csf['id'] . '_' . $objectif['id']);
+                        $objectifUuids[] = $objectif['uuid'] ;
                     }
                    
                     $mapping[$pivotUuid] = $objectifUuids;
@@ -247,7 +247,7 @@ class LivretFcmLight extends Component
         foreach ($this->parcours['affectations'] ?? [] as $affectation) {
             foreach ($affectation['competences'] ?? [] as $competence) {
                 foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
-                    $savoirfaireId = $csf['savoirfaire']['id'] ?? null;
+                    $savoirfaireId = $csf['savoirfaire']['uuid'] ?? null;
                 
                     if (!$savoirfaireId) continue;
 
@@ -258,7 +258,7 @@ class LivretFcmLight extends Component
 
                     // Fusionner les objectifs (sans doublons)
                     foreach ($csf['objectifs'] ?? [] as $objectif) {
-                        $objectifId = $objectif['id'] ?? null;
+                        $objectifId = $objectif['uuid'] ?? null;
                         if ($objectifId && !isset($mapping[$savoirfaireId][$objectifId])) {
                             $mapping[$savoirfaireId][$objectifId] = $objectif;
                         }
@@ -388,7 +388,7 @@ class LivretFcmLight extends Component
             return true;
         }
 
-        $affectationId = $affectation['id'] ?? $affectation['uuid'] ?? '';
+        $affectationId = $affectation['uuid'] ?? $affectation['uuid'] ?? '';
         return (string)$affectationId === $this->affectationFilter;
     }
 
@@ -421,7 +421,7 @@ class LivretFcmLight extends Component
     private function competenceCorrespondAuxFiltres(array $competence): bool
     {
         if ($this->competenceFilter !== 'toutes') {
-            $competenceId = $competence['id'] ?? null;
+            $competenceId = $competence['uuid'] ?? null;
            
             if ((string)$competenceId !== $this->competenceFilter) {
                 return false;

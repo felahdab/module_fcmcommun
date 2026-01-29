@@ -14,7 +14,7 @@
     @include('fcmcommun::livewire.livretfcmlight.layouts.parcoursDetailsValidation.item', [
         'parcoursId'      => $parcoursId,
         'type'            => 'savoirfaire',
-        'id'              => $savoirfaire['id'],
+        //'id'              => $savoirfaire['id'],
         'uuid'            => $pivotUuid,
         'label'           => $savoirfaire['savoirfaire']['libelle_long'] ?? $savoirfaire['savoirfaire']['libelle_court'] ?? 'SF sans nom',
         'libelleLong'     => $this->escapeForTooltip($savoirfaire['savoirfaire']['libelle_long'] ?? ''),
