@@ -1,6 +1,7 @@
 @props(['parcoursId', 'affectation'])
 
 @php
+   
     // ✅ Récupération des heures calculées
     $heuresTotal = $affectation['heures_total'] ?? 0;
     $heuresValidees = $affectation['heures_validees'] ?? 0;
@@ -24,6 +25,7 @@
         'dateProposition' => $affectation['date_proposition'] ?? '',
         'valideur'        => $affectation['valideur'] ?? '',
         'commentaire'     => $affectation['commentaire'] ?? '',
+        'commentaireProposition'     => $affectation['commentaire_proposition'] ?? '',
         'couleurLigne'    => $affectation['color'] ?? 'gray',
         'heuresTotal'     => $heuresTotal,
         'heuresValidees'  => $heuresValidees,

@@ -2,6 +2,7 @@
 
 <li class="mb-2">
     @php
+       
         $pivotUuid = $savoirfaire['uuid'] ?? ('csf_' . $savoirfaire['id']);
         $savoirfaireId = $savoirfaire['savoirfaire']['id'] ?? null;
        
@@ -9,6 +10,17 @@
         $objectifsList = $savoirfaireId && isset($objectifsParSavoirfaire[$savoirfaireId])
             ? $objectifsParSavoirfaire[$savoirfaireId]
             : ($savoirfaire['objectifs'] ?? []);
+            
+        $dateV =!empty($savoirfaire['date_validation'])
+        ? \Carbon\Carbon::parse($savoirfaire['date_validation'])->translatedFormat('d F Y')
+        //? date('d/m/Y', strtotime())
+        : '';
+
+        $dateP =!empty( $savoirfaire['date_proposition'])
+        ? \Carbon\Carbon::parse( $savoirfaire['date_proposition'])->translatedFormat('d F Y')
+        //? date('d/m/Y', strtotime())
+        : '';
+        
     @endphp
 
     @include('fcmcommun::livewire.livretfcmlight.layouts.parcoursDetailsValidation.item', [
@@ -21,10 +33,11 @@
         'libelleLongJs'   => $this->escapeForJs($savoirfaire['savoirfaire']['libelle_long'] ?? ''),
         'libelleCourt'    => $savoirfaire['savoirfaire']['libelle_court'] ?? '',
         'etatValid'       => $savoirfaire['etat_valid'] ?? false,
-        'dateValidation'  => $savoirfaire['date_validation'] ?? '',
-        'dateProposition' => $savoirfaire['date_proposition'] ?? '',
+        'dateValidation'  => $dateV,
+        'dateProposition' => $dateP,
         'valideur'        => $savoirfaire['valideur'] ?? '',
         'commentaire'     => $savoirfaire['commentaire'] ?? '',
+        'commentaireProposition'     => $savoirfaire['commentaire_proposition'] ?? '',
         'couleurLigne'    => $savoirfaire['savoirfaire']['color'],
         'heures'          => $savoirfaire['heures'] ?? null,
         'jours'           => $savoirfaire['jours'] ?? null,

@@ -16,6 +16,7 @@
         'dateProposition' => $competence['date_proposition'] ?? '',
         'valideur'        => $competence['valideur'] ?? '',
         'commentaire'     => $competence['commentaire'] ?? '',
+        'commentaireProposition'     => $competence['commentaire_proposition'] ?? '',
         'couleurLigne'    => $competence['color'] ,
         'infos'           => [
             'competenceSavoirfaires' => $competence['competenceSavoirfaires'] ?? [],
