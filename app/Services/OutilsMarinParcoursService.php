@@ -3,6 +3,8 @@
 
 namespace Modules\FcmCommun\Services;
 
+use Illuminate\Support\Arr;
+
 use Closure;
 
 class OutilsMarinParcoursService
@@ -139,6 +141,32 @@ class OutilsMarinParcoursService
                                 'etat_valid' => $objectif['etat_valid'],
                                 'valideur' => $objectif['valideur'] ?? null,
                                 'commentaire' => $objectif['commentaire'] ?? null,
+                                'date_validation' => $objectif['date_validation'] ?? null,
+                                'date_proposition' => $objectif['date_proposition'] ?? null,
+                            ]
+                        ];
+                    }
+                }
+            }
+        }
+        return array_unique($result, SORT_REGULAR);
+    }
+
+    public function objectifs_valides_ou_proposes_du_parcours(array $ppa = [], string $affectation = null, string $competence = null, string $savoirfaire = null)
+    {
+        $result = [];
+        foreach ($this->savoirfaires_du_parcours($ppa, $affectation, $competence) as $csf) {
+            if ($savoirfaire == null || $csf['uuid'] == $savoirfaire || $csf['id'] == $savoirfaire) {
+                foreach ($csf['objectifs'] ?? [] as $objectif) {
+                    if ($objectif['etat_valid'] === true || Arr::get($objectif, 'etat_propos') === true) {
+                        $uuid = $objectif['uuid'] ?? $objectif['id'];
+                        $result[] = [
+                            $uuid => [
+                                'etat_valid' => $objectif['etat_valid'],
+                                'etat_propos' => Arr::get($objectif, 'etat_propos', false),
+                                'valideur' => $objectif['valideur'] ?? null,
+                                'commentaire' => $objectif['commentaire'] ?? null,
+                                'commentaire_proposition' => $objectif['commentaire_proposition'] ?? null,
                                 'date_validation' => $objectif['date_validation'] ?? null,
                                 'date_proposition' => $objectif['date_proposition'] ?? null,
                             ]
@@ -330,6 +358,32 @@ class OutilsMarinParcoursService
         return array_unique($result, SORT_REGULAR);
     }
 
+    public function savoirfaires_valides_ou_proposes_du_parcours(array $ppa = [], string $affectation = null, string $competence = null)
+    {
+        $result = [];
+        foreach ($this->competences_du_parcours($ppa, $affectation) as $comp) {
+            if ($competence == null || $comp['uuid'] == $competence || $comp['id'] == $competence) {
+                foreach ($comp['competenceSavoirfaires'] ?? [] as $csf) {
+                    if ($csf['etat_valid'] === true || Arr::get($csf,'etat_propos') === true) {
+                        $uuid = $csf['uuid'] ?? $csf['id'];
+                        $result[] = [
+                            $uuid => [
+                                'etat_valid' => $csf['etat_valid'],
+                                'etat_propos' => Arr::get($csf,'etat_propos', false),
+                                'valideur' => $csf['valideur'] ?? null,
+                                'commentaire' => $csf['commentaire'] ?? null,
+                                'date_validation' => $csf['date_validation'] ?? null,
+                                'date_proposition' => $csf['date_proposition'] ?? null,
+                                'commentaire_proposition' => $csf['commentaire_proposition'] ?? null,
+                            ]
+                        ];
+                    }
+                }
+            }
+        }
+        return array_unique($result, SORT_REGULAR);
+    }
+
     /**
      * Savoir-faires non validés du parcours
      */
@@ -422,6 +476,21 @@ class OutilsMarinParcoursService
         return array_unique($result, SORT_REGULAR);
     }
 
+    public function competences_validees_ou_proposees_du_parcours(array $ppa = [], string $affectation = null)
+    {
+        $result = [];
+        foreach ($this->affectations_du_parcours($ppa) as $aff) {
+            if ($affectation == null || $aff['uuid'] == $affectation || $aff['id'] == $affectation) {
+                foreach ($aff['competences'] ?? [] as $competence) {
+                    if ($competence['etat_valid'] === true || Arr::get($competence,'etat_propos') === true) {
+                        $result[] = ['uuid' => $competence['uuid'] ?? $competence['id']];
+                    }
+                }
+            }
+        }
+        return array_unique($result, SORT_REGULAR);
+    }
+
     /**
      * Compétences non validées du parcours
      */
@@ -468,6 +537,17 @@ class OutilsMarinParcoursService
         $result = [];
         foreach ($ppa['affectations'] ?? [] as $affectation) {
             if ($affectation['etat_valid'] === true) {
+                $result[] = ['uuid' => $affectation['uuid'] ?? $affectation['id']];
+            }
+        }
+        return array_unique($result, SORT_REGULAR);
+    }
+
+    public function affectations_validees_ou_proposees_du_parcours(array $ppa = [])
+    {
+        $result = [];
+        foreach ($ppa['affectations'] ?? [] as $affectation) {
+            if ($affectation['etat_valid'] === true || Arr::get($affectation, 'etat_propos') === true) {
                 $result[] = ['uuid' => $affectation['uuid'] ?? $affectation['id']];
             }
         }
