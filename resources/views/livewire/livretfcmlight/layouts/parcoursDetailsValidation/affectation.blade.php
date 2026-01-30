@@ -1,6 +1,7 @@
 @props(['parcoursId', 'affectation'])
 
 @php
+   
     // ✅ Récupération des heures calculées
     $heuresTotal = $affectation['heures_total'] ?? 0;
     $heuresValidees = $affectation['heures_validees'] ?? 0;
@@ -12,9 +13,9 @@
     @include('fcmcommun::livewire.livretfcmlight.layouts.parcoursDetailsValidation.item', [
         'parcoursId'      => $parcoursId,
         'type'            => 'affectation',
-        'id'              => $affectation['id'],
+        //'id'              => $affectation['id'],
         'uuid'            => $affectation['uuid'],
-        'code'            => $affectation['code'] ?? "AFF{$affectation['id']}",
+        'code'            => $affectation['code'],
         'label'           => $affectation['libelle_court'],
         'libelleLong'     => $this->escapeForTooltip($affectation['libelle_long'] ?? ''),
         'libelleLongJs'   => $this->escapeForJs($affectation['libelle_long'] ?? ''),
@@ -24,6 +25,7 @@
         'dateProposition' => $affectation['date_proposition'] ?? '',
         'valideur'        => $affectation['valideur'] ?? '',
         'commentaire'     => $affectation['commentaire'] ?? '',
+        'commentaireProposition'     => $affectation['commentaire_proposition'] ?? '',
         'couleurLigne'    => $affectation['color'] ?? 'gray',
         'heuresTotal'     => $heuresTotal,
         'heuresValidees'  => $heuresValidees,
@@ -39,7 +41,7 @@
       {{--  <ul class=" ml2 mb1 transition-all duration-300" --}}
           
                  <ul class="collapsible ml2 mb1 transition-all duration-300"
-                x-show="isOpen('affectation_{{ $affectation['uuid'] }}')" 
+               
             x-transition.duration.300ms>
             @foreach ($affectation['competences'] as $competence)
                 @include('fcmcommun::livewire.livretfcmlight.layouts.parcoursDetailsValidation.competence', [

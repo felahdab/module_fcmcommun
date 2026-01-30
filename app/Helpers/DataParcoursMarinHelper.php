@@ -16,10 +16,11 @@ class DataParcoursMarinHelper
         // Mode 'init', injection des champs standards et supplémentaires
         if ($mode === 'init') {
             // Champs à injecter fixes
-            $data['commentaire'] = null;
-            $data['etat_valid'] = false;
             $data['valideur'] = null;
+            $data['etat_valid'] = false;
+            $data['commentaire'] = null;
             $data['date_validation'] = null;
+            $data['etat_propos'] = false;
             $data['commentaire_proposition'] = null;
             $data['date_proposition'] = null;
 

@@ -87,14 +87,15 @@ class MigrationParcoursMarinService
         $outils = new OutilsMarinParcoursService($ancienParcoursMarin);
 
         $tableauxValeurs = [
-            'niveau1' => $outils->affectations_valid_du_parcours($ancienParcoursMarin),
-            'niveau2' => $outils->competences_valid_du_parcours($ancienParcoursMarin),
-            'niveau3' => $outils->savoirfaires_valid_du_parcours($ancienParcoursMarin),
-            'niveau4' => $outils->objectifs_valid_du_parcours($ancienParcoursMarin),
+            'niveau1' => $outils->affectations_validees_ou_proposees_du_parcours($ancienParcoursMarin),
+            'niveau2' => $outils->competences_validees_ou_proposees_du_parcours($ancienParcoursMarin),
+            'niveau3' => $outils->savoirfaires_valides_ou_proposes_du_parcours($ancienParcoursMarin),
+            'niveau4' => $outils->objectifs_valides_ou_proposes_du_parcours($ancienParcoursMarin),
         ];
 
         // Appliquer ces états sur la nouvelle structure
         $nouveauParcoursData = $nouveauParcours->parcours;
+        
         $nouveauParcoursMarin = DataParcoursMarinHelper::rajoutChampSupplementaireAvecValeurs(
             $nouveauParcoursData, 
             $tableauxValeurs, 
