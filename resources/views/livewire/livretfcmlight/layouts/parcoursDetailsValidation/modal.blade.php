@@ -165,25 +165,42 @@ icon="heroicon-o-x-circle"
 
 <!-- Modal Infos -->
 <x-filament::modal
-id="infosModal"
-alignment="center"
-width="lg"
-icon="heroicon-o-information-circle"
+    id="infosModal"
+    alignment="center"
+    width="lg"
+    icon="heroicon-o-information-circle"
 >
-<x-slot name="heading">
-    <h2 class="text-lg font-bold">Informations</h2>
-</x-slot>
-<x-slot name="description">
-   
-    
-   
-    <p><strong>Description : </strong><span x-text="infos['intitule']"></span></p>
-   
-    <p><strong>Date de validation : </strong><span x-text="infos['dateValidation']"></span></p>
-    <p><strong>Validé par : </strong><span x-text="infos['valideur']"></span></p>
-    <p><strong>Commentaire : </strong><span x-text="infos['commentaire']"></span></p>
-</x-slot>
-<x-slot name="footer">
-    <x-filament::button x-on:click="infos = {}; $dispatch('close-modal', { id: 'infosModal' })" color="primary">Fermer</x-filament::button>
-</x-slot>
+    <x-slot name="heading">
+        <h2 class="text-lg font-bold">Informations</h2>
+    </x-slot>
+
+    <x-slot name="description">
+        <p><strong>Description : </strong><span x-text="infos.intitule"></span></p>
+
+        <template x-if="infos.dateProposition">
+            <p><strong>Date de Proposition : </strong><span x-text="infos.dateProposition"></span></p>
+        </template>
+
+        <template x-if="infos.commentaireProposition">
+            <p><strong>Commentaire Mentoré : </strong><span x-text="infos.commentaireProposition"></span></p>
+        </template>
+
+        <template x-if="infos.valideur">
+            <p><strong>Validé par : </strong><span x-text="infos.valideur"></span></p>
+        </template>
+
+        <template x-if="infos.dateValidation">
+            <p><strong>Date de validation : </strong><span x-text="infos.dateValidation"></span></p>
+        </template>
+
+        <template x-if="infos.commentaire">
+            <p><strong>Commentaire : </strong><span x-text="infos.commentaire"></span></p>
+        </template>
+    </x-slot>
+
+    <x-slot name="footer">
+        <x-filament::button x-on:click="infos = {}; $dispatch('close-modal', { id: 'infosModal' })" color="primary">Fermer</x-filament::button>
+    </x-slot>
 </x-filament::modal>
+
+

@@ -279,7 +279,7 @@
             <div class="flex items-center justify-between mt-1 mb-4">
                 <div>
                     <h3 class="text-2xl font-bold text-gray-900 mb-1">{{ $parcours['libelle_long'] }}</h3>
-                    <p class="text-sm text-gray-600">Code: {{ $parcours['code'] ?? 'N/A' }}</p>
+                   
                 </div>
                
                 @if($this->statistiques['total'] > 0)

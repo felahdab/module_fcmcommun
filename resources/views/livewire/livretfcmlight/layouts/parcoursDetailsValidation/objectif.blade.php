@@ -1,6 +1,20 @@
 @props(['parcoursId', 'objectif', 'couleurLigne'])
 
 <li>
+    @php
+
+        $dateV =!empty($objectif['date_validation'])
+        ? \Carbon\Carbon::parse($objectif['date_validation'])->translatedFormat('d F Y')
+        //? date('d/m/Y', strtotime())
+        : '';
+
+        $dateP =!empty( $objectif['date_proposition'])
+        ? \Carbon\Carbon::parse( $objectif['date_proposition'])->translatedFormat('d F Y')
+        //? date('d/m/Y', strtotime())
+        : '';
+        
+    @endphp
+        
     @include('fcmcommun::livewire.livretfcmlight.layouts.parcoursDetailsValidation.item', [
         'parcoursId'      => $parcoursId,
         'type'            => 'objectif',
@@ -11,10 +25,11 @@
         'libelleLongJs'   => $this->escapeForJs($objectif['libelle_long'] ?? $objectif['libelle_court'] ?? 'Objectif sans nom'),
         'libelleCourt'    => $objectif['libelle_court'] ?? '',
         'etatValid'       => $objectif['etat_valid'] ?? false,
-        'dateValidation'  => $objectif['date_validation'] ?? '',
-        'dateProposition' => $objectif['date_proposition'] ?? '',
+        'dateValidation'  => $dateV,
+        'dateProposition' => $dateP,
         'valideur'        => $objectif['valideur'] ?? '',
         'commentaire'     => $objectif['commentaire'] ?? '',
+        'commentaireProposition'     => $objectif['commentaire_proposition'] ?? '',
         'code'            => $objectif['code'] ?? '',
         'couleurLigne'    => $couleurLigne,
         'finDeCourse'     => true,

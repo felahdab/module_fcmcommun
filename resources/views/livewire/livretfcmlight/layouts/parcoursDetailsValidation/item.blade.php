@@ -27,6 +27,8 @@
     $colorClasses = 'fcm-item-' . $couleurActuelle;
     $textColorClasses = 'fcm-text-' . $couleurActuelle;
 
+    
+
     $isChecked = $etatValid ?? false;
     $isProposed = !empty($dateProposition);
     $sectionId = $type.'_'.$uuid;
@@ -79,7 +81,13 @@
     );
 @endphp
 
-<div class="flex items-center justify-between mt1 mb1 {{ $indentation }} {{ $colorClasses }}"
+<div class="flex items-center justify-between mt1 mb1 {{ $indentation }} 
+@if(($type === 'savoirfaire')||($type === 'objectif'))
+{{ $isChecked ?  $colorClasses : 'fcm-item-gray'  }}
+@else
+{{  $colorClasses }}
+@endif
+"
      wire:key="item-{{ $uuid }}-{{ $isChecked ? 'checked' : 'unchecked' }}-{{ $isProposed ? 'proposed' : 'normal' }}"
      x-data="{
          isSelected() {
@@ -147,16 +155,42 @@
 
         {{-- Libellé selon type --}}
         @if($type === 'savoirfaire')
-            <x-filament::badge size="sm" color="{{ $couleurLigne }}" style="margin: 0px 4px 0px 4px;">
-                {{ $codeElement }}
-            </x-filament::badge>
-            <x-filament::badge size="sm" color="{{ $savoirfaireTypeColor }}" style="margin: 0px 4px 0px 4px;">
-                {{ $savoirfaireTypeCode }}
-            </x-filament::badge>
+           {{-- ✅ BADGE CODE POUR SAVOIR FAIRE ET TYPE STAGE ANCIEN --}}
+           
+           {{-- ✅ BADGE CODE POUR TYPE STAGE  --}}
+           <x-filament::badge size="sm" color="{{ $savoirfaireTypeColor }}" style="margin: 0px 4px 0px 4px;">
+                  {{ $savoirfaireTypeCode }}
+              </x-filament::badge>
+      
+           
+  
             <strong class="ml1 {{ $textColorClasses }}" title="{{ $tooltipText }}"> {{ $libelleLongTronque }}</strong>
 
-            @if ($isCompagnonnage)
-                <div class="flex items-center ml-2 space-x-2">
+            
+        @else
+            {{-- ✅ BADGE CODE POUR AFFECTATION / COMPETENCE / OBJECTIF ANCIEN --}}
+           
+            <strong class="ml1 {{ $textColorClasses }}" title="{{ $tooltipText }}">
+                {{ str_replace(['&amp;#39;','$apos;'],"'",$label) }} 
+            </strong>
+
+        @endif
+    </div>
+
+
+
+     {{-- ✅ A DROITE AFFICHAGE --}}
+    <div class="flex items-center space-x-2">
+
+         {{-- Code --}}
+         {{-- ✅ BADGE CODE  --}}
+         <x-filament::badge  color="{{ $couleurLigne }}" style="margin: 0px 4px 0px 4px;">
+            {{ $codeElement }}
+        </x-filament::badge>
+
+        @if($type === 'savoirfaire')
+        @if ($isCompagnonnage)
+                <div class="flex items-center ml-2 space-x-2"> 
                     @if($totalObjectifs > 0)
                         <div class="w-20 bg-gray-200 rounded-full h-3 border border-gray-300">
                             <div class="h-3 rounded-full progress-fill-{{ $couleurActuelle }} transition-all duration-300"
@@ -173,28 +207,16 @@
                     @endif
                 </div>
             @endif
-        @else
-            {{-- ✅ BADGE CODE POUR AFFECTATION / COMPETENCE / OBJECTIF --}}
-            <x-filament::badge size="sm" color="{{ $couleurActuelle }}" style="margin: 0px 4px 0px 4px;">
-                {{ $codeElement }}
-            </x-filament::badge>
-            <strong class="ml1 {{ $textColorClasses }}" title="{{ $tooltipText }}">
-                {{ str_replace(['&amp;#39;','$apos;'],"'",$label) }} 
-            </strong>
-
-        @endif
-    </div>
-
-
-
-     {{-- ✅ A DROITE AFFICHAGE --}}
-    <div class="flex items-center space-x-2">
+        
+            @endif
 
 
             {{-- ✅ AFFICHAGE HEURES POUR AFFECTATION --}}
             @if($type === 'affectation')
                 <div class="flex items-center ml-2 space-x-2">
-                    <x-filament::badge size="xs" color="gray">
+                   
+                 
+                   <x-filament::badge size="xs" color="gray">
                         {{ $heuresValidees ?? 0 }}h / {{ $heuresTotal ?? 0 }}h
                     </x-filament::badge>
                     @if(($tauxHeures ?? 0) > 0)
@@ -203,9 +225,11 @@
                             color="{{ $tauxHeures == 100 ? 'success' : ($tauxHeures > 50 ? 'warning' : 'danger') }}">
                             {{ $tauxHeures }}%
                         </x-filament::badge>
-                    @endif
+                    @endif 
                 </div>
             @endif
+
+            
 
         {{-- Boutons infos / dévalider --}}
         @if(($type === 'objectif')||($type === 'savoirfaire'))
@@ -219,8 +243,10 @@
                             
                             'intitule': '{{ $popupInfos }}',
                             'dateValidation': '{{ $dateValidation ?? '' }}',
+                            'dateProposition': '{{ $dateProposition ?? '' }}',
                             'valideur': '{{ $valideur ?? 'Inconnu' }}',
-                            'commentaire': '{{ $commentaire ?? '' }}'
+                            'commentaire': '{{ $commentaire ?? '' }}',
+                            'commentaireProposition': '{{ $commentaireProposition ?? '' }}'
                         };
                         $dispatch('open-modal', { id: 'infosModal'});"
             />
