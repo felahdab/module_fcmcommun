@@ -114,7 +114,7 @@
                         size="lg"
                         icon="heroicon-o-chat-bubble-left-right"
                         x-on:click="a_proposer = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' };
-                            message_du_modal = '{{ $label }}';
+                            message_du_modal = '{{ htmlspecialchars($label) }}';
                             $dispatch('open-modal', { id: 'propos' })"
                         tooltip="Proposer à la validation"/>
                 @endif
@@ -259,7 +259,7 @@
                         icon="heroicon-s-x-circle"
                         tooltip="Dévalider"
                         x-on:click="a_devalider = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' };
-                                    message_du_modal = '{{ $label }}';
+                                    message_du_modal = '{{ htmlspecialchars($label) }}';
                                     $dispatch('open-modal', { id: 'annul' });"
                     />
                 @endif
