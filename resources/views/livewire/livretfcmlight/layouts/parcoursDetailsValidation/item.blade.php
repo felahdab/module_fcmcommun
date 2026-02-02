@@ -102,7 +102,7 @@
                 size="lg"
                 color='success'
                 icon="heroicon-c-shield-check"
-                tooltip="Validé le {{ $dateValidation }} par {{ $valideur }}"
+                {{-- tooltip="Validé le {{ $dateValidation }} par {{ $valideur }}" --}}
                 class="tree-checkbox"/>
         @endif
 
@@ -127,7 +127,7 @@
                         class="tree-checkbox"
                         x-on:click="toggleCheck('{{$sectionId}}')"
                         x-bind:class="isSelected() ? 'text-success' : 'text-gray-600'"
-                        x-bind:title="isSelected() ? 'Sélectionné pour validation' : 'Cliquer pour sélectionner'">
+                        x-bind:title="isSelected() ? 'Dévalider' : 'Valider'">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
                             <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
                         </svg>
@@ -139,16 +139,16 @@
                 @if($this->canValider())
                    <x-filament::icon-button
                         size="lg"
-                        color='info'
+                        color='warning'
                         icon="heroicon-s-clock"
                         x-on:click="toggleCheck('{{$sectionId}}')"
-                        tooltip="En attente depuis le {{ $dateProposition }}. Commentaire: {{ $commentaire }}"/>
+                        tooltip="En attente de validation depuis le {{ $dateProposition }}. Commentaire: {{ $commentaireProposition }}"/>
                 @else
                     <x-filament::icon-button
                         size="lg"
                         color='warning'
                         icon="heroicon-s-clock"
-                        tooltip="En attente depuis le {{ $dateProposition }}. Commentaire: {{ $commentaire }}"/>
+                        tooltip="En attente de validation depuis le {{ $dateProposition }}. Commentaire: {{ $commentaireProposition }}"/>
                 @endcannot
             @endif
         @endif
@@ -212,11 +212,12 @@
 
 
             {{-- ✅ AFFICHAGE HEURES POUR AFFECTATION --}}
-            @if($type === 'affectation')
+            {{-- 
+                 @if($type === 'affectation')
                 <div class="flex items-center ml-2 space-x-2">
                    
                  
-                   <x-filament::badge size="xs" color="gray">
+                  <x-filament::badge size="xs" color="gray">
                         {{ $heuresValidees ?? 0 }}h / {{ $heuresTotal ?? 0 }}h
                     </x-filament::badge>
                     @if(($tauxHeures ?? 0) > 0)
@@ -225,9 +226,10 @@
                             color="{{ $tauxHeures == 100 ? 'success' : ($tauxHeures > 50 ? 'warning' : 'danger') }}">
                             {{ $tauxHeures }}%
                         </x-filament::badge>
-                    @endif 
+                    @endif  
                 </div>
             @endif
+            --}}
 
             
 

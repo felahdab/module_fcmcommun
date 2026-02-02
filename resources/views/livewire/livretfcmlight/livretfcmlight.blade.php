@@ -364,9 +364,9 @@
                                 icon="heroicon-o-check-circle"
                                 class="w-6 h-6"
                             />
-                            <div class="text-left">
-                                <div class="text-sm font-semibold leading-tight">Valider</div>
-                                <div class="text-xs leading-tight">les éléments cochés</div>
+                            <div class="text-left" style="margin-left:10px;">
+                                <div class="text-lg font-semibold leading-tight">Valider</div>
+                                <div class="text-lg font-semibold leading-tight">les éléments cochés</div>
                             </div>
                         </div>
                     </x-filament::button>

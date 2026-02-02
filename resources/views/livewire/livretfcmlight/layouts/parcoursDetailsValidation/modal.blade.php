@@ -118,8 +118,9 @@ icon="heroicon-o-x-circle"
         <h2 class="text-lg font-bold">Confirmer la Proposition</h2>
     </x-slot>
     <x-slot name="description">
-        <p class="p-8">Vous souhaitez proposer à votre mentor la validation de l'élément suivant</p>
-        <p x-text="message_du_modal"></p>
+        <p class="p-8">Vous souhaitez proposer à votre mentor la validation de l'élément suivant : </p>
+        <p x-text="message_du_modal" class="guillemets italic"></p>
+        <br/>
         <textarea x-model="commentaire" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"></textarea>
     </x-slot>
     <x-slot name="footer">
@@ -175,7 +176,7 @@ icon="heroicon-o-x-circle"
     </x-slot>
 
     <x-slot name="description">
-        <p><strong>Description : </strong><span x-text="infos.intitule"></span></p>
+        {{-- <p><strong>Description : </strong><span x-text="infos.intitule"></span></p> --}}
 
         <template x-if="infos.dateProposition">
             <p><strong>Date de Proposition : </strong><span x-text="infos.dateProposition"></span></p>
