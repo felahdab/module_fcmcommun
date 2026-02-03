@@ -422,19 +422,19 @@
             <tr>
                 <td>
                     <div class="jalon-box">
-                        <div class="jalon-label"> Sédimentation</div>
+                        <div class="jalon-label">Date d'entrée en FCM</div>
                         <div class="jalon-date">{{ $jalons['sedimentation'] }}</div>
                     </div>
                 </td>
                 <td>
                     <div class="jalon-box">
-                        <div class="jalon-label"> Vert FCM</div>
+                        <div class="jalon-label">Date de fin de sédimentation</div>
                         <div class="jalon-date">{{ $jalons['fcm'] }}</div>
                     </div>
                 </td>
                 <td>
                     <div class="jalon-box">
-                        <div class="jalon-label">Vert Compétence</div>
+                        <div class="jalon-label">Date de vert compétence</div>
                         <div class="jalon-date">{{ $jalons['competence'] }}</div>
                     </div>
                 </td>
@@ -502,14 +502,14 @@
                                 $typeLabel = match($item['type_sf']) {
                                     'S' => 'STAGE',
                                     'C' => 'COMPAGNONNAGE',
-                                    'EAD' => 'E-LEARNING',
-                                    default => 'ACTIVITÉ'
+                                    'EAD' => 'EAD',
+                                    default => 'SAVOIR FAIRE'
                                 };
                                 $typeClass = match($item['type_sf']) {
                                     'S' => 'stage',
                                     'C' => 'compagnonnage',
                                     'EAD' => 'ead',
-                                    default => 'activite'
+                                    default => 'savoir-faire'
                                 };
                             @endphp
                             <span class="sf-type {{ $typeClass }}">{{ $typeLabel }}</span>

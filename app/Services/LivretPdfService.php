@@ -48,7 +48,7 @@ class LivretPdfService
             'grade' => $marin->grade->libelle_court ?? 'N/A',
             'nom_complet' => $marin->nom . ' ' . $marin->prenom,
             'specialite' => $marin->specialite->libelle_court ?? 'N/A',
-            'unite' => $marin->unite->libelle_court ?? 'N/A',
+            'unite' => $marin->unite->libelle_long ?? 'N/A',
             'cohorte' => $complementsFcm->cohorte->libelle_long ?? 'Non assigné',
             'mentor' => $complementsFcm->mentor ? $complementsFcm->mentor->nom . ' ' . $complementsFcm->mentor->prenom : 'Non assigné',
             'parcours' => $donneesParcours->parcours_serialise->libelle_court ?? 'Non assigné',
