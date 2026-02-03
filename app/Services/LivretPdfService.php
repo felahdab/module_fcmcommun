@@ -4,7 +4,6 @@ namespace Modules\FcmCommun\Services;
 
 use Dompdf\Dompdf;
 use Dompdf\Options;
-use Modules\FcmCentral\Models\Marin;
 use Illuminate\Support\Facades\View;
 
 class LivretPdfService
@@ -22,7 +21,7 @@ class LivretPdfService
         $this->dompdf = new Dompdf($options);
     }
 
-    public function generatePdf(Marin $marin): string
+    public function generatePdf($marin): string
     {
         $data = $this->prepareMarinData($marin);
         $html = View::make('fcmcommun::pdf.livret-fcm', $data)->render();
@@ -34,7 +33,7 @@ class LivretPdfService
         return $this->dompdf->output();
     }
 
-    private function prepareMarinData(Marin $marin): array
+    private function prepareMarinData($marin): array
     {
         $complementsFcm = $marin->complements_fcm;
         $donneesParcours = $complementsFcm->donnees_du_parcours ?? null;
