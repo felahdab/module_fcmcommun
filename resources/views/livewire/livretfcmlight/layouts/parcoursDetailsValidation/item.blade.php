@@ -74,7 +74,12 @@
     }
 
      // VÉRIFIER SI LE SAVOIR-FAIRE DOIT ÊTRE GRISÉ
-     $estGrise = ($type === 'savoirfaire' && in_array($uuid, $savoirfairesAGriser ?? []));
+     if ($type === 'savoirfaire') {
+        $estGrise = in_array($uuid, $savoirfairesAGriser ?? []);
+    } elseif ($type === 'objectif') {
+        $estGrise = in_array($uuid, $objectifsAGriser ?? []);
+    }
+
 
          //  Pour les savoir-faires grisés, vérifier s'ils ont des objectifs à afficher
     $hasObjectifsVisibles = false;
@@ -116,17 +121,18 @@
                 size="lg"
                 color='success'
                 icon="heroicon-c-shield-check"
-                {{-- tooltip="Validé le {{ $dateValidation }} par {{ $valideur }}" --}}
+                tooltip="Validé le {{ $dateValidation }} par {{ $valideur }}"
                 class="tree-checkbox"/>
         @endif
 
-        {{-- Boutons proposer / sélectionner / attente (savoirfaire + objectif uniquement) --}}
+        {{-- Boutons proposer / sélectionner / attente (désactivés si grisé) --}}
         @if(($type === 'savoirfaire')||($type === 'objectif'))
-            @if(!$isChecked && !$isProposed  ) 
-                @if( $this->canProposer() )
+            @if(!$isChecked && !$isProposed && !$estGrise)
+                @if($this->canProposer())
                    <x-filament::icon-button
                         size="lg"
-                        icon="heroicon-o-chat-bubble-left-right"
+                        color='fi-color-jaunepale'
+                        icon="heroicon-c-shield-check"
                         x-on:click="a_proposer = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' };
                             message_du_modal = '{{ htmlspecialchars($label) }}';
                             $dispatch('open-modal', { id: 'propos' })"
@@ -134,7 +140,7 @@
                 @endif
             @endif
 
-            @if(!$isChecked && !$isProposed ) 
+            @if(!$isChecked && !$isProposed && !$estGrise)
                 @if($this->canValider())
                     <button
                         type="button"
@@ -149,23 +155,24 @@
                 @endif
             @endif
 
-            @if(!$isChecked && $isProposed )
+            @if(!$isChecked && $isProposed)
                 @if($this->canValider())
                    <x-filament::icon-button
                         size="lg"
-                        color='warning'
-                        icon="heroicon-s-clock"
+                        color='fi-color-orangefort'
+                        icon="heroicon-c-shield-check"
                         x-on:click="toggleCheck('{{$sectionId}}')"
                         tooltip="En attente de validation depuis le {{ $dateProposition }}. Commentaire: {{ $commentaireProposition }}"/>
                 @else
                     <x-filament::icon-button
                         size="lg"
-                        color='warning'
-                        icon="heroicon-s-clock"
+                        color='fi-color-orangefort'
+                        icon="heroicon-c-shield-check"
                         tooltip="En attente de validation depuis le {{ $dateProposition }}. Commentaire: {{ $commentaireProposition }}"/>
-                @endcannot
+                @endif
             @endif
         @endif
+
 
         {{-- Libellé selon type --}}
         @if($type === 'savoirfaire')

@@ -236,38 +236,79 @@ class LivretFcmLight extends Component
         return $mapping;
     }
 
+    // Liste des Savoir faire et  objectifs à griser
     #[Computed]
     public function savoirfairesAGriser()
     {
         if ($this->statutFilter !== 'non_valides' || !$this->parcours) {
             return [];
         }
-
+    
         $savoirfairesAGriser = [];
-
+    
         foreach ($this->parcours['affectations'] ?? [] as $affectation) {
             foreach ($affectation['competences'] ?? [] as $competence) {
                 foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
                     $csfUuid = $csf['uuid'];
                     
-                    // Vérifier si au moins un objectif est validé
-                    $auMoinsUnObjectifValide = false;
-                    foreach ($csf['objectifs'] ?? [] as $objectif) {
-                        if ($objectif['etat_valid'] ?? false) {
-                            $auMoinsUnObjectifValide = true;
-                            break;
-                        }
+                    // ✅ NE PAS GRISER si le savoir-faire est validé
+                    $savoirfaireValide = ($csf['etat_valid'] ?? false) === true;
+                    if ($savoirfaireValide) {
+                        continue;
                     }
-
-                    if ($auMoinsUnObjectifValide) {
+                    
+                    // ✅ GRISER UNIQUEMENT SI : savoir-faire proposé (et non validé)
+                    $savoirfairePropose = !empty($csf['date_proposition']) && !$savoirfaireValide;
+                    
+                    // ❌ NE PLUS vérifier si un objectif est validé
+                    // On ne grise PAS le SF juste parce qu'un objectif enfant est validé
+                    
+                    if ($savoirfairePropose) {
                         $savoirfairesAGriser[] = $csfUuid;
                     }
                 }
             }
         }
-
+    
         return $savoirfairesAGriser;
     }
+    
+
+    
+    #[Computed]
+    public function objectifsAGriser()
+    {
+        if ($this->statutFilter !== 'non_valides' || !$this->parcours) {
+            return [];
+        }
+
+        $objectifsAGriser = [];
+
+        foreach ($this->parcours['affectations'] ?? [] as $affectation) {
+            foreach ($affectation['competences'] ?? [] as $competence) {
+                foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
+                    foreach ($csf['objectifs'] ?? [] as $objectif) {
+                        $objectifUuid = $objectif['uuid'];
+                        
+                        // ✅ NE PAS GRISER si l'objectif est validé
+                        $objectifValide = ($objectif['etat_valid'] ?? false) === true;
+                        if ($objectifValide) {
+                            continue;
+                        }
+                        
+                        // ✅ GRISER UNIQUEMENT si l'objectif est proposé (et non validé)
+                        if (!empty($objectif['date_proposition'])) {
+                            $objectifsAGriser[] = $objectifUuid;
+                        }
+                    }
+                }
+            }
+        }
+
+        return $objectifsAGriser;
+    }
+
+    
 
 
 
@@ -868,6 +909,7 @@ class LivretFcmLight extends Component
             'savoirfaireTypesDisponibles' => $this->savoirfaireTypesDisponibles,
             'hasActiveFilters' => $this->hasActiveFilters,
             'savoirfairesAGriser' => $this->savoirfairesAGriser,
+            'objectifsAGriser' => $this->objectifsAGriser, 
         ]);
     }
 }

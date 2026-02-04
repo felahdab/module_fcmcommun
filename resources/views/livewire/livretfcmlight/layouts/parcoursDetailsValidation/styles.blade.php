@@ -14,13 +14,15 @@
     .fcm-item-danger { border-left: 4px solid #ef4444; background-color: rgba(239, 68, 68, 0.1); padding: 8px; border-radius: 4px; }
     .fcm-item-info { border-left: 4px solid #0ea5e9; background-color: rgba(14, 165, 233, 0.1); padding: 8px; border-radius: 4px; }
     .fcm-item-gray { border-left: 4px solid #6b7280; background-color: rgba(107, 114, 128, 0.1); padding: 8px; border-radius: 4px; }
-    
+    .fcm-item-grayed { border-left: 4px solid #c3c7ce; background-color: rgba(166, 169, 175, 0.1); padding: 8px; border-radius: 4px; }
+
     /* Classes de texte */
     .fcm-text-success { color: #10b981; font-weight: bold; }
     .fcm-text-warning { color: #f59e0b; font-weight: bold; }
     .fcm-text-danger { color: #ef4444; font-weight: bold; }
     .fcm-text-info { color: #0ea5e9; font-weight: bold; }
     .fcm-text-gray { color: #6b7280; font-weight: bold; }
+    .fcm-text-grayed { color: #313235; font-weight: bold; }
 
     /* États hover */
     .fcm-item-success:hover { background-color: rgba(16, 185, 129, 0.15); }
@@ -28,6 +30,7 @@
     .fcm-item-danger:hover { background-color: rgba(239, 68, 68, 0.15); }
     .fcm-item-info:hover { background-color: rgba(14, 165, 233, 0.15); }
     .fcm-item-gray:hover { background-color: rgba(107, 114, 128, 0.15); }
+    .fcm-item-grayed:hover { background-color: rgba(107, 114, 128, 0.15); }
 
     /* ✅ BARRES DE PROGRESSION COLORÉES */
     .progress-fill-success { background-color: #10b981; }
@@ -35,6 +38,7 @@
     .progress-fill-danger { background-color: #ef4444; }
     .progress-fill-info { background-color: #0ea5e9; }
     .progress-fill-gray { background-color: #6b7280; }
+    .progress-fill-grayed { background-color: #6b7280; }
 
     /* Boutons existants */
     .btn-base { font-weight: bold; padding: 0.75rem 1rem; border-radius: 0.5rem; border: 2px solid; transition: all 0.2s ease-in-out; transform: scale(1); cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
@@ -60,14 +64,44 @@
 
 .fcm-item-grayed {
     background-color: #f3f4f6 !important;
-    opacity: 0.6;
-    pointer-events: none; /* Optionnel: désactiver les interactions */
+    opacity: 0.7;
+    border-left: 3px solid #d1d5db;
 }
 
-.fcm-item-grayed .fcm-text-gray,
-.fcm-item-grayed strong {
-    color: #9ca3af !important;
+
+
+/* ✅ Désactiver seulement les boutons de validation/proposition */
+.fcm-item-grayed .tree-checkbox,
+.fcm-item-grayed button[x-on\:click*="toggleCheck"],
+.fcm-item-grayed button[x-on\:click*="a_proposer"] {
+    pointer-events: none;
+    opacity: 0.3;
 }
+
+/* ✅ Laisser les boutons info et chevron actifs */
+.fcm-item-grayed button[x-on\:click*="infos"],
+.fcm-item-grayed button[x-on\:click*="toggleSection"] {
+    pointer-events: auto;
+    opacity: 1;
+}
+
+.jaunepale{background-color: #FFE600;color: #FFE600;}
+.orangefort{background-color: #FF6F00;color: #FF6F00;}
+
+.fi-color-jaunepale {
+    background-color: #FFE600 !important;
+    color: #7a6a00 !important; /* texte foncé pour contraste */
+    border-color: #FFE600 !important;
+}
+
+/* Orange fort */
+.fi-color-orangefort {
+    background-color: #FF6F00 !important;
+    color: #fff !important; /* texte blanc pour contraste */
+    border-color: #FF6F00 !important;
+}
+
+
 
 
 </style>

@@ -104,7 +104,8 @@
                     wire:click="filtrerParStatut('tous')"
                 >
                     <x-filament::icon icon="heroicon-o-document-text" class="w-4 h-4 mr-1" />
-                    Tous ({{ $this->statistiques['total'] }})
+                    Tous 
+                    {{-- ({{ $this->statistiques['total'] }}) --}}
                 </x-filament::button>
                
                 <x-filament::button
@@ -113,7 +114,8 @@
                     wire:click="filtrerParStatut('valides')"
                 >
                     <x-filament::icon icon="heroicon-o-check-circle" class="w-4 h-4 mr-1" />
-                    Validés ({{ $this->statistiques['valides'] }})
+                    Validés 
+                    {{-- ({{ $this->statistiques['valides'] }}) --}}
                 </x-filament::button>
                
                 <x-filament::button
@@ -122,7 +124,8 @@
                     wire:click="filtrerParStatut('proposes')"
                 >
                     <x-filament::icon icon="heroicon-o-paper-airplane" class="w-4 h-4 mr-1" />
-                    Proposés ({{ $this->statistiques['proposes'] }})
+                    Proposés 
+                    {{-- ({{ $this->statistiques['proposes'] }}) --}}
                 </x-filament::button>
                
                 <x-filament::button
@@ -131,7 +134,8 @@
                     wire:click="filtrerParStatut('non_valides')"
                 >
                     <x-filament::icon icon="heroicon-o-x-circle" class="w-4 h-4 mr-1" />
-                    Non validés ({{ $this->statistiques['non_valides'] }})
+                    Non validés 
+                    {{-- ({{ $this->statistiques['non_valides'] }}) --}}
                 </x-filament::button>
             </div>
 
@@ -282,14 +286,14 @@
                    
                 </div>
                
-                @if($this->statistiques['total'] > 0)
+                {{-- @if($this->statistiques['total'] > 0)
                     <div class="text-right">
                         <div class="text-2xl font-bold text-blue-600">
                             {{ $this->statistiques['valides'] }}/{{ $this->statistiques['total'] }}
                         </div>
                         <div class="text-sm text-gray-600">éléments validés</div>
                     </div>
-                @endif
+                @endif --}}
             </div>
                
             @if(!empty($parcours['affectations']))
