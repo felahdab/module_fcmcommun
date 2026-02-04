@@ -58,4 +58,16 @@
 .guillemets::before { content :"« "}
 .guillemets::after { content :" »"}
 
+.fcm-item-grayed {
+    background-color: #f3f4f6 !important;
+    opacity: 0.6;
+    pointer-events: none; /* Optionnel: désactiver les interactions */
+}
+
+.fcm-item-grayed .fcm-text-gray,
+.fcm-item-grayed strong {
+    color: #9ca3af !important;
+}
+
+
 </style>

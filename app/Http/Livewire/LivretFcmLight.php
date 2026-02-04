@@ -236,6 +236,40 @@ class LivretFcmLight extends Component
         return $mapping;
     }
 
+    #[Computed]
+    public function savoirfairesAGriser()
+    {
+        if ($this->statutFilter !== 'non_valides' || !$this->parcours) {
+            return [];
+        }
+
+        $savoirfairesAGriser = [];
+
+        foreach ($this->parcours['affectations'] ?? [] as $affectation) {
+            foreach ($affectation['competences'] ?? [] as $competence) {
+                foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
+                    $csfUuid = $csf['uuid'];
+                    
+                    // Vérifier si au moins un objectif est validé
+                    $auMoinsUnObjectifValide = false;
+                    foreach ($csf['objectifs'] ?? [] as $objectif) {
+                        if ($objectif['etat_valid'] ?? false) {
+                            $auMoinsUnObjectifValide = true;
+                            break;
+                        }
+                    }
+
+                    if ($auMoinsUnObjectifValide) {
+                        $savoirfairesAGriser[] = $csfUuid;
+                    }
+                }
+            }
+        }
+
+        return $savoirfairesAGriser;
+    }
+
+
 
     #[Computed]
     public function objectifsParSavoirfaire()
@@ -540,21 +574,22 @@ class LivretFcmLight extends Component
     }
 
     private function verifierStatut(array $element): bool
-    {
-        $etatValid = ($element['etat_valid'] ?? false);
-        $dateProposition = $element['date_proposition'] ?? null;
-       
-        $estValide = ($etatValid === true);
-        $estPropose = !empty($dateProposition);
-        $nonValide = !$estValide;
+{
+    $etatValid = ($element['etat_valid'] ?? false);
+    $dateProposition = $element['date_proposition'] ?? null;
+    
+    $estValide = ($etatValid === true);
+    $estPropose = !empty($dateProposition);
+    $nonValide = !$estValide;
 
-        return match($this->statutFilter) {
-            'valides' => $estValide,
-            'proposes' => $estPropose,
-            'non_valides' => $nonValide && !$estPropose,
-            default => true
-        };
-    }
+    return match($this->statutFilter) {
+        'valides' => $estValide,
+        'proposes' => $estPropose && !$estValide, // Seulement proposés non validés
+        'non_valides' => $nonValide, // Non validés (inclut proposés en attente)
+        default => true
+    };
+}
+
 
     // ========================================
     // CALCULS ET STATISTIQUES
@@ -832,6 +867,7 @@ class LivretFcmLight extends Component
             'competencesDisponibles' => $this->competencesDisponibles,
             'savoirfaireTypesDisponibles' => $this->savoirfaireTypesDisponibles,
             'hasActiveFilters' => $this->hasActiveFilters,
+            'savoirfairesAGriser' => $this->savoirfairesAGriser,
         ]);
     }
 }

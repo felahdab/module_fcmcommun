@@ -73,17 +73,31 @@
         $hasObjectifs = false;
     }
 
+     // VÉRIFIER SI LE SAVOIR-FAIRE DOIT ÊTRE GRISÉ
+     $estGrise = ($type === 'savoirfaire' && in_array($uuid, $savoirfairesAGriser ?? []));
+
+         //  Pour les savoir-faires grisés, vérifier s'ils ont des objectifs à afficher
+    $hasObjectifsVisibles = false;
+    if ($type === 'savoirfaire' && $hasObjectifs) {
+        //  FIX: Vérifier qu'il y a bien des objectifs dans $infos
+        $hasObjectifsVisibles = !empty($infos['objectifs']) || !empty($infos['objectifs_list']);
+    }
+
+
     // Déterminer si on doit afficher le chevron
     $showChevron = (
         ($type === 'affectation' && !empty($infos['competences'])) ||
         ($type === 'competence' && !empty($infos['competenceSavoirfaires'])) ||
         ($type === 'savoirfaire' && $hasObjectifs)
     );
+
+   
+
 @endphp
 
 <div class="flex items-center justify-between mt1 mb1 {{ $indentation }} 
 @if(($type === 'savoirfaire')||($type === 'objectif'))
-{{ $isChecked ?  $colorClasses : 'fcm-item-gray'  }}
+{{ $isChecked ?  $colorClasses : ($estGrise ? 'fcm-item-grayed' : 'fcm-item-gray')  }}
 @else
 {{  $colorClasses }}
 @endif
