@@ -57,7 +57,7 @@
 .fcm-item-purple { border-left: 4px solid #800080; background-color: rgba(128, 0, 128, 0.08); padding: 8px; border-radius: 4px; }
 .fcm-text-purple { color: #800080; font-weight: bold; }
 .fcm-item-purple:hover { background-color: rgba(128, 0, 128, 0.15); }
-.progress-fill-purple { background-color: #800080; }
+.progress-fill-purple { background-color:#800080 }
 
 .guillemets::before { content :"« "}
 .guillemets::after { content :" »"}
@@ -101,6 +101,38 @@
     border-color: #FF6F00 !important;
 }
 
+.fi-badge.fi-color-jaunepale {
+        background-color: #FFF9C4 !important;
+        color: #7a6a00 !important;
+        border-color: #FFE600 !important;
+    }
+    
+    /* Orange fort - Badge */
+    .fi-badge.fi-color-orangefort {
+        background-color: #FF6F00 !important;
+        color: #ffffff !important;
+        border-color: #FF6F00 !important;
+    }
+    
+    /* Jaune pâle - Bouton */
+    .fi-icon-btn.fi-color-jaunepale,
+    button.fi-color-jaunepale {
+        color: #FFE600 !important;
+    }
+    
+    .fi-icon-btn.fi-color-jaunepale:hover {
+        color: #D4C000 !important;
+    }
+    
+    /* Orange fort - Bouton */
+    .fi-icon-btn.fi-color-orangefort,
+    button.fi-color-orangefort {
+        color: #FF6F00 !important;
+    }
+    
+    .fi-icon-btn.fi-color-orangefort:hover {
+        color: #E65100 !important;
+    }
 
 
 

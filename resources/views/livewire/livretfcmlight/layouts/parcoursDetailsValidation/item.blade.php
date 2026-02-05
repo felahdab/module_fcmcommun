@@ -27,7 +27,18 @@
     $colorClasses = 'fcm-item-' . $couleurActuelle;
     $textColorClasses = 'fcm-text-' . $couleurActuelle;
 
-    
+    // Bug pour les badges
+    $customStyle="margin: 0px 4px 0px 4px;";
+    if ($couleurLigne == "purple"){
+        $customStyle .= "border-color: #800080;  
+        background-color: rgba(128, 0, 128, 0.15); 
+        color:#800080;";
+    }
+    if ($couleurLigne == "brown"){
+        $customStyle .= "border-color: #8B4513;  
+        background-color: rgba(139, 69, 19, 0.15); 
+        color:#8B4513;;";
+    }
 
     $isChecked = $etatValid ?? false;
     $isProposed = !empty($dateProposition);
@@ -121,7 +132,7 @@
                 size="lg"
                 color='success'
                 icon="heroicon-c-shield-check"
-                tooltip="Validé le {{ $dateValidation }} par {{ $valideur }}"
+                {{-- tooltip="Validé le {{ $dateValidation }} par {{ $valideur }}" --}}
                 class="tree-checkbox"/>
         @endif
 
@@ -131,8 +142,10 @@
                 @if($this->canProposer())
                    <x-filament::icon-button
                         size="lg"
-                        color='fi-color-jaunepale'
-                        icon="heroicon-c-shield-check"
+                        {{-- color='fi-color-jaunepale'
+                        style="color: #FFFF00;" --}}
+                        color='gray'
+                        icon="heroicon-o-shield-check"
                         x-on:click="a_proposer = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' };
                             message_du_modal = '{{ htmlspecialchars($label) }}';
                             $dispatch('open-modal', { id: 'propos' })"
@@ -160,6 +173,7 @@
                    <x-filament::icon-button
                         size="lg"
                         color='fi-color-orangefort'
+                        style="color: #FF6F00;"
                         icon="heroicon-c-shield-check"
                         x-on:click="toggleCheck('{{$sectionId}}')"
                         tooltip="En attente de validation depuis le {{ $dateProposition }}. Commentaire: {{ $commentaireProposition }}"/>
@@ -167,6 +181,7 @@
                     <x-filament::icon-button
                         size="lg"
                         color='fi-color-orangefort'
+                        style="color: #FF6F00;"
                         icon="heroicon-c-shield-check"
                         tooltip="En attente de validation depuis le {{ $dateProposition }}. Commentaire: {{ $commentaireProposition }}"/>
                 @endif
@@ -179,7 +194,10 @@
            {{-- ✅ BADGE CODE POUR SAVOIR FAIRE ET TYPE STAGE ANCIEN --}}
            
            {{-- ✅ BADGE CODE POUR TYPE STAGE  --}}
-           <x-filament::badge size="sm" color="{{ $savoirfaireTypeColor }}" style="margin: 0px 4px 0px 4px;">
+           <x-filament::badge size="sm" color="{{ $savoirfaireTypeColor }}" 
+           style="margin: 0px 4px 0px 4px;
+          
+           ">
                   {{ $savoirfaireTypeCode }}
               </x-filament::badge>
       
@@ -205,8 +223,8 @@
 
          {{-- Code --}}
          {{-- ✅ BADGE CODE  --}}
-         <x-filament::badge  color="{{ $couleurLigne }}" style="margin: 0px 4px 0px 4px;">
-            {{ $codeElement }}
+         <x-filament::badge  color="{{ $couleurLigne }}" style="{{ $customStyle }}">
+            {{ $codeElement }} 
         </x-filament::badge>
 
         @if($type === 'savoirfaire')
