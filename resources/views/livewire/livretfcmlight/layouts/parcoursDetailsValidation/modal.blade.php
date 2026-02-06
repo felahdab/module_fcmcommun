@@ -8,7 +8,12 @@ icon="heroicon-o-information-circle"
         <h2 class="text-lg font-bold">Ajouter un commentaire</h2>
     </x-slot>
     <x-slot name="description">
-        <textarea x-model="commentaire" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 "></textarea>
+        <textarea x-model="commentaire" rows="4" 
+        class="w-full border-gray-300 rounded-md shadow-sm 
+                   focus:ring-primary-500 focus:border-primary-500 
+                   dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+        >
+    </textarea>
     </x-slot>
     <x-slot name="footer">
         <x-filament::button 
@@ -121,7 +126,11 @@ icon="heroicon-o-x-circle"
         <p class="p-8">Vous souhaitez proposer à votre mentor la validation de l'élément suivant : </p>
         <p x-text="message_du_modal" class="guillemets italic"></p>
         <br/>
-        <textarea x-model="commentaire" rows="4" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500"></textarea>
+        <textarea x-model="commentaire" rows="4" 
+        class="w-full border-gray-300 rounded-md shadow-sm 
+        focus:ring-primary-500 focus:border-primary-500 
+        dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
+        ></textarea>
     </x-slot>
     <x-slot name="footer">
         <x-filament::button 

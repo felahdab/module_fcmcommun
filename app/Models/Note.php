@@ -17,7 +17,7 @@ class Note extends Model
         'rh_marin_id',
         'type_note_id',
         'date',
-        'redacteur_id',
+        'redacteur',
         'valide_bcf',
         'lienurl',
         'objet_type',
