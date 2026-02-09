@@ -84,21 +84,45 @@ class LivretFcmLight extends Component
     #[Computed]
     public function marinEstGele(): bool
     {
-        return $this->marin->complements_fcm?->gel ?? false;
+        return $this->marin->estGele();
     }
+    
 
+   
+    // ✅ SÉDIMENTATION (période initiale avant FCM)
     #[Computed]
     public function marinEstEnSedimentation(): bool
     {
         $dateSedimentation = $this->marin->complements_fcm?->date_sedimentation;
-        return !empty($dateSedimentation);
+        $dateFcm = $this->marin->complements_fcm?->date_fcm;
+        
+        // En sédimentation = date_sedimentation renseignée ET date_fcm NON renseignée
+        return $dateSedimentation !== null && $dateFcm === null;
     }
 
+
+    // ✅ FCM ACTIF (après sédimentation, avant compétence
+    #[Computed]
+    public function marinEstEnFcm(): bool
+    {
+        $dateSedimentation = $this->marin->complements_fcm?->date_sedimentation;
+        $dateFcm = $this->marin->complements_fcm?->date_fcm;
+        $dateCompetence = $this->marin->complements_fcm?->date_competence;
+        
+        // ✅ En FCM = date_sedimentation ET date_fcm renseignées ET date_competence NULL
+        return $dateSedimentation !== null 
+            && $dateFcm !== null 
+            && $dateCompetence === null; // ← OBLIGATOIREMENT NULL pour valider
+    }
+
+    // ✅ PEUT PROPOSER/VALIDER = En FCM ET Pas gelé
     #[Computed]
     public function marinPeutProposerOuValider(): bool
     {
-        return !$this->marinEstGele() && !$this->marinEstEnSedimentation();
+        // Si date_competence renseignée → marinEstEnFcm() = false → return false
+        return $this->marinEstEnFcm() && !$this->marinEstGele();
     }
+
 
     
 
@@ -971,7 +995,7 @@ class LivretFcmLight extends Component
             'savoirfairesAGriser' => $this->savoirfairesAGriser,
             'objectifsAGriser' => $this->objectifsAGriser, 
             'marinEstGele' => $this->marinEstGele,
-            'marinEstEnSedimentation' => $this->marinEstEnSedimentation,
+            'marinEstEnFcm' => $this->marinEstEnFcm,
     
         ]);
     }

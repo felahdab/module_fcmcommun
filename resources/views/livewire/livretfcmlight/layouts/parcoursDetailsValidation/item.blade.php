@@ -85,7 +85,8 @@
     }
 
     // Vérifier si le marin est gelé/sedimentation
-    $marinBloque = ($marinEstGele ?? false) || ($marinEstEnSedimentation ?? false);
+   
+    $marinBloque = !$this->marinPeutProposerOuValider();
 
 
      // VÉRIFIER SI LE SAVOIR-FAIRE DOIT ÊTRE GRISÉ
@@ -114,6 +115,9 @@
    
 
 @endphp
+
+
+
 
 <div class="flex items-center justify-between mt1 mb1 {{ $indentation }} 
 @if(($type === 'savoirfaire')||($type === 'objectif'))
