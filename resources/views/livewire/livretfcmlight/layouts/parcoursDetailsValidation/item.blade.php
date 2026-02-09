@@ -84,6 +84,10 @@
         $hasObjectifs = false;
     }
 
+    // Vérifier si le marin est gelé/sedimentation
+    $marinBloque = ($marinEstGele ?? false) || ($marinEstEnSedimentation ?? false);
+
+
      // VÉRIFIER SI LE SAVOIR-FAIRE DOIT ÊTRE GRISÉ
      if ($type === 'savoirfaire') {
         $estGrise = in_array($uuid, $savoirfairesAGriser ?? []);
@@ -138,8 +142,9 @@
 
         {{-- Boutons proposer / sélectionner / attente (désactivés si grisé) --}}
         @if(($type === 'savoirfaire')||($type === 'objectif'))
-            @if(!$isChecked && !$isProposed && !$estGrise)
-                @if($this->canProposer())
+        {{-- BOUTON PROPOSER (si pas validé, pas proposé, pas grisé, pas bloqué) --}}
+            @if(!$isChecked && !$isProposed && !$estGrise && !$marinBloque)
+                @if($this->canProposer()) 
                    <x-filament::icon-button
                         size="lg"
                         {{-- color='fi-color-jaunepale'
@@ -152,13 +157,13 @@
                         tooltip="Proposer à la validation"/>
                 @endif
             @endif
-
-            @if(!$isChecked && !$isProposed && !$estGrise)
-                @if($this->canValider())
+        {{-- BOUTON VALIDER MENTOR (si pas validé, pas proposé, pas grisé, pas bloqué) --}}
+            @if(!$isChecked && !$isProposed && !$estGrise && !$marinBloque)
+                @if($this->canValider()) 
                     <button
                         type="button"
                         class="tree-checkbox"
-                        x-on:click="toggleCheck('{{$sectionId}}')"
+                        x-on:click="toggleCheck('{{$sectionId}}');modification_proposition = false;"
                         x-bind:class="isSelected() ? 'text-success' : 'text-gray-600'"
                         x-bind:title="isSelected() ? 'Dévalider' : 'Valider'">
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="h-6 w-6">
@@ -167,25 +172,50 @@
                     </button>
                 @endif
             @endif
-
-            @if(!$isChecked && $isProposed)
-                @if($this->canValider())
-                   <x-filament::icon-button
-                        size="lg"
-                        color='fi-color-orangefort'
-                        style="color: #FF6F00;"
-                        icon="heroicon-c-shield-check"
-                        x-on:click="toggleCheck('{{$sectionId}}')"
-                        tooltip="En attente de validation depuis le {{ $dateProposition }}. Commentaire: {{ $commentaireProposition }}"/>
-                @else
-                    <x-filament::icon-button
-                        size="lg"
-                        color='fi-color-orangefort'
-                        style="color: #FF6F00;"
-                        icon="heroicon-c-shield-check"
-                        tooltip="En attente de validation depuis le {{ $dateProposition }}. Commentaire: {{ $commentaireProposition }}"/>
-                @endif
-            @endif
+        {{-- ✅ BOUTON EN ATTENTE (si proposé mais pas validé) --}}           
+        @if(!$isChecked && $isProposed)
+        {{-- Mentor peut valider/refuser --}}
+        @if($this->canValider() && !$marinBloque)
+           <x-filament::icon-button
+                size="lg"
+                color='fi-color-orangefort'
+                style="color: #FF6F00;"
+                icon="heroicon-c-shield-check"
+                x-on:click="a_proposition_mentor = { 
+                    'type' : '{{ $type }}', 
+                    'uuid' : '{{ $uuid }}' 
+                };
+                message_du_modal = '{{ htmlspecialchars($label) }}';
+                commentaire_proposition_existant = '{{ htmlspecialchars($commentaireProposition ?? '') }}';
+                commentaire = '';
+                $dispatch('open-modal', { id: 'validMentor' })"
+                tooltip="En attente de validation depuis le {{ $dateProposition }}. Commentaire: {{ $commentaireProposition }}"/>
+        
+        {{-- Marin peut modifier sa proposition --}}
+        @elseif($this->userEstLeMarin() && !$marinBloque)
+            <x-filament::icon-button
+                size="lg"
+                color='fi-color-orangefort'
+                style="color: #FF6F00;"
+                icon="heroicon-c-shield-check"
+                x-on:click="a_proposer = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' };
+                    message_du_modal = '{{ htmlspecialchars($label) }}';
+                    commentaire = '{{ htmlspecialchars($commentaireProposition ?? '') }}';
+                    modification_proposition = true;
+                    $dispatch('open-modal', { id: 'propos' })"
+                tooltip="Modifier votre proposition du {{ $dateProposition }}. Commentaire: {{ $commentaireProposition }}"/>
+        
+        {{-- Sinon juste afficher l'icône --}}
+        @else
+            <x-filament::icon-button
+                size="lg"
+                color='fi-color-orangefort'
+                style="color: #FF6F00;"
+                icon="heroicon-c-shield-check"
+                tooltip="En attente de validation depuis le {{ $dateProposition }}. Commentaire: {{ $commentaireProposition }}"/>
+        @endif
+    @endif
+    
         @endif
 
 

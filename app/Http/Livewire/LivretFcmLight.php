@@ -79,24 +79,57 @@ class LivretFcmLight extends Component
 
         return false;
     }
+
+    // GEL OU SEDIMENTATION PARCOURS
+    #[Computed]
+    public function marinEstGele(): bool
+    {
+        return $this->marin->complements_fcm?->gel ?? false;
+    }
+
+    #[Computed]
+    public function marinEstEnSedimentation(): bool
+    {
+        $dateSedimentation = $this->marin->complements_fcm?->date_sedimentation;
+        return !empty($dateSedimentation);
+    }
+
+    #[Computed]
+    public function marinPeutProposerOuValider(): bool
+    {
+        return !$this->marinEstGele() && !$this->marinEstEnSedimentation();
+    }
+
     
 
     #[Computed]
     public function canProposer()
     {
+        if (!$this->marinPeutProposerOuValider()) {
+            return false;
+        }
+    
         
         return auth()->user()->can($this->PermissionPrefix . '::livret.proposer') || $this->userEstLeMarin();
     }
 
     #[Computed]
     public function canAnnuler()
-    {
+    {   
+        if (!$this->marinPeutProposerOuValider()) {
+            return false;
+        }
+    
         return auth()->user()->can($this->PermissionPrefix . '::livret.annuler');
     }
 
     #[Computed]
     public function canValider()
-    {
+    {   
+        if (!$this->marinPeutProposerOuValider()) {
+            return false;
+        }
+    
         return auth()->user()->can($this->PermissionPrefix . '::livret.valider');
     }
 
@@ -836,6 +869,34 @@ class LivretFcmLight extends Component
         $this->refreshAfterAction();
     }
 
+    //  méthode pour annuler une proposition
+    public function annulerProposition(array $element_a_annuler, string $commentaire = '')
+    {
+        if (!$this->canAnnuler()) {
+            logger()->warning("Un utilisateur n'ayant pas l'autorisation d'annuler une proposition a tenté de le faire.");
+            abort(403, 'Vous n\'avez pas le droit d\'annuler des propositions.');
+        }
+
+        logger()->info("Annuler proposition: ", $element_a_annuler);
+
+        $event = new ($this->UserGeneratedEvent)(
+            event_type: UserGeneratedEventTypes::ANNUL_PROPOS_ELMT_MARIN_PARCOURS,
+            user_uuid: auth()->user()->uuid,
+            object_class: ObjectClasses::MARIN,
+            object_uuid: $this->marin->uuid,
+            detail: [
+                "type_element" => $element_a_annuler['type'],
+                "uuid_element" => $element_a_annuler['uuid'],
+                "date" => Carbon::now(),
+                "commentaire" => $commentaire
+            ]
+        );
+        event($event);
+
+        $this->refreshAfterAction();
+    }
+
+
     // ========================================
     // MÉTHODES HELPER POUR ACTIONS
     // ========================================
@@ -903,13 +964,15 @@ class LivretFcmLight extends Component
             'savoirFaireChildren' => $this->savoirFaireChildren,
             'objectifsParSavoirfaire' => $this->objectifsParSavoirfaire, 
             'statistiques' => $this->statistiques,
-           
             'affectationsDisponibles' => $this->affectationsDisponibles,
             'competencesDisponibles' => $this->competencesDisponibles,
             'savoirfaireTypesDisponibles' => $this->savoirfaireTypesDisponibles,
             'hasActiveFilters' => $this->hasActiveFilters,
             'savoirfairesAGriser' => $this->savoirfairesAGriser,
             'objectifsAGriser' => $this->objectifsAGriser, 
+            'marinEstGele' => $this->marinEstGele,
+            'marinEstEnSedimentation' => $this->marinEstEnSedimentation,
+    
         ]);
     }
 }

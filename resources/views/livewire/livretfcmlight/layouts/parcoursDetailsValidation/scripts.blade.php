@@ -12,6 +12,10 @@
            
             commentaire: '',
             message_du_modal: '',
+
+            modification_proposition: false,
+            a_proposition_mentor: {},  
+            commentaire_proposition_existant: '',  
            
             savoirFaireChildren: window.savoirfaireChildren || {},
             selectedItems: {},
