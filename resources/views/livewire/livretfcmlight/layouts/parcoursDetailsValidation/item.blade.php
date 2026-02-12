@@ -112,8 +112,24 @@
         ($type === 'savoirfaire' && $hasObjectifs)
     );
 
-   
 
+   // Les ACCENTS et apostrophes
+
+    $commentairePropositionClean =$commentaireProposition ?? '';
+    
+    $commentaireClean = $commentaire ?? '';
+    $tooltipTextClean = $tooltipText ?? '';
+    $labelClean = $label ?? '';
+    $popupInfosClean = $popupInfos ?? '';
+
+    
+    $tooltipPropositionAttente = 'En attente de validation depuis le ' . ($dateProposition ?? '') .
+    '. Commentaire:' .  $this->cleanForTooltip($commentairePropositionClean);
+   
+    $tooltipPropositionModifie = 'Modifier votre proposition du ' . ($dateProposition ?? '') .
+     '. Commentaire: ' .  $this->cleanForTooltip($commentairePropositionClean);
+
+    
 @endphp
 
 
@@ -156,7 +172,7 @@
                         color='gray'
                         icon="heroicon-o-shield-check"
                         x-on:click="a_proposer = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' };
-                            message_du_modal = '{{ htmlspecialchars($label) }}';
+                            message_du_modal = '{{ $labelClean }}';
                             $dispatch('open-modal', { id: 'propos' })"
                         tooltip="Proposer à la validation"/>
                 @endif
@@ -189,11 +205,12 @@
                     'type' : '{{ $type }}', 
                     'uuid' : '{{ $uuid }}' 
                 };
-                message_du_modal = '{{ htmlspecialchars($label) }}';
-                commentaire_proposition_existant = '{{ htmlspecialchars($commentaireProposition ?? '') }}';
+                message_du_modal = '{{ $labelClean }}';
+                commentaire_proposition_existant = '{{ $commentaireProposition }}';
                 commentaire = '';
                 $dispatch('open-modal', { id: 'validMentor' })"
-                tooltip="En attente de validation depuis le {{ $dateProposition }}. Commentaire: {{ $commentaireProposition }}"/>
+                tooltip="{{ ($tooltipPropositionAttente) }}"
+                />
         
         {{-- Marin peut modifier sa proposition --}}
         @elseif($this->userEstLeMarin() && !$marinBloque)
@@ -203,11 +220,11 @@
                 style="color: #FF6F00;"
                 icon="heroicon-c-shield-check"
                 x-on:click="a_proposer = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' };
-                    message_du_modal = '{{ htmlspecialchars($label) }}';
-                    commentaire = '{{ htmlspecialchars($commentaireProposition ?? '') }}';
+                    message_du_modal = '{{ $labelClean }}';
+                    commentaire = '{{ $commentairePropositionClean}}';
                     modification_proposition = true;
                     $dispatch('open-modal', { id: 'propos' })"
-                tooltip="Modifier votre proposition du {{ $dateProposition }}. Commentaire: {{ $commentaireProposition }}"/>
+                tooltip="{{ ($tooltipPropositionModifie) }}" />
         
         {{-- Sinon juste afficher l'icône --}}
         @else
@@ -216,7 +233,7 @@
                 color='fi-color-orangefort'
                 style="color: #FF6F00;"
                 icon="heroicon-c-shield-check"
-                tooltip="En attente de validation depuis le {{ $dateProposition }}. Commentaire: {{ $commentaireProposition }}"/>
+                tooltip="{{ ($tooltipPropositionModifie) }}"/>
         @endif
     @endif
     

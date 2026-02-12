@@ -435,6 +435,34 @@ class LivretFcmLight extends Component
                $this->savoirfaireTypeFilter !== 'tous';
     }
 
+    
+    // pour nettoyer les tooltip
+    #[Computed]
+    function cleanForTooltip(string $text): string
+    {
+        if (empty($text)) {
+            return '';
+        }
+        
+        // 1. Décoder les entités HTML multiples
+        // $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        // $text = html_entity_decode($text, ENT_QUOTES | ENT_HTML5, 'UTF-8'); // 2x pour double encodage
+        
+        // 2. Retirer les backslashes
+        $text = stripslashes($text);
+        
+        // 3. Retirer les accents
+        $text = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $text);
+        
+        // 4. Retirer tous les caractères spéciaux sauf lettres, chiffres, espaces et ponctuation basique
+        $text = preg_replace('/[^a-zA-Z0-9\s\.\,\!\?\-\(\)]/', ' ', $text);
+        
+        // 5. Nettoyer les espaces multiples
+        $text = preg_replace('/\s+/', ' ', $text);
+        
+        return trim($text);
+    }
+
     // ========================================
     // MÉTHODES HELPER POUR AFFICHAGE
     // ========================================
