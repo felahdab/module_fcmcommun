@@ -321,6 +321,13 @@ icon="heroicon-o-x-circle"
     <x-slot name="description">
         {{-- <p><strong>Description : </strong><span x-text="infos.intitule"></span></p> --}}
 
+        <template x-if="infos.valideur">
+            <p><strong>Validé par : </strong><span x-text="infos.valideur"></span></p>
+        </template>
+        <template x-if="infos.dateValidation">
+            <p><strong>Date de validation : </strong><span x-text="infos.dateValidation"></span></p>
+        </template>
+        
         <template x-if="infos.dateProposition">
             <p><strong>Date de Proposition : </strong><span x-text="infos.dateProposition"></span></p>
         </template>
@@ -329,17 +336,13 @@ icon="heroicon-o-x-circle"
             <p><strong>Commentaire Mentoré : </strong><span x-text="infos.commentaireProposition"></span></p>
         </template>
 
-        <template x-if="infos.valideur">
-            <p><strong>Validé par : </strong><span x-text="infos.valideur"></span></p>
-        </template>
-
-        <template x-if="infos.dateValidation">
-            <p><strong>Date de validation : </strong><span x-text="infos.dateValidation"></span></p>
-        </template>
-
+       
         <template x-if="infos.commentaire">
             <p><strong>Commentaire : </strong><span x-text="infos.commentaire"></span></p>
         </template>
+        
+
+        
     </x-slot>
 
     <x-slot name="footer">

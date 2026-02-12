@@ -41,7 +41,7 @@
       {{--  <ul class=" ml2 mb1 transition-all duration-300" --}}
           
                  <ul class="collapsible ml2 mb1 transition-all duration-300"
-               
+                 x-show="isOpen('affectation_{{ $affectation['uuid'] }}')"
             x-transition.duration.300ms>
             @foreach ($affectation['competences'] as $competence)
                 @include('fcmcommun::livewire.livretfcmlight.layouts.parcoursDetailsValidation.competence', [
