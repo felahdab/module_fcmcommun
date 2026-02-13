@@ -1,3 +1,18 @@
+## 0.1.1 (February 13, 2026)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.1.0 –> 0.1.1
+- Implements art #685754 : modifications diverses sur les IHM et les permissions
+- Retrait de la référence à FcmCentral dans le service PDF. Ce service travaille sur un objet de type Marin qui peut être soit un FcmCentral\Models\Marin, soit un FcmUnite\Models\Marin.
+- Ajout d'un htmlspecialchars pour protéger les chaines de caractères provenant de la définition des parcours dans les composants alpinejs du livret de FCM.
+- La migration du parcours d'un marin lors du figement d'une nouvelle version doit prendre en compte les parties du parcours qui font l'objet d'une proposition. Sinon, on perd des données.
+- L'état de proposition doit être inclus dès l'initialisation du parcours du marin à l'attribution d'un parcours sérialisé.
+- Implements art #683344 : Modification parcours pour mettre des UUID a la place ID Suppression migration Documentation
+- Implements art #677000 Correction Bug  Serialisation Parcours Marin
+- Retrait du panneau Filament du module.
+- Rationalisation de la gestion des permissions dans le livret. Toutes les vérifications, front et back, sont faites dans les méthodes PHP du composant Livewire. Lorsque le livret est consulté par le marin, il a forcément le droit de proposer des éléments à la validation de son mentor.
+- Retrait de dépendances descendantes vers FcmCentral. TODO: il reste des dépendances descendantes vers FcmCentral qui doivent être supprimées.
+- Implements art #668651 : Correction et refonte du livret Marin parcours en PDF
+- Implements art #668651 : Mise a Jour migrations Jalons, rajout Jalons
+
 ## 0.1.0 (January 13, 2026)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.0.10 –> 0.1.0
 - Implements art #665468 : Suppression des Helpers des Test  Unit
