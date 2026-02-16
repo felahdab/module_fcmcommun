@@ -129,6 +129,7 @@
     $tooltipPropositionModifie = 'Modifier votre proposition du ' . ($dateProposition ?? '') .
      '. Commentaire: ' .  $this->cleanForTooltip($commentairePropositionClean);
 
+     $labelForJs = addslashes($labelClean);
     
 @endphp
 
@@ -172,7 +173,7 @@
                         color='gray'
                         icon="heroicon-o-shield-check"
                         x-on:click="a_proposer = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' };
-                            message_du_modal = '{{ $labelClean }}';
+                            message_du_modal = '{{  $labelForJs }}';
                             $dispatch('open-modal', { id: 'propos' })"
                         tooltip="Proposer à la validation"/>
                 @endif
@@ -205,7 +206,7 @@
                     'type' : '{{ $type }}', 
                     'uuid' : '{{ $uuid }}' 
                 };
-                message_du_modal = '{{ $labelClean }}';
+                message_du_modal = '{{  $labelForJs }}';
                 commentaire_proposition_existant = '{{ $commentaireProposition }}';
                 commentaire = '';
                 $dispatch('open-modal', { id: 'validMentor' })"
@@ -220,7 +221,7 @@
                 style="color: #FF6F00;"
                 icon="heroicon-c-shield-check"
                 x-on:click="a_proposer = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' };
-                    message_du_modal = '{{ $labelClean }}';
+                    message_du_modal = '{{  $labelForJs }}';
                     commentaire = '{{ $commentairePropositionClean}}';
                     modification_proposition = true;
                     $dispatch('open-modal', { id: 'propos' })"
@@ -351,7 +352,7 @@
                         icon="heroicon-s-x-circle"
                         tooltip="Dévalider"
                         x-on:click="a_devalider = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' };
-                                    message_du_modal = '{{ htmlspecialchars($label) }}';
+                                    message_du_modal = '{{ $labelForJs }}';
                                     $dispatch('open-modal', { id: 'annul' });"
                     />
                 @endif
