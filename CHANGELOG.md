@@ -1,3 +1,8 @@
+## 0.1.2 (February 16, 2026)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.1.1 –> 0.1.2
+- Implements art #696979 : Correctif Bug Apostrophe ok dans item blade parcours.
+- Rajout Permission pour refuser une proposition dans LivretFCm
+
 ## 0.1.1 (February 13, 2026)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.1.0 –> 0.1.1
 - Implements art #685754 : modifications diverses sur les IHM et les permissions
