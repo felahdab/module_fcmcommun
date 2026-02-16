@@ -157,6 +157,16 @@ class LivretFcmLight extends Component
         return auth()->user()->can($this->PermissionPrefix . '::livret.valider');
     }
 
+    #[Computed]
+    public function canRefuser()
+    {   
+        if (!$this->marinPeutProposerOuValider()) {
+            return false;
+        }
+    
+        return auth()->user()->can($this->PermissionPrefix . '::livret.refuser');
+    }
+
 
     // ========================================
     // DONNÉES DE BASE
@@ -921,15 +931,15 @@ class LivretFcmLight extends Component
         $this->refreshAfterAction();
     }
 
-    //  méthode pour annuler une proposition
+    //  méthode pour refuser une proposition
     public function annulerProposition(array $element_a_annuler, string $commentaire = '')
     {
-        if (!$this->canAnnuler()) {
+        if (!$this->canRefuser()) {
             logger()->warning("Un utilisateur n'ayant pas l'autorisation d'annuler une proposition a tenté de le faire.");
             abort(403, 'Vous n\'avez pas le droit d\'annuler des propositions.');
         }
 
-        logger()->info("Annuler proposition: ", $element_a_annuler);
+        logger()->info("Refuser proposition: ", $element_a_annuler);
 
         $event = new ($this->UserGeneratedEvent)(
             event_type: UserGeneratedEventTypes::ANNUL_PROPOS_ELMT_MARIN_PARCOURS,
@@ -947,6 +957,9 @@ class LivretFcmLight extends Component
 
         $this->refreshAfterAction();
     }
+
+
+    
 
 
     // ========================================
