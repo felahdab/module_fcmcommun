@@ -1,12 +1,12 @@
 <?php
 // filepath: tests/Unit/Models/MentorRelationTest.php
-
+use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Modules\FcmCentral\Models\Marin;
 use Modules\FcmCentral\Models\FcmMarin;
 
 uses(RefreshDatabase::class);
-uses(Tests\TestCase::class);
+uses(TestCase::class);
 
 pest()->group("Tests Mentors");
 

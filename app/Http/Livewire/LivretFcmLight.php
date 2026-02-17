@@ -3,6 +3,7 @@
 
 namespace Modules\FcmCommun\Http\Livewire;
 
+use Modules\FcmCommun\Services\CalculHeuresParcoursService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
@@ -636,7 +637,7 @@ class LivretFcmLight extends Component
             }
         }
 
-        $tauxHeures =  \Modules\FcmCommun\Services\CalculHeuresParcoursService::calculerPourcentageEtatValid($parcours);
+        $tauxHeures =  CalculHeuresParcoursService::calculerPourcentageEtatValid($parcours);
 
         return [
             'affectations_total' => $affectationsTotal,

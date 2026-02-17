@@ -1,11 +1,12 @@
 <?php
 
+use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 
 use Modules\FcmCommun\Models\Marin;
 
 uses(RefreshDatabase::class);
-uses(Tests\TestCase::class);
+uses(TestCase::class);
 
 pest()->group("Fcm Commun");
 

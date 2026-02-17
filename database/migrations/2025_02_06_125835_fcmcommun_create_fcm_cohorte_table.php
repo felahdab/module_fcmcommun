@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Database\PostgresConnection;
+use Illuminate\Database\MySqlConnection;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,13 +17,13 @@ return new class extends Migration
     {
         $default_value = "";
 
-        if (DB::connection() instanceof \Illuminate\Database\PostgresConnection) {
+        if (DB::connection() instanceof PostgresConnection) {
             $default_value = DB::raw('(gen_random_uuid())');
         }
-        elseif (DB::connection() instanceof \Illuminate\Database\MySqlConnection){
+        elseif (DB::connection() instanceof MySqlConnection){
             $default_value = DB::raw('(UUID())');
         }
-        
+
         Schema::create('fcmcommun_cohortes', function (Blueprint $table) use ($default_value) {
                $table->id('id');
                $table->uuid('uuid')->default($default_value);
@@ -31,7 +33,7 @@ return new class extends Migration
                $table->timestamps();
             });
 
-       
+
 
         // Liaision avec table FcmUniteMarins et FcmCohortes
         // Schema::table('fcmunite_fcm_marins', function (Blueprint $table){

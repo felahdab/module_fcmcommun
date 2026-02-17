@@ -118,7 +118,7 @@ class OutilsMarinParcoursService
     /**
      * Liste des UUIDs des objectifs validés
      */
-    public function liste_objectifs_valid_du_parcours(array $ppa = [], string $affectation = null, string $competence = null, string $savoirfaire = null)
+    public function liste_objectifs_valid_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null, ?string $savoirfaire = null)
     {
         return $this->liste_des_objectifs_du_parcours_respectant_une_condition(function ($objectif) {
             return $objectif["etat_valid"] === true;
@@ -128,7 +128,7 @@ class OutilsMarinParcoursService
     /**
      * Objectifs validés du parcours avec détails
      */
-    public function objectifs_valid_du_parcours(array $ppa = [], string $affectation = null, string $competence = null, string $savoirfaire = null)
+    public function objectifs_valid_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null, ?string $savoirfaire = null)
     {
         $result = [];
         foreach ($this->savoirfaires_du_parcours($ppa, $affectation, $competence) as $csf) {
@@ -152,7 +152,7 @@ class OutilsMarinParcoursService
         return array_unique($result, SORT_REGULAR);
     }
 
-    public function objectifs_valides_ou_proposes_du_parcours(array $ppa = [], string $affectation = null, string $competence = null, string $savoirfaire = null)
+    public function objectifs_valides_ou_proposes_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null, ?string $savoirfaire = null)
     {
         $result = [];
         foreach ($this->savoirfaires_du_parcours($ppa, $affectation, $competence) as $csf) {
@@ -181,7 +181,7 @@ class OutilsMarinParcoursService
     /**
      * Objectifs non validés du parcours
      */
-    public function objectifs_nonvalid_du_parcours(array $ppa = [], string $affectation = null, string $competence = null, string $savoirfaire = null)
+    public function objectifs_nonvalid_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null, ?string $savoirfaire = null)
     {
         $result = [];
         foreach ($this->savoirfaires_du_parcours($ppa, $affectation, $competence) as $csf) {
@@ -208,7 +208,7 @@ class OutilsMarinParcoursService
     /**
      * Objectifs proposés du parcours
      */
-    public function objectifs_propos_du_parcours(array $ppa = [], string $affectation = null, string $competence = null, string $savoirfaire = null)
+    public function objectifs_propos_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null, ?string $savoirfaire = null)
     {
         $result = [];
         foreach ($this->savoirfaires_du_parcours($ppa, $affectation, $competence) as $csf) {
@@ -235,7 +235,7 @@ class OutilsMarinParcoursService
     /**
      * Tous les objectifs du parcours
      */
-    public function objectifs_du_parcours(array $ppa = [], string $affectation = null, string $competence = null, string $savoirfaire = null)
+    public function objectifs_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null, ?string $savoirfaire = null)
     {
         $result = [];
         foreach ($this->savoirfaires_du_parcours($ppa, $affectation, $competence) as $csf) {
@@ -255,7 +255,7 @@ class OutilsMarinParcoursService
     /**
      * Objectifs de type STAGE validés
      */
-    public function stages_valid_du_parcours(array $ppa = [], string $affectation = null, string $competence = null, string $savoirfaire = null)
+    public function stages_valid_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null, ?string $savoirfaire = null)
     {
         return $this->objectifs_du_parcours_respectant_une_condition(function ($objectif) {
             return $objectif['etat_valid'] === true &&
@@ -266,7 +266,7 @@ class OutilsMarinParcoursService
     /**
      * Objectifs de type STAGE non validés
      */
-    public function stages_nonvalid_du_parcours(array $ppa = [], string $affectation = null, string $competence = null, string $savoirfaire = null)
+    public function stages_nonvalid_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null, ?string $savoirfaire = null)
     {
         return $this->objectifs_du_parcours_respectant_une_condition(function ($objectif) {
             return $objectif['etat_valid'] !== true &&
@@ -277,7 +277,7 @@ class OutilsMarinParcoursService
     /**
      * Tous les objectifs de type STAGE
      */
-    public function stages_du_parcours(array $ppa = [], string $affectation = null, string $competence = null, string $savoirfaire = null)
+    public function stages_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null, ?string $savoirfaire = null)
     {
         return $this->objectifs_du_parcours_respectant_une_condition(function ($objectif) {
             return ($objectif['type_objectif'] ?? '') === 'STAGE';
@@ -287,7 +287,7 @@ class OutilsMarinParcoursService
     /**
      * Objectifs de type TACHE validés
      */
-    public function taches_valid_du_parcours(array $ppa = [], string $affectation = null, string $competence = null, string $savoirfaire = null)
+    public function taches_valid_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null, ?string $savoirfaire = null)
     {
         return $this->objectifs_du_parcours_respectant_une_condition(function ($objectif) {
             return $objectif['etat_valid'] === true &&
@@ -298,7 +298,7 @@ class OutilsMarinParcoursService
     /**
      * Objectifs de type TACHE non validés
      */
-    public function taches_nonvalid_du_parcours(array $ppa = [], string $affectation = null, string $competence = null, string $savoirfaire = null)
+    public function taches_nonvalid_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null, ?string $savoirfaire = null)
     {
         return $this->objectifs_du_parcours_respectant_une_condition(function ($objectif) {
             return $objectif['etat_valid'] !== true &&
@@ -309,7 +309,7 @@ class OutilsMarinParcoursService
     /**
      * Objectifs de type TACHE proposés
      */
-    public function taches_propos_du_parcours(array $ppa = [], string $affectation = null, string $competence = null, string $savoirfaire = null)
+    public function taches_propos_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null, ?string $savoirfaire = null)
     {
         return $this->objectifs_du_parcours_respectant_une_condition(function ($objectif) {
             return ($objectif['type_objectif'] ?? '') === 'TACHE' &&
@@ -320,7 +320,7 @@ class OutilsMarinParcoursService
     /**
      * Tous les objectifs de type TACHE
      */
-    public function taches_du_parcours(array $ppa = [], string $affectation = null, string $competence = null, string $savoirfaire = null)
+    public function taches_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null, ?string $savoirfaire = null)
     {
         return $this->objectifs_du_parcours_respectant_une_condition(function ($objectif) {
             return ($objectif['type_objectif'] ?? '') === 'TACHE';
@@ -334,7 +334,7 @@ class OutilsMarinParcoursService
     /**
      * Savoir-faires validés du parcours
      */
-    public function savoirfaires_valid_du_parcours(array $ppa = [], string $affectation = null, string $competence = null)
+    public function savoirfaires_valid_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null)
     {
         $result = [];
         foreach ($this->competences_du_parcours($ppa, $affectation) as $comp) {
@@ -358,7 +358,7 @@ class OutilsMarinParcoursService
         return array_unique($result, SORT_REGULAR);
     }
 
-    public function savoirfaires_valides_ou_proposes_du_parcours(array $ppa = [], string $affectation = null, string $competence = null)
+    public function savoirfaires_valides_ou_proposes_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null)
     {
         $result = [];
         foreach ($this->competences_du_parcours($ppa, $affectation) as $comp) {
@@ -387,7 +387,7 @@ class OutilsMarinParcoursService
     /**
      * Savoir-faires non validés du parcours
      */
-    public function savoirfaires_nonvalid_du_parcours(array $ppa = [], string $affectation = null, string $competence = null)
+    public function savoirfaires_nonvalid_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null)
     {
         $result = [];
         foreach ($this->competences_du_parcours($ppa, $affectation) as $comp) {
@@ -414,7 +414,7 @@ class OutilsMarinParcoursService
     /**
      * Savoir-faires proposés du parcours
      */
-    public function savoirfaires_propos_du_parcours(array $ppa = [], string $affectation = null, string $competence = null)
+    public function savoirfaires_propos_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null)
     {
         $result = [];
         foreach ($this->competences_du_parcours($ppa, $affectation) as $comp) {
@@ -441,7 +441,7 @@ class OutilsMarinParcoursService
     /**
      * Tous les savoir-faires du parcours
      */
-    public function savoirfaires_du_parcours(array $ppa = [], string $affectation = null, string $competence = null)
+    public function savoirfaires_du_parcours(array $ppa = [], ?string $affectation = null, ?string $competence = null)
     {
         $result = [];
         foreach ($this->competences_du_parcours($ppa, $affectation) as $comp) {
@@ -461,7 +461,7 @@ class OutilsMarinParcoursService
     /**
      * Compétences validées du parcours
      */
-    public function competences_valid_du_parcours(array $ppa = [], string $affectation = null)
+    public function competences_valid_du_parcours(array $ppa = [], ?string $affectation = null)
     {
         $result = [];
         foreach ($this->affectations_du_parcours($ppa) as $aff) {
@@ -476,7 +476,7 @@ class OutilsMarinParcoursService
         return array_unique($result, SORT_REGULAR);
     }
 
-    public function competences_validees_ou_proposees_du_parcours(array $ppa = [], string $affectation = null)
+    public function competences_validees_ou_proposees_du_parcours(array $ppa = [], ?string $affectation = null)
     {
         $result = [];
         foreach ($this->affectations_du_parcours($ppa) as $aff) {
@@ -494,7 +494,7 @@ class OutilsMarinParcoursService
     /**
      * Compétences non validées du parcours
      */
-    public function competences_nonvalid_du_parcours(array $ppa = [], string $affectation = null)
+    public function competences_nonvalid_du_parcours(array $ppa = [], ?string $affectation = null)
     {
         $result = [];
         foreach ($this->affectations_du_parcours($ppa) as $aff) {
@@ -512,7 +512,7 @@ class OutilsMarinParcoursService
     /**
      * Toutes les compétences du parcours
      */
-    public function competences_du_parcours(array $ppa = [], string $affectation = null)
+    public function competences_du_parcours(array $ppa = [], ?string $affectation = null)
     {
         $result = [];
         foreach ($this->affectations_du_parcours($ppa) as $aff) {

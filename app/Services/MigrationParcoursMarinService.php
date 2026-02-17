@@ -2,6 +2,7 @@
 
 namespace Modules\FcmCommun\Services;
 
+use Exception;
 use Illuminate\Support\Facades\Log;
 use Modules\FcmCentral\Models\ParcoursSerialise;
 use Modules\FcmCentral\Models\MarinParcours;
@@ -61,7 +62,7 @@ class MigrationParcoursMarinService
             try {
                 $this->migrerMarinParcours($marinParcours, $nouveauParcours);
                 $stats['success']++;
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 $stats['errors']++;
                 Log::error('❌ Erreur migration MarinParcours', [
                     'marin_parcours_id' => $marinParcours->id,

@@ -39,7 +39,7 @@ abstract class Livret extends Component implements HasActions, HasForms
             ->label("Mettre à jour le livret")
             ->visible($this->authorizeUser())
             ->requiresConfirmation()
-            ->form([
+            ->schema([
                 Textarea::make('commentaire')
             ])
             ->action(function (array $arguments, array $data) {

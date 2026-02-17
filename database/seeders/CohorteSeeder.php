@@ -2,6 +2,7 @@
 
 namespace Modules\FcmCommun\Database\Seeders;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
@@ -20,21 +21,21 @@ class CohorteSeeder extends Seeder
 
         // Creer une cohorte
         Cohorte::create([
-            'uuid'      =>  (string) \Illuminate\Support\Str::uuid(),
+            'uuid'      =>  (string) Str::uuid(),
             'libelle_court' => '22.1',
             'libelle_long' => 'BAT DEASM 22.1',
         ]);
 
         // Creer une cohorte
         Cohorte::create([
-            'uuid'      =>  (string) \Illuminate\Support\Str::uuid(),
+            'uuid'      =>  (string) Str::uuid(),
             'libelle_court' => '22.2',
             'libelle_long' => 'BAT DEASM 22.2',
         ]);
 
         // Creer une cohorte
         Cohorte::create([
-            'uuid'      =>  (string) \Illuminate\Support\Str::uuid(),
+            'uuid'      =>  (string) Str::uuid(),
             'libelle_court' => '23.1',
             'libelle_long' => 'BAT DEASM 23.1',
         ]);
@@ -42,7 +43,7 @@ class CohorteSeeder extends Seeder
 
          // Creer une cohorte
          Cohorte::create([
-            'uuid'      =>  (string) \Illuminate\Support\Str::uuid(),
+            'uuid'      =>  (string) Str::uuid(),
             'libelle_court' => '23.2',
             'libelle_long' => 'BAT DEASM 23.2',
         ]);
