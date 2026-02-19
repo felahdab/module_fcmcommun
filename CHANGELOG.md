@@ -1,3 +1,7 @@
+## 0.2.0 (February 19, 2026)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.1.2 –> 0.2.0
+- Ajustements pour Filament v4 (donc skeletor v4.0.0+)
+
 ## 0.1.2 (February 16, 2026)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.1.1 –> 0.1.2
 - Implements art #696979 : Correctif Bug Apostrophe ok dans item blade parcours.

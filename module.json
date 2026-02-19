@@ -7,5 +7,6 @@
     "providers": [
         "Modules\\FcmCommun\\Providers\\FcmCommunServiceProvider"
     ],
-    "files": []
+    "files": [],
+    "version": "0.2.0"
 }
