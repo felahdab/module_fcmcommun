@@ -14,11 +14,11 @@ beforeEach(function () {
     Marin::factory()->create();
 });
 
-it('has at least 1 Marin to work on', function() {
+it('a au moins 1 marin en base pour derouler les autres tests', function() {
     $this->assertTrue(Marin::count() > 0);
 });
 
-it('can mark a Marin as suivi en FCM', function() {
+it('peut marquer un marin en suivi en FCM', function() {
     $marin = Marin::first();
     $this->assertTrue($marin->suivi_en_fcm == false);
     $marin->suivi_en_fcm = true;
@@ -28,7 +28,7 @@ it('can mark a Marin as suivi en FCM', function() {
 
 });
 
-it('can query Marin which are suivi en FCM', function() {
+it('peut requeter les marins qui sont en FCM', function() {
     $marin = Marin::first();
     $this->assertTrue($marin->suivi_en_fcm == false);
     $marin->suivi_en_fcm = true;
@@ -38,7 +38,7 @@ it('can query Marin which are suivi en FCM', function() {
 
 });
 
-it('can will not show Marin which are not suivi en FCM', function() {
+it('ignore bien les marins qui ne sont pas suivis en FCM quand on requete en filtrant', function() {
     $marin = Marin::first();
     $this->assertTrue($marin->suivi_en_fcm == false);
 

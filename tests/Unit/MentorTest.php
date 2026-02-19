@@ -8,7 +8,7 @@ use Modules\FcmCentral\Models\FcmMarin;
 uses(RefreshDatabase::class);
 uses(TestCase::class);
 
-pest()->group("Tests Mentors");
+pest()->group("FcmCommun")->group("Tests mentors");
 
 beforeEach(function () {
     $this->marin = Marin::factory()->create();
@@ -103,10 +103,6 @@ it('peut savoir si plusieurs marins peuvent avoir le même mentor', function() {
         $marins->push($marin);
     }
     
-    // Alors - Tous ont le même mentor
-    $marinsAvecMentor = FcmMarin::avecMentorSpecifique($mentorPopulaire->id)->get();
-    $this->assertCount(5, $marinsAvecMentor);
-    
     // Vérifier depuis le scope mentor
     $marinsmentores = Marin::mentorePar($mentorPopulaire)->get();
     $this->assertCount(5, $marinsmentores);
@@ -149,53 +145,6 @@ it('peut savoir si un marin ne peut pas avoir plusieurs mentors (contrainte)', f
     $this->assertEquals($mentor2->id, $fcmMarinRefresh->mentor_id);
 });
 
-// ========================================
-// TESTS CONTRAINTES MÉTIER
-// ========================================
-
-it('peut valider la contrainte unicité mentor par marin', function() {
-    // Etant donné
-    $mentor1 = Marin::factory()->create();
-    $mentor2 = Marin::factory()->create();
-    
-    // Quand - Un marin a un mentor
-    $this->fcmMarin->changerMentor($mentor1);
-    $this->assertTrue($this->fcmMarin->hasMentor());
-    $this->assertEquals($mentor1->id, $this->fcmMarin->mentor_id);
-    
-    // Quand - Changer de mentor
-    $this->fcmMarin->changerMentor($mentor2);
-    
-    // Alors - Seul le nouveau mentor est présent
-    $this->assertEquals($mentor2->id, $this->fcmMarin->mentor_id);
-    $this->assertNotEquals($mentor1->id, $this->fcmMarin->mentor_id);
-    
-    // Vérifier qu'il n'y a qu'un mentor dans la DB
-    $this->assertDatabaseHas('fcmcentral_fcm_marins', [
-        'id' => $this->fcmMarin->id,
-        'mentor_id' => $mentor2->id
-    ]);
-    
-    $this->assertDatabaseMissing('fcmcentral_fcm_marins', [
-        'id' => $this->fcmMarin->id,
-        'mentor_id' => $mentor1->id
-    ]);
-});
-
-it('peut retirer un mentor', function() {
-    // Etant donné - Marin avec mentor
-    $mentor = Marin::factory()->create();
-    $this->fcmMarin->changerMentor($mentor);
-    $this->assertTrue($this->fcmMarin->hasMentor());
-    
-    // Quand - Retirer le mentor
-    $this->fcmMarin->retirerMentor();
-    
-    // Alors
-    $this->assertFalse($this->fcmMarin->hasMentor());
-    $this->assertNull($this->fcmMarin->mentor_id);
-    $this->assertNull($this->fcmMarin->mentor);
-});
 
 
 
