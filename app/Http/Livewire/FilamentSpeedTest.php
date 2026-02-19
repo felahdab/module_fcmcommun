@@ -2,6 +2,7 @@
  
  namespace Modules\FcmCommun\Http\Livewire;
  
+use Filament\Facades\Filament;
 use Livewire\Component;
 use Illuminate\Support\Facades\Log;
  
@@ -29,7 +30,7 @@ class FilamentSpeedTest extends Component
         
         // 3. Filament check
         $startFilament = microtime(true);
-        $panels = \Filament\Facades\Filament::getCurrentPanel();
+        $panels = Filament::getCurrentOrDefaultPanel();
         $times['filament'] = round((microtime(true) - $startFilament) * 1000, 3);
         
         $total = round((microtime(true) - $start) * 1000, 2);

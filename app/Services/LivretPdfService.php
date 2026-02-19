@@ -2,6 +2,7 @@
 
 namespace Modules\FcmCommun\Services;
 
+use Carbon\Carbon;
 use Dompdf\Dompdf;
 use Dompdf\Options;
 use Illuminate\Support\Facades\View;
@@ -58,9 +59,9 @@ class LivretPdfService
             'stats' => $stats,
             'date_generation' => now()->format('d/m/Y à H:i'),
             'jalons' => [
-                'sedimentation' => $complementsFcm->date_sedimentation ? \Carbon\Carbon::parse($complementsFcm->date_sedimentation)->format('d/m/Y') : 'Non renseigné',
-                'fcm' => $complementsFcm->date_fcm ? \Carbon\Carbon::parse($complementsFcm->date_fcm)->format('d/m/Y') : 'Non renseigné',
-                'competence' => $complementsFcm->date_competence ? \Carbon\Carbon::parse($complementsFcm->date_competence)->format('d/m/Y') : 'Non renseigné',
+                'sedimentation' => $complementsFcm->date_sedimentation ? Carbon::parse($complementsFcm->date_sedimentation)->format('d/m/Y') : 'Non renseigné',
+                'fcm' => $complementsFcm->date_fcm ? Carbon::parse($complementsFcm->date_fcm)->format('d/m/Y') : 'Non renseigné',
+                'competence' => $complementsFcm->date_competence ? Carbon::parse($complementsFcm->date_competence)->format('d/m/Y') : 'Non renseigné',
             ],
         ];
     }

@@ -1,6 +1,7 @@
 <?php
 namespace Modules\FcmCommun\Services;
 
+use Exception;
 use Illuminate\Support\Facades\Log;
 
 class CalculHeuresParcoursService
@@ -77,7 +78,7 @@ class CalculHeuresParcoursService
 
             return true;
 
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             Log::error('Erreur calcul heures parcours', ['erreur' => $e->getMessage()]);
             return false;
         }

@@ -3,6 +3,7 @@
 
 namespace Modules\FcmCommun\Console;
 
+use Exception;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
@@ -60,7 +61,7 @@ class GenerateParcoursSeederCommand extends Command
             $this->info("📁 Dossier: {$this->seederPath}");
             $this->info("🚀 Pour utiliser: php artisan db:seed --class=\"Modules\\FcmCentral\\Database\\Seeders\\Parcours\\{$this->parcoursName}MasterSeeder\"");
  
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->error("❌ Erreur: " . $e->getMessage());
             return 1;
         }

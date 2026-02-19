@@ -8,7 +8,7 @@ use Illuminate\Support\Str;
 use Modules\FcmCommun\Models\Cohorte;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\TransformationHistory>
+ * @extends Factory<\App\Models\TransformationHistory>
  */
 class CohorteFactory extends Factory
 {

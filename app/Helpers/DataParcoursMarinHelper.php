@@ -11,7 +11,7 @@ class DataParcoursMarinHelper
      * @param string $mode
      * @return array
      */
-    public static function rajoutChampSupplementaire(array $data, array $addFields = null, string $mode = 'init'): array
+    public static function rajoutChampSupplementaire(array $data, ?array $addFields = null, string $mode = 'init'): array
     {
         // Mode 'init', injection des champs standards et supplémentaires
         if ($mode === 'init') {
