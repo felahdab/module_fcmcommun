@@ -1,3 +1,8 @@
+## 0.2.1 (March 10, 2026)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.2.0 –> 0.2.1
+- Suppression des tests Mentor de ce module. Déplacement dans FcmCentral.
+- Ajustement de tests anciens
+
 ## 0.2.0 (February 19, 2026)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.1.2 –> 0.2.0
 - Ajustements pour Filament v4 (donc skeletor v4.0.0+)
