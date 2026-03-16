@@ -17,6 +17,9 @@ use Modules\FcmCommun\DataObjects\Enums\UserGeneratedEventTypes;
 
 class LivretFcmLight extends Component
 {
+   
+  
+
     #[Locked]
     public $marinId;
 
@@ -553,8 +556,7 @@ class LivretFcmLight extends Component
         return $parcoursFiltre;
     }
 
-    private function affectationCorrespondAuFiltre(array $affectation): bool
-    {
+    private function affectationCorrespondAuFiltre(array $affectation): bool    {
         if ($this->affectationFilter === 'toutes') {
             return true;
         }

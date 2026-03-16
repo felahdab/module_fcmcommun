@@ -1,4 +1,4 @@
-<x-filament::card>
+<x-filament::section >
 
     <div x-data="parcoursManager()" x-init="initLivret()" x-cloak>
 
@@ -34,7 +34,8 @@
             </div>
 
             {{-- ✅ FILTRES PAR CATÉGORIE --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {{-- <div class="grid grid-cols-3 md:grid-cols-3 gap-4"> --}}
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 12px;"> 
                
                 {{-- Filtre par Affectation --}}
                 <div>
@@ -384,7 +385,7 @@
     @push('styles')
         @include('fcmcommun::livewire.livretfcmlight.layouts.parcoursDetailsValidation.styles')
     @endpush
-</x-filament::card>
+</x-filament::section>
 
 @push('scripts')
     @include('fcmcommun::livewire.livretfcmlight.layouts.parcoursDetailsValidation.scripts')
