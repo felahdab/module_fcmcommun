@@ -12,6 +12,7 @@
            
             commentaire: '',
             message_du_modal: '',
+            date_validation: new Date().toISOString().split('T')[0],
 
             modification_proposition: false,
             a_proposition_mentor: {},  
@@ -27,6 +28,15 @@
            
             init() {
                 this.loadFromStorage();
+
+                // ✅ Écoute les changements depuis le modal
+                window.addEventListener('date-changed', (e) => {
+                    this.date_validation = e.detail;
+                });
+                window.addEventListener('commentaire-changed', (e) => {
+                    this.commentaire = e.detail;
+                });
+
                
                 this.$wire.on('clear-selections', () => {
                     this.clearSelections();

@@ -910,7 +910,7 @@ class LivretFcmLight extends Component
         $this->refreshAfterAction();
     }
 
-    public function valider(array $elements_a_valider, string $commentaire)
+    public function valider(array $elements_a_valider, string $commentaire, ?string $dateValidation = null)
     {
         if ( ! $this->canValider() )
         {
@@ -918,13 +918,15 @@ class LivretFcmLight extends Component
             abort(403, 'Vous n avez pas le droit de valider des éléments du parcours de FCM.');
         }
 
+        $date = $dateValidation ? Carbon::parse($dateValidation) : Carbon::now();
+
         logger()->info("Valider: ", $elements_a_valider);
 
         if (array_key_exists("savoirfaire", $elements_a_valider)){
             foreach($elements_a_valider["savoirfaire"] as $savoirfaire_uuid => $bool) {
                 if (!$bool) continue;
                
-                $this->createValidationEvent("savoirfaire", $savoirfaire_uuid, $commentaire);
+                $this->createValidationEvent("savoirfaire", $savoirfaire_uuid, $commentaire, $date);
             }
         }
 
@@ -932,7 +934,7 @@ class LivretFcmLight extends Component
             foreach($elements_a_valider["objectif"] as $objectif_uuid => $bool) {
                 if (!$bool) continue;
                
-                $this->createValidationEvent("objectif", $objectif_uuid, $commentaire);
+                $this->createValidationEvent("objectif", $objectif_uuid, $commentaire, $date);
             }
         }
 
@@ -1001,7 +1003,7 @@ class LivretFcmLight extends Component
     // MÉTHODES HELPER POUR ACTIONS
     // ========================================
 
-    private function createValidationEvent(string $type, string $uuid, string $commentaire): void
+    private function createValidationEvent(string $type, string $uuid, string $commentaire, ?Carbon $date = null): void
     {
         $event = new ($this->UserGeneratedEvent)(
             event_type: UserGeneratedEventTypes::VALID_ELMT_MARIN_PARCOURS,
@@ -1009,14 +1011,15 @@ class LivretFcmLight extends Component
             object_class: ObjectClasses::MARIN,
             object_uuid: $this->marin->uuid,
             detail: [
-                "type_element" => $type,
-                "uuid_element" => $uuid,
-                "date" => Carbon::now(),
-                "commentaire" => $commentaire,
+                "type_element"  => $type,
+                "uuid_element"  => $uuid,
+                "date"          => $date ?? Carbon::now(), // ✅ date antidatée
+                "commentaire"   => $commentaire,
             ]
         );
         event($event);
     }
+
 
     private function refreshAfterAction(): void
     {

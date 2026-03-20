@@ -8,6 +8,35 @@ icon="heroicon-o-information-circle"
         <h2 class="text-lg font-bold">Ajouter un commentaire</h2>
     </x-slot>
     <x-slot name="description">
+        {{-- ✅ Date de validation --}}
+        <div x-data="{
+            localDate: new Date().toISOString().split('T')[0],
+            localCommentaire: ''
+         }"
+         x-init="
+            $watch('localDate', val => $dispatch('date-changed', val));
+            $watch('localCommentaire', val => $dispatch('commentaire-changed', val));
+         "
+    >
+        {{-- ✅ Date --}}
+        <div class="mb-4" style="margin:10px 0px 20px;;">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Date de validation
+            </label>
+            <input
+                style="padding:3px;"
+                type="date"
+                x-model="localDate"
+                :max="new Date().toISOString().split('T')[0]"
+                class="w-full border-gray-300 rounded-md shadow-sm
+                       focus:ring-primary-500 focus:border-primary-500
+                       dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+            />
+        </div>
+
+
+    {{-- Commentaire existant --}}
+
         <textarea x-model="commentaire" rows="4" 
         class="w-full border-gray-300 rounded-md shadow-sm 
                    focus:ring-primary-500 focus:border-primary-500 
@@ -29,11 +58,12 @@ icon="heroicon-o-information-circle"
             x-bind:disabled="loading"
             x-on:click="
                 loading = true;
-                $wire.valider(selectedItems, commentaire)
+                $wire.valider(selectedItems, commentaire, date_validation)
                     .then(() => {
                         loading = false;
                         selectedItems = {};
                         commentaire = '';
+                        date_validation = new Date().toISOString().split('T')[0]; 
                         $dispatch('close-modal', {id: 'sauve'});
                     })
                     .catch(() => {
@@ -105,7 +135,7 @@ icon="heroicon-o-x-circle"
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
-            Suppression...
+           Annulation / Suppression...
         </span>
     </x-filament::button>
 </x-slot>
