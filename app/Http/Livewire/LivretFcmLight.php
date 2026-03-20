@@ -128,7 +128,9 @@ class LivretFcmLight extends Component
     }
 
 
-    
+    // ========================================
+    // DROITS
+    // ========================================
 
     #[Computed]
     public function canProposer()
@@ -136,40 +138,70 @@ class LivretFcmLight extends Component
         if (!$this->marinPeutProposerOuValider()) {
             return false;
         }
-    
-        
-        return auth()->user()->can($this->PermissionPrefix . '::livret.proposer') || $this->userEstLeMarin();
+
+        // ✅ Le marin peut toujours proposer ses propres éléments sans permission explicite
+        if ($this->userEstLeMarin()) {
+            return true;
+        }
+
+        return auth()->user()->can($this->PermissionPrefix . '::livret.proposer');
     }
 
     #[Computed]
     public function canAnnuler()
-    {   
+    {
         if (!$this->marinPeutProposerOuValider()) {
             return false;
         }
-    
+
+        // ✅ Le marin peut toujours annuler ses propres propositions sans permission explicite
+        if ($this->userEstLeMarin()) {
+            return true;
+        }
+
         return auth()->user()->can($this->PermissionPrefix . '::livret.annuler');
     }
 
     #[Computed]
     public function canValider()
-    {   
+    {
         if (!$this->marinPeutProposerOuValider()) {
             return false;
         }
-    
+
+        // ✅ Le mentor peut toujours valider sans permission explicite
+        $currentMarin = ($this->Marin)::fromCurrentUser();
+        if ($currentMarin && $currentMarin->est_mentor_de($this->marin)) {
+            return true;
+        }
+
         return auth()->user()->can($this->PermissionPrefix . '::livret.valider');
     }
 
     #[Computed]
+    public function canDevalider()
+    {
+      
+
+        return auth()->user()->can($this->PermissionPrefix . '::livret.annuler');
+    }
+
+    #[Computed]
     public function canRefuser()
-    {   
+    {
         if (!$this->marinPeutProposerOuValider()) {
             return false;
         }
-    
+
+        // ✅ Le mentor peut toujours refuser sans permission explicite
+        $currentMarin = ($this->Marin)::fromCurrentUser();
+        if ($currentMarin && $currentMarin->est_mentor_de($this->marin)) {
+            return true;
+        }
+
         return auth()->user()->can($this->PermissionPrefix . '::livret.refuser');
     }
+
 
 
     // ========================================

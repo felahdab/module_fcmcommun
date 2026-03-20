@@ -344,7 +344,7 @@
                         $dispatch('open-modal', { id: 'infosModal'});"
             />
 
-            @if($isChecked || $isProposed )
+            {{-- @if($isChecked || $isProposed )
                 @if($this->canAnnuler())
                     <x-filament::icon-button
                         size="lg"
@@ -356,7 +356,39 @@
                                     $dispatch('open-modal', { id: 'annul' });"
                     />
                 @endif
-            @endif
+            @endif --}}
+
+            {{-- ✅ ANNULER PROPOSITION (marin uniquement, si proposé mais pas validé) --}}
+                @if($isProposed && !$isChecked)
+                    @if($this->userEstLeMarin() || $this->canAnnuler())
+                        <x-filament::icon-button
+                            size="lg"
+                            color="warning"
+                            icon="heroicon-s-x-circle"
+                            tooltip="Annuler ma proposition"
+                            x-on:click="a_devalider = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' };
+                                        message_du_modal = '{{ $labelForJs }}';
+                                        $dispatch('open-modal', { id: 'annul' });"
+                        />
+                    @endif
+                @endif
+
+                {{-- ✅ DÉVALIDER (mentor/admin uniquement, si validé) --}}
+                @if($isChecked)
+                    @if($this->canDevalider())
+                        <x-filament::icon-button
+                            size="lg"
+                            color="danger"
+                            icon="heroicon-s-x-circle"
+                            tooltip="Dévalider"
+                            x-on:click="a_devalider = { 'type' : '{{ $type }}', 'uuid' : '{{ $uuid }}' };
+                                        message_du_modal = '{{ $labelForJs }}';
+                                        $dispatch('open-modal', { id: 'annul' });"
+                        />
+                    @endif
+                @endif
+
+
         @endif
 
         {{-- Chevron --}}
