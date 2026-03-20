@@ -1,3 +1,9 @@
+## 0.2.2 (March 20, 2026)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.2.1 –> 0.2.2
+- Implements art #717730 : Ajout input date pour antidater les validations
+- Implements art #717730 : Autorisations implicites pour Marin et Mentor,  modification et rajout methode canDevalider
+- Implements art #717301 : Modifcation vue LivrectFCM bug v4 et Seeder
+
 ## 0.2.1 (March 10, 2026)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.2.0 –> 0.2.1
 - Suppression des tests Mentor de ce module. Déplacement dans FcmCentral.
