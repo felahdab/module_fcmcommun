@@ -17,7 +17,7 @@ icon="heroicon-o-information-circle"
             <input
                 style="padding:3px;"
                 type="date"
-                x-model="localDate"
+                x-model="date_validation"
                 :max="new Date().toISOString().split('T')[0]"
                 class="w-full border-gray-300 rounded-md shadow-sm
                        focus:ring-primary-500 focus:border-primary-500
