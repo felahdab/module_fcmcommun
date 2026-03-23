@@ -8,16 +8,7 @@ icon="heroicon-o-information-circle"
         <h2 class="text-lg font-bold">Ajouter un commentaire</h2>
     </x-slot>
     <x-slot name="description">
-        {{-- ✅ Date de validation --}}
-        <div x-data="{
-            localDate: new Date().toISOString().split('T')[0],
-            localCommentaire: ''
-         }"
-         x-init="
-            $watch('localDate', val => $dispatch('date-changed', val));
-            $watch('localCommentaire', val => $dispatch('commentaire-changed', val));
-         "
-    >
+      
         {{-- ✅ Date --}}
         <div class="mb-4" style="margin:10px 0px 20px;;">
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
