@@ -768,7 +768,7 @@ class LivretFcmLight extends Component
 
     private function calculerStatistiques(): array
     {
-        $total = 0;
+        $total   = 0;
         $valides = 0;
         $proposes = 0;
 
@@ -776,35 +776,30 @@ class LivretFcmLight extends Component
             foreach ($affectation['competences'] ?? [] as $competence) {
                 foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
                     $total++;
-                   
-                    if ($csf['etat_valid'] ?? false) {
-                        $valides++;
-                    }
-                    if (!empty($csf['date_proposition'])) {
-                        $proposes++;
-                    }
+                    if ($csf['etat_valid'] ?? false)         $valides++;
+                    if (!empty($csf['date_proposition']))    $proposes++;
 
                     foreach ($csf['objectifs'] ?? [] as $objectif) {
                         $total++;
-                       
-                        if ($objectif['etat_valid'] ?? false) {
-                            $valides++;
-                        }
-                        if (!empty($objectif['date_proposition'])) {
-                            $proposes++;
-                        }
+                        if ($objectif['etat_valid'] ?? false)      $valides++;
+                        if (!empty($objectif['date_proposition'])) $proposes++;
                     }
                 }
             }
         }
 
+        // ✅ Taux basé sur les heures (compagnonnage inclus) via le service
+        $taux = CalculHeuresParcoursService::calculerPourcentageEtatValid($this->parcours);
+
         return [
-            'total' => $total,
-            'valides' => $valides,
-            'proposes' => $proposes,
-            'non_valides' => $total - $valides
+            'total'      => $total,
+            'valides'    => $valides,
+            'proposes'   => $proposes,
+            'non_valides' => $total - $valides,
+            'taux'       => $taux,      
         ];
     }
+
 
     protected function getStatistiquesGenerales(): array
     {
@@ -812,46 +807,41 @@ class LivretFcmLight extends Component
 
         if (empty($parcours)) {
             return [
-                'affectations_total' => 0,
+                'affectations_total'    => 0,
                 'affectations_validees' => 0,
-                'heures_total' => 0,
-                'heures_validees' => 0,
-                'taux_heures' => 0,
+                'heures_total'          => 0,
+                'heures_validees'       => 0,
+                'taux_heures'           => 0,
             ];
         }
 
-        $affectationsTotal = count($parcours['affectations'] ?? []);
+        $affectationsTotal    = count($parcours['affectations'] ?? []);
         $affectationsValidees = collect($parcours['affectations'] ?? [])
             ->where('etat_valid', true)
             ->count();
 
-        // ✅ Calcul des heures totales
-        $heuresTotal = 0;
+        // ✅ Lecture des heures déjà calculées par CalculHeuresParcoursService
+        // (renseignées sur chaque affectation par mettreAJourHeures dans les listeners)
+        $heuresTotal    = 0;
         $heuresValidees = 0;
-
         foreach ($parcours['affectations'] ?? [] as $affectation) {
-            foreach ($affectation['competences'] ?? [] as $competence) {
-                foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
-                    $heures = (float) ($csf['heures'] ?? (($csf['jours'] ?? 0) * 7));
-                    $heuresTotal += $heures;
-
-                    if ($csf['etat_valid'] ?? false) {
-                        $heuresValidees += $heures;
-                    }
-                }
-            }
+            $heuresTotal    += $affectation['heures_total']    ?? 0;
+            $heuresValidees += $affectation['heures_validees'] ?? 0;
         }
 
-        $tauxHeures =  CalculHeuresParcoursService::calculerPourcentageEtatValid($parcours);
+        // ✅ Taux via le service (gère compagnonnage, jours→heures, objectifs)
+        $taux = CalculHeuresParcoursService::calculerPourcentageEtatValid($parcours);
 
         return [
-            'affectations_total' => $affectationsTotal,
+            'affectations_total'    => $affectationsTotal,
             'affectations_validees' => $affectationsValidees,
-            'heures_total' => round($heuresTotal, 2),
-            'heures_validees' => round($heuresValidees, 2),
-            'taux_heures' => $tauxHeures,
+            'heures_total'          => round($heuresTotal, 0),
+            'heures_validees'       => round($heuresValidees, 0),
+            'taux_heures'           => $taux,
         ];
     }
+
+
 
 
     // ========================================
