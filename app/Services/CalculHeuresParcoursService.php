@@ -87,7 +87,7 @@ class CalculHeuresParcoursService
     /**
      * ✅ Récupère les heures d'un competenceSavoirfaire (pivot)
      */
-    private static function getHeures(array $csf): float
+    public static function getHeures(array $csf): float
     {
         // ✅ Priorité 1 : heures directement dans le CSF
         if (isset($csf['heures']) && is_numeric($csf['heures'])) {
