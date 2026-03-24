@@ -29,13 +29,6 @@
             init() {
                 this.loadFromStorage();
 
-                // ✅ Écoute les changements depuis le modal
-                window.addEventListener('date-changed', (e) => {
-                    this.date_validation = e.detail;
-                });
-                window.addEventListener('commentaire-changed', (e) => {
-                    this.commentaire = e.detail;
-                });
 
                
                 this.$wire.on('clear-selections', () => {
