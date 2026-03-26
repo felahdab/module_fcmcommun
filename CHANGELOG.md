@@ -1,3 +1,7 @@
+## 0.2.3 (March 24, 2026)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.2.2 –> 0.2.3
+- Implements art #722480 : bug modal initiation alpine date qui plante l'ouverture des autres modals
+
 ## 0.2.2 (March 20, 2026)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.2.1 –> 0.2.2
 - Implements art #717730 : Ajout input date pour antidater les validations
