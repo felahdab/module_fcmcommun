@@ -1,3 +1,9 @@
+## 0.2.4 (March 27, 2026)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.2.3 –> 0.2.4
+- Implements art #722833 : Modification de getHeures  private en public pour les widgets FcmCentral
+- Implements art #722833 : modifier calcul taux avec horaires objectifs
+- Implements art #722821 : modification dans les vues pour pouvoir antidater une validation
+
 ## 0.2.3 (March 24, 2026)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.2.2 –> 0.2.3
 - Implements art #722480 : bug modal initiation alpine date qui plante l'ouverture des autres modals
