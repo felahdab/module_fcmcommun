@@ -87,7 +87,7 @@ class CalculHeuresParcoursService
     /**
      * ✅ Récupère les heures d'un competenceSavoirfaire (pivot)
      */
-    private function getHeures(array $csf): float
+    public static function getHeures(array $csf): float
     {
         // ✅ Priorité 1 : heures directement dans le CSF
         if (isset($csf['heures']) && is_numeric($csf['heures'])) {
@@ -119,32 +119,95 @@ class CalculHeuresParcoursService
     /**
      * ✅ Calcul Pourcentage
      */
+    // public static function calculerPourcentageEtatValid(array $parcoursMarin): float
+    // {
+    //     $total = 0;
+    //     $valid = 0;
+
+    //     foreach ($parcoursMarin['affectations'] ?? [] as $affectation) {
+    //         //$total++;
+    //         //if ($affectation['etat_valid'] ?? false) $valid++;
+
+    //         foreach ($affectation['competences'] ?? [] as $competence) {
+    //             //$total++;
+    //             //if ($competence['etat_valid'] ?? false) $valid++;
+
+    //             foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
+    //                 $total++;
+    //                 if ($csf['etat_valid'] ?? false) $valid++;
+
+    //                 foreach ($csf['objectifs'] ?? [] as $objectif) {
+    //                     $total++;
+    //                     if ($objectif['etat_valid'] ?? false) $valid++;
+    //                 }
+    //             }
+    //         }
+    //     }
+
+    //     return $total > 0 ? round(($valid / $total) * 100, 0) : 0;
+    // }
+
+    /**
+     * ✅ Calcul Pourcentage basé sur les heures
+     * - Type normal : heures comptées au niveau du CSF
+     * - Type compagnonnage (C) : heures comptées au niveau des objectifs
+     */
     public static function calculerPourcentageEtatValid(array $parcoursMarin): float
     {
-        $total = 0;
-        $valid = 0;
+        $heuresTotal    = 0;
+        $heuresValidees = 0;
 
         foreach ($parcoursMarin['affectations'] ?? [] as $affectation) {
-            //$total++;
-            //if ($affectation['etat_valid'] ?? false) $valid++;
-
             foreach ($affectation['competences'] ?? [] as $competence) {
-                //$total++;
-                //if ($competence['etat_valid'] ?? false) $valid++;
-
                 foreach ($competence['competenceSavoirfaires'] ?? [] as $csf) {
-                    $total++;
-                    if ($csf['etat_valid'] ?? false) $valid++;
 
-                    foreach ($csf['objectifs'] ?? [] as $objectif) {
-                        $total++;
-                        if ($objectif['etat_valid'] ?? false) $valid++;
+                    $isCompagnonnage = ($csf['savoirfaire_type']['code'] ?? null) === 'C';
+
+                    if ($isCompagnonnage) {
+                        // ── Compagnonnage : granularité objectif ──────────────
+                        $objectifs  = $csf['objectifs'] ?? [];
+                        $nbObjectifs = count($objectifs);
+
+                        if ($nbObjectifs > 0) {
+                            // Part horaire par objectif (heures propres ou répartition du CSF)
+                            foreach ($objectifs as $objectif) {
+                                $hObj = self::getHeures($objectif);
+
+                                // Fallback : répartir les heures du CSF également
+                                if ($hObj == 0) {
+                                    $hObj = self::getHeures($csf) / $nbObjectifs;
+                                }
+
+                                $heuresTotal += $hObj;
+
+                                if ($objectif['etat_valid'] ?? false) {
+                                    $heuresValidees += $hObj;
+                                }
+                            }
+                        } else {
+                            // Compagnonnage sans objectifs → fallback sur le CSF
+                            $heures      = self::getHeures($csf);
+                            $heuresTotal += $heures;
+                            if ($csf['etat_valid'] ?? false) {
+                                $heuresValidees += $heures;
+                            }
+                        }
+
+                    } else {
+                        // ── Autres types : granularité CSF ────────────────────
+                        $heures      = self::getHeures($csf);
+                        $heuresTotal += $heures;
+
+                        if ($csf['etat_valid'] ?? false) {
+                            $heuresValidees += $heures;
+                        }
                     }
                 }
             }
         }
 
-        return $total > 0 ? round(($valid / $total) * 100, 0) : 0;
+        return $heuresTotal > 0 ? round(($heuresValidees / $heuresTotal) * 100, 0) : 0;
     }
+
 
 }
