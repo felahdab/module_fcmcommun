@@ -7,6 +7,7 @@ use Modules\FcmCommun\Services\CalculHeuresParcoursService;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Log;
 use Livewire\Component;
+use Livewire\WithFileUploads;
 use Livewire\Attributes\Locked;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
@@ -17,6 +18,7 @@ use Modules\FcmCommun\DataObjects\Enums\UserGeneratedEventTypes;
 
 class LivretFcmLight extends Component
 {
+    use WithFileUploads;
    
   
 
@@ -38,6 +40,8 @@ class LivretFcmLight extends Component
     // PROPRIÉTÉS DE FILTRAGE
     // ========================================
    
+    public $pieceJointe = null;
+
     public string $search = '';
     public string $statutFilter = 'tous';
     public string $affectationFilter = 'toutes';
@@ -63,11 +67,20 @@ class LivretFcmLight extends Component
 
     }
 
+    public function updatedPieceJointe(): void
+    {
+        $this->validate([
+            'pieceJointe' => ['nullable', 'file', 'mimes:pdf', 'max:5120'], // 5 Mo, PDF uniquement
+        ], [
+            'pieceJointe.mimes' => 'La pièce jointe doit être un fichier PDF.',
+            'pieceJointe.max' => 'La pièce jointe ne doit pas dépasser 5 Mo.',
+        ]);
+    }
+
     public function boot()
     {
        // $this->service = new OutilsMarinParcoursService();
     }
-
 
     // ========================================
     // PERMISSIONS
@@ -104,7 +117,6 @@ class LivretFcmLight extends Component
         return $dateSedimentation !== null && $dateFcm === null;
     }
 
-
     // ✅ FCM ACTIF (après sédimentation, avant compétence
     #[Computed]
     public function marinEstEnFcm(): bool
@@ -126,7 +138,6 @@ class LivretFcmLight extends Component
         // Si date_competence renseignée → marinEstEnFcm() = false → return false
         return $this->marinEstEnFcm() && !$this->marinEstGele();
     }
-
 
     // ========================================
     // DROITS
@@ -201,7 +212,6 @@ class LivretFcmLight extends Component
 
         return auth()->user()->can($this->PermissionPrefix . '::livret.refuser');
     }
-
 
 
     // ========================================
@@ -414,7 +424,6 @@ class LivretFcmLight extends Component
     
 
 
-
     #[Computed]
     public function objectifsParSavoirfaire()
     {
@@ -448,7 +457,6 @@ class LivretFcmLight extends Component
         // Convertir en tableaux indexés
         return array_map(fn($objectifs) => array_values($objectifs), $mapping);
     }
-
 
     #[Computed]
     public function isCurrentUser()
@@ -761,7 +769,6 @@ class LivretFcmLight extends Component
     };
 }
 
-
     // ========================================
     // CALCULS ET STATISTIQUES
     // ========================================
@@ -799,7 +806,6 @@ class LivretFcmLight extends Component
             'taux'       => $taux,      
         ];
     }
-
 
     protected function getStatistiquesGenerales(): array
     {
@@ -840,7 +846,6 @@ class LivretFcmLight extends Component
             'taux_heures'           => $taux,
         ];
     }
-
 
 
 
@@ -912,21 +917,25 @@ class LivretFcmLight extends Component
 
         logger()->info("Valider: ", $elements_a_valider);
 
+        $pieceJointePath = $this->stockerPieceJointe($elements_a_valider, $date);
+
         if (array_key_exists("savoirfaire", $elements_a_valider)){
             foreach($elements_a_valider["savoirfaire"] as $savoirfaire_uuid => $bool) {
                 if (!$bool) continue;
-               
-                $this->createValidationEvent("savoirfaire", $savoirfaire_uuid, $commentaire, $date);
+
+                $this->createValidationEvent("savoirfaire", $savoirfaire_uuid, $commentaire, $date, $pieceJointePath);
             }
         }
 
         if (array_key_exists("objectif", $elements_a_valider)){
             foreach($elements_a_valider["objectif"] as $objectif_uuid => $bool) {
                 if (!$bool) continue;
-               
-                $this->createValidationEvent("objectif", $objectif_uuid, $commentaire, $date);
+
+                $this->createValidationEvent("objectif", $objectif_uuid, $commentaire, $date, $pieceJointePath);
             }
         }
+
+        $this->pieceJointe = null;
 
         $this->refreshAfterAction();
     }
@@ -985,31 +994,67 @@ class LivretFcmLight extends Component
         $this->refreshAfterAction();
     }
 
-
     
-
 
     // ========================================
     // MÉTHODES HELPER POUR ACTIONS
     // ========================================
 
-    private function createValidationEvent(string $type, string $uuid, string $commentaire, ?Carbon $date = null): void
+    private function createValidationEvent(string $type, string $uuid, string $commentaire, ?Carbon $date = null, ?string $pieceJointePath = null): void
     {
+        $detail = [
+            "type_element"  => $type,
+            "uuid_element"  => $uuid,
+            "date"          => $date ?? Carbon::now(), // ✅ date antidatée
+            "commentaire"   => $commentaire,
+        ];
+
+        if ($pieceJointePath) {
+            $detail["piece_jointe"] = $pieceJointePath;
+        }
+
         $event = new ($this->UserGeneratedEvent)(
             event_type: UserGeneratedEventTypes::VALID_ELMT_MARIN_PARCOURS,
             user_uuid: auth()->user()->uuid,
             object_class: ObjectClasses::MARIN,
             object_uuid: $this->marin->uuid,
-            detail: [
-                "type_element"  => $type,
-                "uuid_element"  => $uuid,
-                "date"          => $date ?? Carbon::now(), // ✅ date antidatée
-                "commentaire"   => $commentaire,
-            ]
+            detail: $detail
         );
         event($event);
     }
 
+    /**
+     * Stocke la pièce jointe uploadée (diplôme, justificatif) lors d'une validation
+     * et retourne son chemin de stockage, ou null si aucun fichier n'a été fourni.
+     *
+     * Classement : fcmcommun/livretfcm/pieces-jointes/{savoirfaire|objectif}/{annee}/{mois}
+     * pour éviter d'accumuler des milliers de fichiers dans un seul dossier.
+     */
+    private function stockerPieceJointe(array $elements_a_valider = [], ?Carbon $date = null): ?string
+    {
+        if (!$this->pieceJointe) {
+            return null;
+        }
+
+        $this->validate([
+            'pieceJointe' => ['file', 'mimes:pdf', 'max:5120'], // 5 Mo, PDF uniquement
+        ], [
+            'pieceJointe.mimes' => 'La pièce jointe doit être un fichier PDF.',
+            'pieceJointe.max' => 'La pièce jointe ne doit pas dépasser 5 Mo.',
+        ]);
+
+        $date = $date ?? Carbon::now();
+        $categorie = array_key_exists('savoirfaire', $elements_a_valider) ? 'savoirfaire' : 'objectif';
+
+        $directory = sprintf(
+            'fcmcommun/livretfcm/pieces-jointes/%s/%s/%s',
+            $categorie,
+            $date->format('Y'),
+            $date->format('m')
+        );
+
+        return $this->pieceJointe->store($directory, 's3-public');
+    }
 
     private function refreshAfterAction(): void
     {

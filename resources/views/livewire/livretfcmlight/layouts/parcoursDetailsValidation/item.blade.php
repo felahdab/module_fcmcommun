@@ -4,6 +4,10 @@
         $infos = [];
     }
 
+    $pieceJointeUrl = !empty($pieceJointe)
+        ? \Illuminate\Support\Facades\Storage::disk('s3-public')->url($pieceJointe)
+        : '';
+
     // Uniformiser les clés selon le type
     if ($type === 'affectation') {
         $infos['competences'] = $infos['competences'] ?? [];
@@ -44,7 +48,6 @@
     $isProposed = !empty($dateProposition);
     $sectionId = $type.'_'.$uuid;
     $tooltipText = !empty($libelleLong) ? $libelleLong : $label;
-
 
     // ✅ CODE BADGE POUR TOUS LES TYPES
     $codeElement = $code ?? match($type) {
@@ -88,14 +91,12 @@
    
     $marinBloque = !$this->marinPeutProposerOuValider();
 
-
      // VÉRIFIER SI LE SAVOIR-FAIRE DOIT ÊTRE GRISÉ
      if ($type === 'savoirfaire') {
         $estGrise = in_array($uuid, $savoirfairesAGriser ?? []);
     } elseif ($type === 'objectif') {
         $estGrise = in_array($uuid, $objectifsAGriser ?? []);
     }
-
 
          //  Pour les savoir-faires grisés, vérifier s'ils ont des objectifs à afficher
     $hasObjectifsVisibles = false;
@@ -104,14 +105,12 @@
         $hasObjectifsVisibles = !empty($infos['objectifs']) || !empty($infos['objectifs_list']);
     }
 
-
     // Déterminer si on doit afficher le chevron
     $showChevron = (
         ($type === 'affectation' && !empty($infos['competences'])) ||
         ($type === 'competence' && !empty($infos['competenceSavoirfaires'])) ||
         ($type === 'savoirfaire' && $hasObjectifs)
     );
-
 
    // Les ACCENTS et apostrophes
 
@@ -132,7 +131,6 @@
      $labelForJs = addslashes($labelClean);
     
 @endphp
-
 
 
 
@@ -240,7 +238,6 @@
     
         @endif
 
-
         {{-- Libellé selon type --}}
         @if($type === 'savoirfaire')
            {{-- ✅ BADGE CODE POUR SAVOIR FAIRE ET TYPE STAGE ANCIEN --}}
@@ -267,7 +264,6 @@
 
         @endif
     </div>
-
 
 
      {{-- ✅ A DROITE AFFICHAGE --}}
@@ -300,7 +296,6 @@
             @endif
         
             @endif
-
 
             {{-- ✅ AFFICHAGE HEURES POUR AFFECTATION --}}
             {{-- 
@@ -339,7 +334,8 @@
                             'dateProposition': '{{ $dateProposition ?? '' }}',
                             'valideur': '{{ $valideur ?? 'Inconnu' }}',
                             'commentaire': '{{ $commentaire ?? '' }}',
-                            'commentaireProposition': '{{ $commentaireProposition ?? '' }}'
+                            'commentaireProposition': '{{ $commentaireProposition ?? '' }}',
+                            'pieceJointeUrl': '{{ $pieceJointeUrl }}'
                         };
                         $dispatch('open-modal', { id: 'infosModal'});"
             />
@@ -387,7 +383,6 @@
                         />
                     @endif
                 @endif
-
 
         @endif
 

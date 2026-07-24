@@ -25,26 +25,47 @@ icon="heroicon-o-information-circle"
             />
         </div>
 
-
     {{-- Commentaire existant --}}
 
-        <textarea x-model="commentaire" rows="4" 
-        class="w-full border-gray-300 rounded-md shadow-sm 
-                   focus:ring-primary-500 focus:border-primary-500 
+        <textarea x-model="commentaire" rows="4"
+        class="w-full border-gray-300 rounded-md shadow-sm
+                   focus:ring-primary-500 focus:border-primary-500
                    dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
         >
     </textarea>
+
+        {{-- ✅ Pièce jointe (ex: diplôme PDF pour un stage) --}}
+        <div class="mt-4">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Pièce jointe (diplôme, justificatif...)
+            </label>
+            <input
+                type="file"
+                wire:model="pieceJointe"
+                accept="application/pdf"
+                class="w-full text-sm text-gray-700 dark:text-gray-300 border-gray-300 rounded-md shadow-sm
+                       focus:ring-primary-500 focus:border-primary-500
+                       dark:bg-gray-700 dark:border-gray-600"
+            />
+            <p class="text-xs text-gray-400 mt-1">PDF uniquement, 5 Mo maximum.</p>
+            <div wire:loading wire:target="pieceJointe" class="text-xs text-gray-500 mt-1">
+                Envoi du fichier en cours...
+            </div>
+            @error('pieceJointe')
+                <p class="text-xs text-danger-600 mt-1">{{ $message }}</p>
+            @enderror
+        </div>
     </x-slot>
     <x-slot name="footer">
-        <x-filament::button 
-        color="gray" 
-        class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" 
+        <x-filament::button
+        color="gray"
+        class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
         wire:click="$dispatch('close-modal',{id:'sauve'})">
         Annuler
         </x-filament::button>
-        <x-filament::button 
-            color="success" 
-            class="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700" 
+        <x-filament::button
+            color="success"
+            class="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700"
             x-data="{ loading: false }"
             x-bind:disabled="loading"
             x-on:click="
@@ -54,7 +75,7 @@ icon="heroicon-o-information-circle"
                         loading = false;
                         selectedItems = {};
                         commentaire = '';
-                        date_validation = new Date().toISOString().split('T')[0]; 
+                        date_validation = new Date().toISOString().split('T')[0];
                         $dispatch('close-modal', {id: 'sauve'});
                     })
                     .catch(() => {
@@ -132,7 +153,6 @@ icon="heroicon-o-x-circle"
 </x-slot>
 </x-filament::modal>
 
-
 <!-- Modal Propos -->
 <x-filament::modal
     id="propos"
@@ -193,7 +213,6 @@ icon="heroicon-o-x-circle"
         </x-filament::button>
     </x-slot>
 </x-filament::modal>
-
 
 <!-- Modal Validation Mentor (Accepter/Refuser une proposition) -->
 <x-filament::modal
@@ -327,7 +346,6 @@ icon="heroicon-o-x-circle"
 
 
 
-
 <!-- Modal Infos -->
 <x-filament::modal
     id="infosModal"
@@ -361,14 +379,19 @@ icon="heroicon-o-x-circle"
         <template x-if="infos.commentaire">
             <p><strong>Commentaire : </strong><span x-text="infos.commentaire"></span></p>
         </template>
-        
 
-        
+        <template x-if="infos.pieceJointeUrl">
+            <p>
+                <strong>Pièce jointe : </strong>
+                <a :href="infos.pieceJointeUrl" target="_blank" rel="noopener" class="text-primary-600 hover:underline">
+                    Voir le document
+                </a>
+            </p>
+        </template>
+
     </x-slot>
 
     <x-slot name="footer">
         <x-filament::button x-on:click="infos = {}; $dispatch('close-modal', { id: 'infosModal' })" color="primary">Fermer</x-filament::button>
     </x-slot>
 </x-filament::modal>
-
-
