@@ -37,7 +37,7 @@ class CreateFcmMarinMigration extends Migration
       */
      public function down(): void
      {
-         Schema::dropIfExists($this->prefix . 'marins');
+         Schema::dropIfExists($this->prefix . 'fcm_marins');
      }
  };
  
