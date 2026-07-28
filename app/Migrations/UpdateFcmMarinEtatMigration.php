@@ -34,7 +34,7 @@ class UpdateFcmMarinEtatMigration extends Migration
      public function down(): void
      {
         Schema::table($this->prefix . 'fcm_marins', function (Blueprint $table) {
-            $table->dropColumn(['date_sedimentation','date_fcm','date_competence','gel']);
+            $table->dropColumn(['date_sedimentation','date_fcm','date_competence']);
         });
      }
  };
