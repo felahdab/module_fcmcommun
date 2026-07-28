@@ -25,26 +25,47 @@ icon="heroicon-o-information-circle"
             />
         </div>
 
-
     {{-- Commentaire existant --}}
 
-        <textarea x-model="commentaire" rows="4" 
-        class="w-full border-gray-300 rounded-md shadow-sm 
-                   focus:ring-primary-500 focus:border-primary-500 
+        <textarea x-model="commentaire" rows="4"
+        class="w-full border-gray-300 rounded-md shadow-sm
+                   focus:ring-primary-500 focus:border-primary-500
                    dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
         >
     </textarea>
+
+        {{-- ✅ Pièce jointe (ex: diplôme PDF pour un stage) --}}
+        <div class="mt-4">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Pièce jointe (diplôme, justificatif...)
+            </label>
+            <input
+                type="file"
+                wire:model="pieceJointe"
+                accept="application/pdf"
+                class="w-full text-sm text-gray-700 dark:text-gray-300 border-gray-300 rounded-md shadow-sm
+                       focus:ring-primary-500 focus:border-primary-500
+                       dark:bg-gray-700 dark:border-gray-600"
+            />
+            <p class="text-xs text-gray-400 mt-1">PDF uniquement, 5 Mo maximum.</p>
+            <div wire:loading wire:target="pieceJointe" class="text-xs text-gray-500 mt-1">
+                Envoi du fichier en cours...
+            </div>
+            @error('pieceJointe')
+                <p class="text-xs text-danger-600 mt-1">{{ $message }}</p>
+            @enderror
+        </div>
     </x-slot>
     <x-slot name="footer">
-        <x-filament::button 
-        color="gray" 
-        class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400" 
+        <x-filament::button
+        color="gray"
+        class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
         wire:click="$dispatch('close-modal',{id:'sauve'})">
         Annuler
         </x-filament::button>
-        <x-filament::button 
-            color="success" 
-            class="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700" 
+        <x-filament::button
+            color="success"
+            class="px-4 py-2 bg-primary-600 text-white rounded hover:bg-primary-700"
             x-data="{ loading: false }"
             x-bind:disabled="loading"
             x-on:click="
@@ -54,7 +75,7 @@ icon="heroicon-o-information-circle"
                         loading = false;
                         selectedItems = {};
                         commentaire = '';
-                        date_validation = new Date().toISOString().split('T')[0]; 
+                        date_validation = new Date().toISOString().split('T')[0];
                         $dispatch('close-modal', {id: 'sauve'});
                     })
                     .catch(() => {
@@ -132,7 +153,6 @@ icon="heroicon-o-x-circle"
 </x-slot>
 </x-filament::modal>
 
-
 <!-- Modal Propos -->
 <x-filament::modal
     id="propos"
@@ -193,7 +213,6 @@ icon="heroicon-o-x-circle"
         </x-filament::button>
     </x-slot>
 </x-filament::modal>
-
 
 <!-- Modal Validation Mentor (Accepter/Refuser une proposition) -->
 <x-filament::modal
@@ -327,7 +346,6 @@ icon="heroicon-o-x-circle"
 
 
 
-
 <!-- Modal Infos -->
 <x-filament::modal
     id="infosModal"
@@ -361,9 +379,40 @@ icon="heroicon-o-x-circle"
         <template x-if="infos.commentaire">
             <p><strong>Commentaire : </strong><span x-text="infos.commentaire"></span></p>
         </template>
-        
 
-        
+        {{-- ✅ Pièce jointe — gestion uniquement si l'élément est validé et si l'utilisateur en a le droit --}}
+        @if($this->canGererPieceJointe())
+        <template x-if="infos.estValide">
+            <div class="mt-3 pt-3 border-t border-gray-100 dark:border-gray-700">
+                <template x-if="infos.pieceJointeUrl">
+                    <div class="flex items-center justify-between">
+                        <a :href="infos.pieceJointeUrl" target="_blank" rel="noopener" class="text-primary-600 hover:underline inline-flex items-center gap-1">
+                            <svg class="w-4 h-4 shrink-0 text-danger-600" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Z" opacity="0.15"/>
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6Zm0 1.5L18.5 8H15a1 1 0 0 1-1-1V3.5ZM6 20V4h7v3.5A2.5 2.5 0 0 0 15.5 10H18v10H6Z"/>
+                                <text x="7.2" y="16.5" font-size="6.5" font-weight="700" fill="currentColor" font-family="Arial, sans-serif">PDF</text>
+                            </svg>
+                            <span><strong>Pièce jointe :</strong> Voir le document</span>
+                        </a>
+                        <button type="button" class="text-xs text-danger-600 hover:underline"
+                                x-on:click="if (confirm('Supprimer définitivement cette pièce jointe ?')) { $wire.supprimerPieceJointeSurElement(infos.type, infos.uuid); infos = {}; $dispatch('close-modal', { id: 'infosModal' }); }">
+                            Supprimer
+                        </button>
+                    </div>
+                </template>
+                <template x-if="!infos.pieceJointeUrl">
+                    <div class="flex items-center justify-between">
+                        <span class="text-xs text-gray-400">Pas de pièce jointe</span>
+                        <button type="button" class="text-xs text-primary-600 hover:underline"
+                                x-on:click="$wire.ouvrirGestionPieceJointe(infos.type, infos.uuid); $dispatch('close-modal', { id: 'infosModal' });">
+                            Ajouter un document
+                        </button>
+                    </div>
+                </template>
+            </div>
+        </template>
+        @endif
+
     </x-slot>
 
     <x-slot name="footer">
@@ -371,4 +420,40 @@ icon="heroicon-o-x-circle"
     </x-slot>
 </x-filament::modal>
 
+<!-- Modal Ajout Pièce Jointe (sur un élément déjà validé) -->
+<x-filament::modal id="gerer-piece-jointe" alignment="center" width="md" icon="heroicon-o-paper-clip">
+    <x-slot name="heading">
+        Pièce jointe
+    </x-slot>
 
+    <x-slot name="description">
+        <div class="space-y-2">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                Document (PDF, 5 Mo maximum)
+            </label>
+            <input
+                type="file"
+                wire:model="nouvellePieceJointeElement"
+                accept="application/pdf"
+                class="w-full text-sm text-gray-700 dark:text-gray-300 border-gray-300 rounded-md shadow-sm
+                       focus:ring-primary-500 focus:border-primary-500
+                       dark:bg-gray-700 dark:border-gray-600"
+            />
+            <div wire:loading wire:target="nouvellePieceJointeElement" class="text-xs text-gray-500">
+                Envoi du fichier en cours...
+            </div>
+            @error('nouvellePieceJointeElement')
+                <p class="text-xs text-danger-600">{{ $message }}</p>
+            @enderror
+        </div>
+    </x-slot>
+
+    <x-slot name="footer">
+        <x-filament::button wire:click="ajouterPieceJointeSurElement" color="primary" :disabled="!$nouvellePieceJointeElement">
+            Enregistrer
+        </x-filament::button>
+        <x-filament::button x-on:click="$dispatch('close-modal', { id: 'gerer-piece-jointe' })" color="gray">
+            Annuler
+        </x-filament::button>
+    </x-slot>
+</x-filament::modal>
