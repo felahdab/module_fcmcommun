@@ -56,7 +56,9 @@
            icon="heroicon-c-information-circle"
            tooltip="Voir les infos"
            x-on:click="infos = {
-
+                       'type': '{{ $type }}',
+                       'uuid': '{{ $uuid }}',
+                       'estValide': {{ $isChecked ? 'true' : 'false' }},
                        'intitule': '{{ $popupInfos }}',
                        'dateValidation': '{{ $dateValidation ?? '' }}',
                        'dateProposition': '{{ $dateProposition ?? '' }}',
@@ -134,3 +136,4 @@
        />
    @endif
 </div>
+

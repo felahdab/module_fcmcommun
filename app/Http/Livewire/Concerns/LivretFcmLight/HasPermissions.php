@@ -109,6 +109,18 @@ trait HasPermissions
         return auth()->user()->can($this->PermissionPrefix . '::livret.annuler');
     }
 
+    // ✅ Gestion (ajout/suppression) de la pièce jointe d'un élément déjà validé
+    #[Computed]
+    public function canGererPieceJointe()
+    {
+        $currentMarin = ($this->Marin)::fromCurrentUser();
+        if ($currentMarin && $currentMarin->est_mentor_de($this->marin)) {
+            return true;
+        }
+
+        return auth()->user()->can($this->PermissionPrefix . '::livret.valider');
+    }
+
     #[Computed]
     public function canRefuser()
     {

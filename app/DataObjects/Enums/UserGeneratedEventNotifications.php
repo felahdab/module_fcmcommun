@@ -5,7 +5,6 @@ namespace Modules\FcmCommun\DataObjects\Enums;
 class UserGeneratedEventNotifications
 {
 
-
     // FLASH NOTIFICATIONS FILAMENT
     // COHORTE
     public const COHORTE = [
@@ -77,7 +76,16 @@ class UserGeneratedEventNotifications
         'title' => 'Jalon Marin FCM',
         'message' => 'Le marin %s est a un nouveau Jalon.',
     ];
-    
+
+    public const AJOUT_PIECE_JOINTE_MARIN_PARCOURS = [
+        'title' => 'Pièce jointe ajoutée',
+        'message' => 'Une pièce jointe a été ajoutée sur le parcours du marin %s.',
+    ];
+
+    public const SUPPR_PIECE_JOINTE_MARIN_PARCOURS = [
+        'title' => 'Pièce jointe supprimée',
+        'message' => 'Une pièce jointe a été supprimée du parcours du marin %s.',
+    ];
 
     /**
      * Récupère et formate un message dynamique en fonction du type.
@@ -89,7 +97,6 @@ class UserGeneratedEventNotifications
             'message' => sprintf($type['message'], $marin), // Message formaté
         ];
     }
-
 
    
 }
