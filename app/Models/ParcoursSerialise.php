@@ -31,7 +31,10 @@ class ParcoursSerialise extends Model
     protected static function booted ()
     {
         static::creating(function ($model){
-            $model->uuid = (string) Str::uuid();
+            if (null == $model->uuid)
+            {
+                $model->uuid = (string) Str::uuid();
+            }
         });
     }
 
