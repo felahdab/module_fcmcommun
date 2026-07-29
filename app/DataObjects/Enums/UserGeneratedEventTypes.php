@@ -19,5 +19,7 @@ enum UserGeneratedEventTypes:string
     case RESTORE_ELMT_MARIN_PARCOURS                = 'restore_elmt_marin_parcours';
     case REBOOT_ELMT_MARIN_PARCOURS                 = 'reboot_elmt_marin_parcours';
     case DEFINIR_JALON_FCM                          = 'definir_jalon_fcm';
-   
+    case AJOUT_PIECE_JOINTE_MARIN_PARCOURS          = 'ajout_piece_jointe_marin_parcours';
+    case SUPPR_PIECE_JOINTE_MARIN_PARCOURS          = 'suppr_piece_jointe_marin_parcours';
+
 }

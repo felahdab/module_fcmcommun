@@ -38,6 +38,7 @@
         'valideur'        => $savoirfaire['valideur'] ?? '',
         'commentaire'     => $savoirfaire['commentaire'] ?? '',
         'commentaireProposition'     => $savoirfaire['commentaire_proposition'] ?? '',
+        'pieceJointe'     => $savoirfaire['piece_jointe'] ?? null,
         'couleurLigne'    => $savoirfaire['savoirfaire']['color'],
         'heures'          => $savoirfaire['heures'] ?? null,
         'jours'           => $savoirfaire['jours'] ?? null,
@@ -70,4 +71,3 @@
         </ul>
     @endif
 </li>
-

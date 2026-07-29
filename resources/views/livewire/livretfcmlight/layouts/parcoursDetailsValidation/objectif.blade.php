@@ -30,6 +30,7 @@
         'valideur'        => $objectif['valideur'] ?? '',
         'commentaire'     => $objectif['commentaire'] ?? '',
         'commentaireProposition'     => $objectif['commentaire_proposition'] ?? '',
+        'pieceJointe'     => $objectif['piece_jointe'] ?? null,
         'code'            => $objectif['code'] ?? '',
         'couleurLigne'    => $couleurLigne,
         'finDeCourse'     => true,
@@ -42,3 +43,4 @@
         
     ])
 </li>
+
