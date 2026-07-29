@@ -49,13 +49,14 @@ trait HasPieceJointe
         $categorie = array_key_exists('savoirfaire', $elements_a_valider) ? 'savoirfaire' : 'objectif';
 
         $directory = sprintf(
-            'fcmcentral/livretfcm/pieces-jointes/%s/%s/%s',
+            'fcmcentral/livretfcm/pieces-jointes/%s/%s/%s/%s',
             $categorie,
+            $this->marin->uuid,
             $date->format('Y'),
             $date->format('m')
         );
 
-        return $this->pieceJointe->store($directory, 's3-public');
+        return $this->pieceJointe->store($directory, 's3-private');
     }
 
     // ========================================
@@ -121,12 +122,13 @@ trait HasPieceJointe
         }
 
         $directory = sprintf(
-            'fcmcentral/livretfcm/pieces-jointes/%s/%s/%s',
+            'fcmcentral/livretfcm/pieces-jointes/%s/%s/%s/%s',
             $this->pieceJointeGestionType,
+            $this->marin->uuid,
             now()->format('Y'),
             now()->format('m')
         );
-        $nouveauChemin = $this->nouvellePieceJointeElement->store($directory, 's3-public');
+        $nouveauChemin = $this->nouvellePieceJointeElement->store($directory, 's3-private');
 
         // ✅ Passe par l'event/listener (même schéma fiable que valider()/devalider()), qui fait
         // la mutation JSON du parcours en base et nettoie l'éventuel ancien fichier remplacé.
