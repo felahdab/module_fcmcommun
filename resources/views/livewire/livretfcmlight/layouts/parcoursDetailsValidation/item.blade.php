@@ -4,8 +4,12 @@
         $infos = [];
     }
 
-    $pieceJointeUrl = !empty($pieceJointe)
-        ? \Illuminate\Support\Facades\Storage::disk('s3-public')->url($pieceJointe)
+    $pieceJointeUrl = !empty($pieceJointe) && in_array($type, ['savoirfaire', 'objectif'], true)
+        ? route('fcmcentral.piece-jointe.telecharger', [
+            'marinUuid' => $this->marin->uuid,
+            'type' => $type,
+            'uuid' => $uuid,
+        ])
         : '';
 
     // Uniformiser les clés selon le type
