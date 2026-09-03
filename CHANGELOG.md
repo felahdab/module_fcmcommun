@@ -1,3 +1,14 @@
+## 0.2.5 (September 03, 2026)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.2.4 –> 0.2.5
+- Implements art #927866 : Modification pour S3 Private , changement url
+- Correction callback sur l evenement creating du ParcoursSerialise: l uuid ne doit etre cree que s'il n'existe pas deja.
+- Correction rollback de la migration updateFcmMarinEtat
+- Correction tipo dans la migration de la table fcm_marins
+- Implements art #927866 : Ajout  Icon PDF ajout Method pour event LIsteners ajout/supp modification methodes pour ajouter et supprimer piece jointe dans le PArcours
+- Implements art #927866 : Refactorisation de LivretFcmLight Refactorisation de item.blade.php
+- Implements art #927866 : modification pour rajout Upload dans parcours
+- Implements art #805355 : suppression ligne mentor_id dans la migration
+
 ## 0.2.4 (March 27, 2026)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.2.3 –> 0.2.4
 - Implements art #722833 : Modification de getHeures  private en public pour les widgets FcmCentral
