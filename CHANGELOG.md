@@ -1,3 +1,7 @@
+## 0.2.6 (September 22, 2026)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.2.5 –> 0.2.6
+- Implement art #967307 : nouvelle migration pour transformer le champs libelle des notes en text (pour avoir plus de place)
+
 ## 0.2.5 (September 03, 2026)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.2.4 –> 0.2.5
 - Implements art #927866 : Modification pour S3 Private , changement url
