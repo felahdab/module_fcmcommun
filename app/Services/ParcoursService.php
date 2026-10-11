@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Arr;
 
 use Modules\FcmCommun\DataObjects\ParcoursDto;
+use Modules\FcmCommun\Models\Marin;
 
 class ParcoursService
 {
@@ -106,7 +107,7 @@ class ParcoursService
                     event_type: $changes[$annee['id']]["state"]["checked"] == "set" ? "valide_annee" : "invalide_annee",
                     user_id: auth()->user()->uuid,
                     object_class: "Marin",
-                    object_uuid: $marinparcours->marin_id,
+                    object_uuid: Marin::findOrFail($marinparcours->marin_id)->nid,
                     detail: [
                         "marinparcours_id" => $marinparcours->id,
                         "parcours_id" => $marinparcours->parcours_id,
@@ -127,7 +128,7 @@ class ParcoursService
                         event_type: $changes[$savoirfaire['id']]["state"]["checked"] == "set" ? "valide_savoirfaire" : "invalide_savoirfaire",
                         user_id: auth()->user()->uuid,
                         object_class: "Marin",
-                        object_uuid: $marinparcours->marin_id,
+                        object_uuid: Marin::findOrFail($marinparcours->marin_id)->nid,
                         detail: [
                             "marinparcours_id" => $marinparcours->id,
                             "parcours_id" => $marinparcours->parcours_id,
@@ -148,7 +149,7 @@ class ParcoursService
                             event_type: $changes[$objectif['id']]["state"]["checked"] == "set" ? "valide_objectif" : "invalide_objectif",
                             user_id: auth()->user()->uuid,
                             object_class: "Marin",
-                            object_uuid: $marinparcours->marin_id,
+                            object_uuid: Marin::findOrFail($marinparcours->marin_id)->nid,
                             detail: [
                                 "marinparcours_id" => $marinparcours->id,
                                 "parcours_id" => $marinparcours->parcours_id,
@@ -175,7 +176,7 @@ class ParcoursService
             event_type: "attribue_parcours",
             user_id: auth()->user()->uuid,
             object_class: "Marin",
-            object_uuid: $marin->id,
+            object_uuid: Marin::findOrFail($marin->id)->nid,
             detail: [
                 "parcoursserialise" => $parcours->id,
                 // "parcours" => $parcours->uuid,
@@ -192,7 +193,7 @@ class ParcoursService
             event_type: "retire_parcours",
             user_id: auth()->user()->uuid,
             object_class: "Marin",
-            object_uuid: $marin->id,
+            object_uuid: Marin::findOrFail($marin->id)->nid,
             detail: [
                 "parcoursserialise" => $parcours->id,
                 // "parcours" => $parcours->uuid,

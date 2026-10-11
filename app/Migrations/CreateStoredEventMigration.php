@@ -35,7 +35,7 @@ class CreateStoredEventMigration extends Migration
             $table->string('event_type');
             $table->uuid('user_uuid');
             $table->string('object_class');
-            $table->uuid('object_uuid')->nullable(true);
+            $table->string('object_uuid')->nullable(true);
             $table->json('detail')->nullable(true);
 
             $table->timestamps();
