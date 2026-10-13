@@ -9,7 +9,7 @@ trait HasParcoursData
     #[Computed]
     public function marin()
     {
-        return $this->Marin::select(['id', 'uuid', 'nom', 'prenom'])
+        return $this->Marin::select(['id', 'uuid', 'nid', 'nom', 'prenom'])
             ->with(['complementsFcm:id,rh_marin_id'])
             ->find($this->marinId);
     }
