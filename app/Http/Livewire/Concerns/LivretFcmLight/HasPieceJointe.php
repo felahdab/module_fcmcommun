@@ -136,7 +136,7 @@ trait HasPieceJointe
             event_type: UserGeneratedEventTypes::AJOUT_PIECE_JOINTE_MARIN_PARCOURS,
             user_uuid: auth()->user()->uuid,
             object_class: ObjectClasses::MARIN,
-            object_uuid: $this->marin->uuid,
+            object_uuid: $this->marin->nid,
             detail: [
                 'type_element' => $this->pieceJointeGestionType,
                 'uuid_element' => $this->pieceJointeGestionUuid,
@@ -181,7 +181,7 @@ trait HasPieceJointe
             event_type: UserGeneratedEventTypes::SUPPR_PIECE_JOINTE_MARIN_PARCOURS,
             user_uuid: auth()->user()->uuid,
             object_class: ObjectClasses::MARIN,
-            object_uuid: $this->marin->uuid,
+            object_uuid: $this->marin->nid,
             detail: [
                 'type_element' => $type,
                 'uuid_element' => $uuid,

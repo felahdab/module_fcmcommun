@@ -22,7 +22,7 @@ trait HasValidationActions
             event_type: UserGeneratedEventTypes::ANNUL_ELMT_MARIN_PARCOURS,
             user_uuid: auth()->user()->uuid,
             object_class: ObjectClasses::MARIN,
-            object_uuid: $this->marin->uuid,
+            object_uuid: $this->marin->nid,
             detail: [
                 "type_element" => $element_a_devalider['type'],
                 "uuid_element" => $element_a_devalider['uuid'],
@@ -83,7 +83,7 @@ trait HasValidationActions
             event_type: UserGeneratedEventTypes::PROPOS_ELMT_MARIN_PARCOURS,
             user_uuid: auth()->user()->uuid,
             object_class: ObjectClasses::MARIN,
-            object_uuid: $this->marin->uuid,
+            object_uuid: $this->marin->nid,
             detail: [
                 "type_element" => $element_a_proposer['type'],
                 "uuid_element" => $element_a_proposer['uuid'],
@@ -110,7 +110,7 @@ trait HasValidationActions
             event_type: UserGeneratedEventTypes::ANNUL_PROPOS_ELMT_MARIN_PARCOURS,
             user_uuid: auth()->user()->uuid,
             object_class: ObjectClasses::MARIN,
-            object_uuid: $this->marin->uuid,
+            object_uuid: $this->marin->nid,
             detail: [
                 "type_element" => $element_a_annuler['type'],
                 "uuid_element" => $element_a_annuler['uuid'],
@@ -144,7 +144,7 @@ trait HasValidationActions
             event_type: UserGeneratedEventTypes::VALID_ELMT_MARIN_PARCOURS,
             user_uuid: auth()->user()->uuid,
             object_class: ObjectClasses::MARIN,
-            object_uuid: $this->marin->uuid,
+            object_uuid: $this->marin->nid,
             detail: $detail
         );
         event($event);
