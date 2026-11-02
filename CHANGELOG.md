@@ -1,3 +1,7 @@
+## 0.2.7 (November 02, 2026)
+- Updated VERSION, Updated CHANGELOG.md, Bumped 0.2.6 –> 0.2.7
+- Reference marin by nid
+
 ## 0.2.6 (September 22, 2026)
 - Updated VERSION, Updated CHANGELOG.md, Bumped 0.2.5 –> 0.2.6
 - Implement art #967307 : nouvelle migration pour transformer le champs libelle des notes en text (pour avoir plus de place)
